@@ -39,6 +39,9 @@ var loginCmd = &cobra.Command{
 	//This application is a tool to generate the needed files
 	//to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		// loading
+		log.BStart("redirecting to browser")
+
 		// get ticket id
 		tickeIDInterface, err := requests.GetJsonWithPath("https://api.let.sh/oauth/ticket_id", "data")
 		if err != nil {
@@ -51,7 +54,7 @@ var loginCmd = &cobra.Command{
 
 		// valid response
 		start := time.Now()
-
+		log.BUpdate("waiting for login result")
 		for {
 			// Code to measure
 			duration := time.Since(start)
@@ -62,13 +65,15 @@ var loginCmd = &cobra.Command{
 			if err == nil && tokenInterface.String() != "" {
 				// verify response
 				utils.SetToken(tokenInterface.String())
-				log.Success("login succeed")
+				log.BStop()
+				log.Success("login to let.sh succeed")
 				return
 			}
 
-			time.Sleep(time.Second * 2)
+			time.Sleep(time.Second * 1)
 		}
 
+		log.BStop()
 		log.Error(errors.New("login failed"))
 	},
 }

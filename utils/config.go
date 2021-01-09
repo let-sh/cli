@@ -30,6 +30,7 @@ func init() {
 		os.Create(home + "/.let/projects.json")
 	}
 
+	// bootstrap configs
 	credentialsFile, _ := ioutil.ReadFile(home + "/.let/credentials.json")
 	err = json.Unmarshal(credentialsFile, &Credentials)
 	if err != nil {
