@@ -16,6 +16,7 @@ limitations under the License.
 package cmd
 
 import (
+	"encoding/json"
 	"github.com/let-sh/cli/log"
 	"github.com/let-sh/cli/requests"
 	"github.com/let-sh/cli/types"
@@ -124,18 +125,37 @@ var deployCmd = &cobra.Command{
 
 			// remove if not clean
 			os.Remove(dir + "/" + deploymentConfig.Name + "-" + hashID + ".tar.gz")
-			err = archiver.Archive([]string{dir + "/" + deploymentConfig.Name + "-" + hashID}, dir+"/"+deploymentConfig.Name+"-"+hashID+".tar.gz")
+			err = archiver.Archive([]string{"."}, dir+"/"+deploymentConfig.Name+"-"+hashID+".tar.gz")
 			if err != nil {
 				log.Error(err)
 				return
 			}
 
 			oss.UploadFileToCodeSource(dir+"/"+deploymentConfig.Name+"-"+hashID+".tar.gz", deploymentConfig.Name+"-"+hashID+".tar.gz", deploymentConfig.Name)
+
+			configBytes, _ := json.Marshal(deploymentConfig)
+			deployment, err := requests.Deploy(deploymentConfig.Type, deploymentConfig.Name, string(configBytes), inputCN)
+			if err != nil {
+				log.Error(err)
+				return
+			}
+			// awaiting deployment result
+
+			for {
+				currentStatus, err := requests.GetDeploymentStatus(deployment.ID)
+				if err != nil {
+					log.Error(err)
+				}
+
+				log.BUpdate(" NetworkStage: " + currentStatus.NetworkStage + ", PackerStage: " + currentStatus.PackerStage + ", Status: " + currentStatus.Status)
+
+				time.Sleep(time.Second * 2)
+				if currentStatus.Done {
+					break
+				}
+			}
 		}
-
-		// awaiting deployment result
-
-		time.Sleep(time.Second * 4)
+		log.Success("deploy succeed")
 		log.BStop()
 		return
 	},
@@ -144,6 +164,7 @@ var deployCmd = &cobra.Command{
 var deploymentConfig types.LetConfig
 var inputProjectName string
 var inputProjectType string
+var inputCN bool
 
 func init() {
 	rootCmd.AddCommand(deployCmd)
@@ -152,4 +173,5 @@ func init() {
 	// is called directly, e.g.:
 	deployCmd.Flags().StringVarP(&inputProjectName, "project", "p", "", "current project name")
 	deployCmd.Flags().StringVarP(&inputProjectType, "type", "t", "", "current project type, e.g. react")
+	deployCmd.Flags().BoolVarP(&inputCN, "cn", "", true, "deploy in mainland of china")
 }

@@ -9,6 +9,7 @@ import (
 	"github.com/vbauerster/mpb/v5"
 	"github.com/vbauerster/mpb/v5/decor"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -48,7 +49,7 @@ func UploadFileToCodeSource(filepath, filename, projectName string) {
 
 	// 创建OSSClient实例
 	endpoint := strings.Join(strings.Split(stsToken.Host, ".")[1:], ".")
-	client, err := oss.New(endpoint, stsToken.AccessKeyID, stsToken.AccessKeySecret)
+	client, err := oss.New(endpoint, stsToken.AccessKeyID, stsToken.AccessKeySecret, oss.SecurityToken(stsToken.SecurityToken))
 	if err != nil {
 		fmt.Println("Error:", err)
 		os.Exit(-1)
@@ -67,12 +68,116 @@ func UploadFileToCodeSource(filepath, filename, projectName string) {
 	proxyReader := bar.ProxyReader(r)
 	defer proxyReader.Close()
 
-	bucket.PutObject(filename, proxyReader, oss.Progress(&OssProgressListener{}))
-
-	bar.Abort(true)
+	err = bucket.PutObject(filename, proxyReader, oss.Progress(&OssProgressListener{}))
+	if err != nil {
+		fmt.Println("Error:", err)
+		os.Exit(-1)
+	}
+	//bar.Abort(true)
 
 	log.S.Suffix(" deploying ")
 	log.BUnpause()
+}
+
+func UploadDirToStaticSource(dirPath, projectName, bundleID string) error {
+	log.BPause()
+	stsToken, err := requests.GetStsToken("static", projectName)
+	if err != nil {
+		fmt.Println("Error:", err)
+		os.Exit(-1)
+	}
+	// 创建OSSClient实例
+	endpoint := strings.Join(strings.Split(stsToken.Host, ".")[1:], ".")
+	client, err := oss.New(endpoint, stsToken.AccessKeyID, stsToken.AccessKeySecret, oss.SecurityToken(stsToken.SecurityToken))
+	if err != nil {
+		fmt.Println("Error:", err)
+		os.Exit(-1)
+	}
+	bucketName := strings.Replace(strings.Split(stsToken.Host, ".")[0], "https://", "", 1)
+
+	// 获取存储空间。
+	bucket, err := client.Bucket(bucketName)
+	if err != nil {
+		fmt.Println("Error:", err)
+		os.Exit(-1)
+	}
+
+	// Read directory and close.
+
+	dir, err := os.Open(dirPath)
+	if err != nil {
+		return err
+	}
+	names, err := dir.Readdirnames(-1)
+	if err != nil {
+		return err
+	}
+	dir.Close()
+
+	// Copy names to a channel for workers to consume. Close the
+	// channel so that workers stop when all work is complete.
+
+	namesChan := make(chan string, len(names))
+	for _, name := range names {
+		namesChan <- name
+	}
+	close(namesChan)
+
+	// Create a maximum of 8 workers
+
+	workers := 8
+	if len(names) < workers {
+		workers = len(names)
+	}
+
+	errChan := make(chan error, 1)
+	resChan := make(chan *error, len(names))
+
+	// Run workers
+
+	for i := 0; i < workers; i++ {
+		go func() {
+			// Consume work from namesChan. Loop will end when no more work.
+			for name := range namesChan {
+				if err != nil {
+					select {
+					case errChan <- err:
+						// will break parent goroutine out of loop
+					default:
+						// don't care, first error wins
+					}
+					return
+				}
+				err = bucket.PutObjectFromFile(projectName+"-"+bundleID, filepath.Join(dirPath, name))
+
+				if err != nil {
+					select {
+					case errChan <- err:
+						// will break parent goroutine out of loop
+					default:
+						// don't care, first error wins
+					}
+					return
+				}
+				resChan <- &err
+			}
+		}()
+	}
+
+	// Collect results from workers
+
+	for i := 0; i < len(names); i++ {
+		select {
+		case res := <-resChan:
+			fmt.Println(res)
+		case err := <-errChan:
+			return err
+		}
+	}
+	log.S.Suffix(" deploying ")
+	log.BUnpause()
+	return nil
+
 }
 
 type OssProgressListener struct {

@@ -80,3 +80,82 @@ query($type: String!, $name: String!) {
 
 	return respData.StsToken, nil
 }
+
+func Deploy(projectType, projectName, config string, cn bool) (deployment struct {
+	ID           string `json:"id"`
+	NetworkStage string `json:"networkStage"`
+	PackerStage  string `json:"packerStage"`
+	Status       string `json:"status"`
+}, err error) {
+	req := graphql.NewRequest(`
+mutation($type: String!, $name: String!, $config: String, $cn: Boolean) {
+	  deploy(input:{type:$type, projectName:$name, config:$config, cn:$cn}) {
+		id
+		networkStage
+		packerStage
+		status
+	  }
+}
+`)
+
+	req.Var("type", projectType)
+	req.Var("name", projectName)
+	req.Var("config", config)
+	req.Var("cn", cn)
+	req.Header.Set("Authorization", "Bearer "+utils.Credentials.Token)
+
+	// run it and capture the response
+	var respData struct {
+		Deploy struct {
+			ID           string `json:"id"`
+			NetworkStage string `json:"networkStage"`
+			PackerStage  string `json:"packerStage"`
+			Status       string `json:"status"`
+		} `json:"deploy,omitempty"`
+	}
+	if err := Graphql.Run(context.Background(), req, &respData); err != nil {
+		//if len(respData.Error.Errors) > 0 {
+		//	return "", false, errors.New(respData.Error.Errors[0].Message)
+		//}
+
+		return deployment, err
+	}
+
+	return respData.Deploy, nil
+}
+
+func GetDeploymentStatus(id string) (deployment struct {
+	NetworkStage string `json:"networkStage"`
+	PackerStage  string `json:"packerStage"`
+	Status       string `json:"status"`
+	Done         bool   `json:"done"`
+}, err error) {
+	req := graphql.NewRequest(`
+query($id: UUID!) {
+	  deployment(id:$id) {
+		networkStage
+		packerStage
+		status
+		done
+	  }
+}
+`)
+	req.Var("id", id)
+	req.Header.Set("Authorization", "Bearer "+utils.Credentials.Token)
+
+	// run it and capture the response
+	var respData struct {
+		Deployment struct {
+			NetworkStage string `json:"networkStage"`
+			PackerStage  string `json:"packerStage"`
+			Status       string `json:"status"`
+			Done         bool   `json:"done"`
+		} `json:"deployment,omitempty"`
+	}
+	if err := Graphql.Run(context.Background(), req, &respData); err != nil {
+
+		return deployment, err
+	}
+
+	return respData.Deployment, nil
+}
