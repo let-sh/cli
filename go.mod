@@ -1,4 +1,4 @@
-module github.com/let-sh/let.cli
+module github.com/let-sh/cli
 
 go 1.15
 

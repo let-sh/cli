@@ -17,7 +17,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/let-sh/let.cli/utils"
+	"github.com/let-sh/cli/utils"
 	"github.com/spf13/cobra"
 	"os"
 )
@@ -50,7 +50,7 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	//rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.let.cli.yaml)")
+	//rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cli.yaml)")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.

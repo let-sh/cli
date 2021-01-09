@@ -2,8 +2,8 @@ package utils
 
 import (
 	"encoding/json"
-	"github.com/let-sh/let.cli/log"
-	"github.com/let-sh/let.cli/types"
+	"github.com/let-sh/cli/log"
+	"github.com/let-sh/cli/types"
 	"github.com/mitchellh/go-homedir"
 	"io/ioutil"
 	"os"

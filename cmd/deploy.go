@@ -16,7 +16,7 @@ limitations under the License.
 package cmd
 
 import (
-	"github.com/let-sh/let.cli/log"
+	"github.com/let-sh/cli/log"
 	"github.com/spf13/cobra"
 	"time"
 )

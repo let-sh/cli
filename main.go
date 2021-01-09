@@ -15,7 +15,7 @@ limitations under the License.
 */
 package main
 
-import "github.com/let-sh/let.cli/cmd"
+import "github.com/let-sh/cli/cmd"
 
 func main() {
 	cmd.Execute()

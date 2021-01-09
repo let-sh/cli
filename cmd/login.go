@@ -18,9 +18,9 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"github.com/let-sh/let.cli/log"
-	"github.com/let-sh/let.cli/requests"
-	"github.com/let-sh/let.cli/utils"
+	"github.com/let-sh/cli/log"
+	"github.com/let-sh/cli/requests"
+	"github.com/let-sh/cli/utils"
 	"github.com/matishsiao/goInfo"
 	"github.com/spf13/cobra"
 	"os/exec"
