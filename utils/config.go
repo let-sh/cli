@@ -22,12 +22,14 @@ func init() {
 
 	_, err = os.Stat(home + "/.let/credentials.json")
 	if os.IsNotExist(err) {
-		os.Create(home + "/.let/credentials.json")
+		f,_ := os.Create(home + "/.let/credentials.json")
+		f.WriteString("{}")
 	}
 
 	_, err = os.Stat(home + "/.let/projects.json")
 	if os.IsNotExist(err) {
-		os.Create(home + "/.let/projects.json")
+		f,_ := os.Create(home + "/.let/projects.json")
+		f.WriteString("{}")
 	}
 
 	// bootstrap configs

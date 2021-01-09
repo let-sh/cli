@@ -16,7 +16,6 @@ limitations under the License.
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"github.com/let-sh/cli/log"
 	"github.com/let-sh/cli/requests"
@@ -66,7 +65,6 @@ var loginCmd = &cobra.Command{
 				// verify response
 				utils.SetToken(tokenInterface.String())
 				log.BStop()
-				log.Success("login to let.sh succeed")
 				return
 			}
 
@@ -74,7 +72,6 @@ var loginCmd = &cobra.Command{
 		}
 
 		log.BStop()
-		log.Error(errors.New("login failed"))
 	},
 }
 

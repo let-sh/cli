@@ -1,25 +1,46 @@
 package log
 
 import (
-	"github.com/briandowns/spinner"
+	"github.com/theckman/yacspin"
 	"time"
 )
 
-var s *spinner.Spinner
+var S *yacspin.Spinner
 
 func init() {
-	s = spinner.New(spinner.CharSets[14], 50*time.Millisecond)
+	cfg := yacspin.Config{
+		Frequency: 50 * time.Millisecond,
+		CharSet:   yacspin.CharSets[14],
+		//Suffix:"steps",
+		SuffixAutoColon: true,
+		//Message:         "exporting data",
+		StopCharacter: "✓",
+		StopColors:    []string{"fgGreen"},
+	}
+	S, _ = yacspin.New(cfg)
+
+	//s = spinner.New(spinner.CharSets[14], 50*time.Millisecond)
 }
 
 func BStart(suffix string) {
-	s.Suffix = " " + suffix
-	s.Start()
+	S.Suffix(" " + suffix)
+	//s.Suffix = " " + suffix
+	S.Start()
 }
 
 func BUpdate(suffix string) {
-	s.Suffix = " " + suffix
+	S.Suffix(suffix)
 }
 
 func BStop() {
-	s.Stop()
+	S.Stop()
+
+}
+
+func BPause() {
+	S.Pause()
+}
+
+func BUnpause() {
+	S.Unpause()
 }

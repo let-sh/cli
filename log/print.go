@@ -16,3 +16,9 @@ func Success(msg string) {
 	//red := color.New(color.FgRed).SprintFunc()
 	fmt.Printf("%s %s.\n", green("[success]"), msg)
 }
+
+func Warning(msg string) {
+	yellow := color.New(color.FgHiYellow).SprintFunc()
+	//red := color.New(color.FgRed).SprintFunc()
+	fmt.Printf("%s %s.\n", yellow("[warn]"), msg)
+}
