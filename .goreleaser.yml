@@ -16,7 +16,7 @@ builds:
       - windows
       - darwin
     ldflags:
-      - -X cmd.version={{.Version}}
+      - -X github.com/let-sh/cli/cmd.version={{.Version}}
 
 archives:
   - replacements:
