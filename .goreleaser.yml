@@ -11,10 +11,20 @@ builds:
   - env:
       - CGO_ENABLED=0
     binary: let
+    id: lets
     goos:
       - linux
       - windows
+    ldflags:
+      - -X github.com/let-sh/cli/cmd.version={{.Version}}
+  - env:
+      - CGO_ENABLED=0
+    binary: let
+    id: lets_macos
+    goos:
       - darwin
+    goarch:
+      - amd64
     ldflags:
       - -X github.com/let-sh/cli/cmd.version={{.Version}}
     hooks:
@@ -47,5 +57,3 @@ release:
     owner: let-sh
     name: cli
   prerelease: auto
-signs:
-  - artifacts: checksum

@@ -29,7 +29,7 @@ var versionCmd = &cobra.Command{
 	Short: "print current cli version",
 	Long:  `usage 'lets version' or 'lets --version'`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("current version: %s", version)
+		fmt.Println("current version:", version)
 	},
 }
 
