@@ -8,6 +8,11 @@ import (
 var S *yacspin.Spinner
 
 func init() {
+
+	//s = spinner.New(spinner.CharSets[14], 50*time.Millisecond)
+}
+
+func BStart(message string) {
 	cfg := yacspin.Config{
 		Frequency: 50 * time.Millisecond,
 		CharSet:   yacspin.CharSets[14],
@@ -18,23 +23,16 @@ func init() {
 		StopColors:    []string{"fgGreen"},
 	}
 	S, _ = yacspin.New(cfg)
-
-	//s = spinner.New(spinner.CharSets[14], 50*time.Millisecond)
-}
-
-func BStart(suffix string) {
-	S.Suffix(" " + suffix)
-	//s.Suffix = " " + suffix
+	S.Message(" " + message)
 	S.Start()
 }
 
-func BUpdate(suffix string) {
-	S.Suffix(suffix)
+func BUpdate(message string) {
+	S.Message(message)
 }
 
 func BStop() {
 	S.Stop()
-
 }
 
 func BPause() {

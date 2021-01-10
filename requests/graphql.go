@@ -83,6 +83,7 @@ query($type: String!, $name: String!) {
 
 func Deploy(projectType, projectName, config string, cn bool) (deployment struct {
 	ID           string `json:"id"`
+	TargetFQDN   string `json:"targetFQDN"`
 	NetworkStage string `json:"networkStage"`
 	PackerStage  string `json:"packerStage"`
 	Status       string `json:"status"`
@@ -91,6 +92,7 @@ func Deploy(projectType, projectName, config string, cn bool) (deployment struct
 mutation($type: String!, $name: String!, $config: String, $cn: Boolean) {
 	  deploy(input:{type:$type, projectName:$name, config:$config, cn:$cn}) {
 		id
+		targetFQDN
 		networkStage
 		packerStage
 		status
@@ -108,6 +110,7 @@ mutation($type: String!, $name: String!, $config: String, $cn: Boolean) {
 	var respData struct {
 		Deploy struct {
 			ID           string `json:"id"`
+			TargetFQDN   string `json:"targetFQDN"`
 			NetworkStage string `json:"networkStage"`
 			PackerStage  string `json:"packerStage"`
 			Status       string `json:"status"`
@@ -125,6 +128,7 @@ mutation($type: String!, $name: String!, $config: String, $cn: Boolean) {
 }
 
 func GetDeploymentStatus(id string) (deployment struct {
+	TargetFQDN   string `json:"targetFQDN"`
 	NetworkStage string `json:"networkStage"`
 	PackerStage  string `json:"packerStage"`
 	Status       string `json:"status"`
@@ -133,6 +137,7 @@ func GetDeploymentStatus(id string) (deployment struct {
 	req := graphql.NewRequest(`
 query($id: UUID!) {
 	  deployment(id:$id) {
+		targetFQDN
 		networkStage
 		packerStage
 		status
@@ -146,6 +151,7 @@ query($id: UUID!) {
 	// run it and capture the response
 	var respData struct {
 		Deployment struct {
+			TargetFQDN   string `json:"targetFQDN"`
 			NetworkStage string `json:"networkStage"`
 			PackerStage  string `json:"packerStage"`
 			Status       string `json:"status"`

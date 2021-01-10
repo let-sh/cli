@@ -17,6 +17,7 @@ package cmd
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/let-sh/cli/log"
 	"github.com/let-sh/cli/requests"
 	"github.com/let-sh/cli/types"
@@ -36,14 +37,13 @@ var deployCmd = &cobra.Command{
 	Short: "Deploy your current project to let.sh",
 	Long:  `Deploy your current project to let.sh with a single command line`,
 	Run: func(cmd *cobra.Command, args []string) {
-		log.BStart("deploying")
-
 		// check whether user is logged in
 		if utils.Credentials.Token == "" {
 			log.Warning("please login via `lets login` first")
 			return
 		}
 
+		log.BStart("deploying")
 		// merge config
 		// cli flag > config file > auto saved config > detected config & types
 		{
@@ -56,6 +56,12 @@ var deployCmd = &cobra.Command{
 			_, err := os.Stat("index.html")
 			if !os.IsNotExist(err) {
 				deploymentConfig.Type = "static"
+				deploymentConfig.Static = "./"
+			}
+
+			if len(inputStaticDir) > 0 {
+				deploymentConfig.Type = "static"
+				deploymentConfig.Static = inputStaticDir
 			}
 
 			// check if js by package.json
@@ -107,11 +113,23 @@ var deployCmd = &cobra.Command{
 			// TODO: respect .gitignore
 
 		}
+
+		log.S.StopFail()
+		fmt.Printf("name: %s\n", deploymentConfig.Name)
+		fmt.Printf("type: %s\n", deploymentConfig.Type)
+		time.Sleep(time.Second * 2)
+
 		// if contains static, upload static files to oss
+		if utils.ItemExists([]string{"static"}, deploymentConfig.Type) {
+			if err := oss.UploadDirToStaticSource(deploymentConfig.Static, deploymentConfig.Name, deploymentConfig.Name+"-"+hashID); err != nil {
+				log.Error(err)
+				return
+			}
+		}
 
 		// if contains dynamic, upload dynamic files to oss
 		// then trigger deployment
-		{
+		if utils.ItemExists([]string{"gin", "express"}, deploymentConfig.Type) {
 
 			// create temp dir
 			dir := os.TempDir()
@@ -132,30 +150,32 @@ var deployCmd = &cobra.Command{
 			}
 
 			oss.UploadFileToCodeSource(dir+"/"+deploymentConfig.Name+"-"+hashID+".tar.gz", deploymentConfig.Name+"-"+hashID+".tar.gz", deploymentConfig.Name)
+		}
 
-			configBytes, _ := json.Marshal(deploymentConfig)
-			deployment, err := requests.Deploy(deploymentConfig.Type, deploymentConfig.Name, string(configBytes), inputCN)
+		configBytes, _ := json.Marshal(deploymentConfig)
+		deployment, err := requests.Deploy(deploymentConfig.Type, deploymentConfig.Name, string(configBytes), inputCN)
+		if err != nil {
+			log.Error(err)
+			return
+		}
+
+		log.BStart("deploying")
+		// awaiting deployment result
+		for {
+			currentStatus, err := requests.GetDeploymentStatus(deployment.ID)
 			if err != nil {
 				log.Error(err)
-				return
 			}
-			// awaiting deployment result
 
-			for {
-				currentStatus, err := requests.GetDeploymentStatus(deployment.ID)
-				if err != nil {
-					log.Error(err)
-				}
+			log.BUpdate(" NetworkStage: " + currentStatus.NetworkStage + ", PackerStage: " + currentStatus.PackerStage + ", Status: " + currentStatus.Status)
 
-				log.BUpdate(" NetworkStage: " + currentStatus.NetworkStage + ", PackerStage: " + currentStatus.PackerStage + ", Status: " + currentStatus.Status)
-
-				time.Sleep(time.Second * 2)
-				if currentStatus.Done {
-					break
-				}
+			if currentStatus.Done {
+				break
 			}
+
+			log.S.StopMessage(" deploy succeed\nyou could visit https://" + currentStatus.TargetFQDN)
 		}
-		log.Success("deploy succeed")
+
 		log.BStop()
 		return
 	},
@@ -165,6 +185,7 @@ var deploymentConfig types.LetConfig
 var inputProjectName string
 var inputProjectType string
 var inputCN bool
+var inputStaticDir string
 
 func init() {
 	rootCmd.AddCommand(deployCmd)
@@ -173,5 +194,6 @@ func init() {
 	// is called directly, e.g.:
 	deployCmd.Flags().StringVarP(&inputProjectName, "project", "p", "", "current project name")
 	deployCmd.Flags().StringVarP(&inputProjectType, "type", "t", "", "current project type, e.g. react")
+	deployCmd.Flags().StringVarP(&inputStaticDir, "static", "", "", "static dir name (if deploy type is static)")
 	deployCmd.Flags().BoolVarP(&inputCN, "cn", "", true, "deploy in mainland of china")
 }

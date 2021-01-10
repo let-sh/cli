@@ -17,8 +17,6 @@ import (
 var bar *mpb.Bar
 
 func UploadFileToCodeSource(filepath, filename, projectName string) {
-	log.BPause()
-
 	// create and start new bar
 	fi, _ := os.Stat(filepath)
 
@@ -39,6 +37,7 @@ func UploadFileToCodeSource(filepath, filename, projectName string) {
 			decor.Name(" ] "),
 			decor.EwmaSpeed(decor.UnitKB, "% .2f", 1024),
 		),
+		mpb.BarRemoveOnComplete(),
 	)
 
 	stsToken, err := requests.GetStsToken("buildBundle", projectName)
@@ -73,10 +72,7 @@ func UploadFileToCodeSource(filepath, filename, projectName string) {
 		fmt.Println("Error:", err)
 		os.Exit(-1)
 	}
-	//bar.Abort(true)
-
-	log.S.Suffix(" deploying ")
-	log.BUnpause()
+	bar.Completed()
 }
 
 func UploadDirToStaticSource(dirPath, projectName, bundleID string) error {
@@ -89,6 +85,7 @@ func UploadDirToStaticSource(dirPath, projectName, bundleID string) error {
 	// 创建OSSClient实例
 	endpoint := strings.Join(strings.Split(stsToken.Host, ".")[1:], ".")
 	client, err := oss.New(endpoint, stsToken.AccessKeyID, stsToken.AccessKeySecret, oss.SecurityToken(stsToken.SecurityToken))
+
 	if err != nil {
 		fmt.Println("Error:", err)
 		os.Exit(-1)
@@ -103,7 +100,6 @@ func UploadDirToStaticSource(dirPath, projectName, bundleID string) error {
 	}
 
 	// Read directory and close.
-
 	dir, err := os.Open(dirPath)
 	if err != nil {
 		return err
@@ -148,7 +144,9 @@ func UploadDirToStaticSource(dirPath, projectName, bundleID string) error {
 					}
 					return
 				}
-				err = bucket.PutObjectFromFile(projectName+"-"+bundleID, filepath.Join(dirPath, name))
+				objKey := bundleID + "/" + name
+				filePath := filepath.Join(dirPath, name)
+				err = bucket.PutObjectFromFile(objKey, filePath)
 
 				if err != nil {
 					select {
@@ -165,11 +163,11 @@ func UploadDirToStaticSource(dirPath, projectName, bundleID string) error {
 	}
 
 	// Collect results from workers
-
 	for i := 0; i < len(names); i++ {
 		select {
 		case res := <-resChan:
-			fmt.Println(res)
+			// collect result
+			_ = res
 		case err := <-errChan:
 			return err
 		}
@@ -177,7 +175,6 @@ func UploadDirToStaticSource(dirPath, projectName, bundleID string) error {
 	log.S.Suffix(" deploying ")
 	log.BUnpause()
 	return nil
-
 }
 
 type OssProgressListener struct {
