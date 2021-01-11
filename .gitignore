@@ -1,4 +1,5 @@
 .idea/
 dist
 .DS_Store
-#gon.hcl
+version
+version.properties

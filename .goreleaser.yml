@@ -7,6 +7,8 @@ before:
     - go mod download
     # you may remove this if you don't need go generate
     - go generate ./...
+    - chmod +x ./scripts/gen_version.sh
+    - ./scripts/gen_version.sh
 builds:
   - env:
       - CGO_ENABLED=0
@@ -56,4 +58,6 @@ blobs:
     endpoint: let-cli.oss-cn-hongkong.aliyuncs.com
     region: cn-hongkong
     bucket: "."
-    folder: "/"
+    folder: "{{.Version}}"
+    extra_files:
+      - glob: ./version
