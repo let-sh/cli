@@ -52,6 +52,8 @@ release:
     owner: let-sh
     name: cli
   prerelease: auto
+  extra_files:
+    - glob: ./dist/lets_macos_darwin_amd64/*
 blobs:
   -
     provider: s3
@@ -61,3 +63,4 @@ blobs:
     folder: "."
     extra_files:
       - glob: ./version
+      - glob: ./dist/lets_macos_darwin_amd64/*

@@ -16,3 +16,7 @@ dmg{
   output_path= "./dist/lets_macos_darwin_amd64/lets.dmg"
   volume_name= "let.sh cli"
 }
+
+zip {
+  output_path = "./dist/lets_macos_darwin_amd64/lets.zip"
+}
