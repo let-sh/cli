@@ -21,7 +21,7 @@ builds:
       - -X github.com/let-sh/cli/cmd.version={{.Version}}
   - env:
       - CGO_ENABLED=0
-    binary: let
+    binary: lets
     id: lets_macos
     goos:
       - darwin
