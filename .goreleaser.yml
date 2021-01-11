@@ -27,15 +27,16 @@ builds:
       - amd64
     ldflags:
       - -X github.com/let-sh/cli/cmd.version={{.Version}}
-    hooks:
-      post: gon gon.hcl
-archives:
-  - replacements:
-      darwin: Darwin
-      linux: Linux
-      windows: Windows
-      386: i386
-      amd64: x86_64
+#    hooks:
+#      post: gon gon.hcl
+#archives:
+#  - format: gz
+#  - replacements:
+#      darwin: darwin
+#      linux: linux
+#      windows: Windows
+#      386: i386
+#      amd64: x86_64
 checksum:
   name_template: 'checksums.txt'
 snapshot:
@@ -57,3 +58,10 @@ release:
     owner: let-sh
     name: cli
   prerelease: auto
+blobs:
+  -
+    provider: s3
+    endpoint: let-cli.oss-accelerate.aliyuncs.com
+    region: cn-hongkong
+    bucket: "/"
+    folder: "/"
