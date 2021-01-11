@@ -1,6 +1,6 @@
 # The path follows a pattern
 # ./dist/BUILD-ID_TARGET/BINARY-NAME
-source = ["./dist/lets_macos_darwin_amd64/let"]
+source = ["./dist/lets_macos_darwin_amd64/lets"]
 bundle_id = "com.oasis-networks.cli"
 
 apple_id {
@@ -13,6 +13,6 @@ sign {
 }
 
 dmg{
-  output_path= "./dist/lets_macos_darwin_amd64/let.dmg"
+  output_path= "./dist/lets_macos_darwin_amd64/lets.dmg"
   volume_name= "let.sh cli"
 }
