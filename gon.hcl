@@ -4,7 +4,7 @@ source = ["./dist/lets_macos_darwin_amd64/let"]
 bundle_id = "com.oasis-networks.cli"
 
 apple_id {
-  username = "@env:AC_USERNAME"
+  username = "liangzhib@163.com"
   password = "@env:AC_PASSWORD"
 }
 
