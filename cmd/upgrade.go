@@ -1,5 +1,5 @@
 /*
-Copyright © 2021 Fred Liang <fred@oasis.ac>
+Copyright © 2021 NAME HERE <EMAIL ADDRESS>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+	"os/exec"
 
 	"github.com/spf13/cobra"
 )
@@ -24,9 +26,16 @@ import (
 // upgradeCmd represents the upgrade command
 var upgradeCmd = &cobra.Command{
 	Use:   "upgrade",
-	Short: "Upgrade cli to latest version",
+	Short: "Upgrade let.sh cli ",
+	Long:  `Upgrade let.sh cli to latest version.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("upgrade called")
+		c := exec.Command("sh", "-c", "curl install.let.sh.cn | bash")
+		c.Stdout = os.Stdout
+		c.Stderr = os.Stderr
+		err := c.Run()
+		if err != nil {
+			fmt.Printf("cmd.Run() failed with %s\n", err)
+		}
 	},
 }
 
