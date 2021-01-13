@@ -1,5 +1,5 @@
 /*
-Copyright © 2021 NAME HERE <EMAIL ADDRESS>
+Copyright © 2021 Fred Liang <fred@oasis.ac>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ var version string
 // versionCmd represents the version command
 var versionCmd = &cobra.Command{
 	Use:   "version",
-	Short: "print current cli version",
+	Short: "Print current cli version",
 	Long:  `usage 'lets version' or 'lets --version'`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("current version:", version)

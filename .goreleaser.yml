@@ -53,7 +53,8 @@ release:
     name: cli
   prerelease: auto
   extra_files:
-    - glob: ./dist/lets_macos_darwin_amd64/*
+    - glob: ./dist/lets_macos_darwin_amd64/*.zip
+    - glob: ./dist/lets_macos_darwin_amd64/*.dmg
 blobs:
   -
     provider: s3
@@ -63,4 +64,5 @@ blobs:
     folder: "."
     extra_files:
       - glob: ./version
-      - glob: ./dist/lets_macos_darwin_amd64/*
+      - glob: ./dist/lets_macos_darwin_amd64/*.zip
+      - glob: ./dist/lets_macos_darwin_amd64/*.dmg

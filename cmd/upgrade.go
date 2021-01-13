@@ -1,5 +1,5 @@
 /*
-Copyright © 2021 NAME HERE <EMAIL ADDRESS>
+Copyright © 2021 Fred Liang <fred@oasis.ac>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import (
 // upgradeCmd represents the upgrade command
 var upgradeCmd = &cobra.Command{
 	Use:   "upgrade",
-	Short: "upgrade cli to latest version",
+	Short: "Upgrade cli to latest version",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("upgrade called")
 	},
