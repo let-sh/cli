@@ -58,7 +58,6 @@ letsh_get_binary() {
   # Get both the tarball and its GPG signature
   # if curl --fail --progress-bar -L -o ~/.let/bin/lets "$url"; then
   if curl --fail --progress-bar -L "$url" 2> /dev/null | tar xzvf - -C ~/.let/bin/ > /dev/null 2>&1; then
-    mv ~/.let/bin/let ~/.let/bin/lets
     printf "$cyan> Chmod-ing file ~/.let/bin/lets...$reset\n"
     chmod +x ~/.let/bin/lets
   else
