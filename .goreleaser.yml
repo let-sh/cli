@@ -29,8 +29,8 @@ builds:
       - amd64
     ldflags:
       - -X github.com/let-sh/cli/cmd.version={{.Version}}
-    hooks:
-      post: gon gon.hcl
+#    hooks:
+#      post: gon gon.hcl
 checksum:
   name_template: 'checksums.txt'
 snapshot:
@@ -64,5 +64,6 @@ blobs:
     folder: "."
     extra_files:
       - glob: ./version
+      - glob: ./scripts/install.sh
       - glob: ./dist/lets_macos_darwin_amd64/*.zip
       - glob: ./dist/lets_macos_darwin_amd64/*.dmg
