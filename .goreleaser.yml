@@ -9,6 +9,7 @@ before:
     - go generate ./...
     - chmod +x ./scripts/gen_version.sh
     - ./scripts/gen_version.sh
+    - cat version
 builds:
   - env:
       - CGO_ENABLED=0
