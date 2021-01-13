@@ -16,6 +16,7 @@ func BStart(message string) {
 	cfg := yacspin.Config{
 		Frequency: 50 * time.Millisecond,
 		CharSet:   yacspin.CharSets[14],
+		Colors:    []string{"fgCyan"},
 		//Suffix:"steps",
 		SuffixAutoColon: true,
 		//Message:         "exporting data",
@@ -28,7 +29,7 @@ func BStart(message string) {
 }
 
 func BUpdate(message string) {
-	S.Message(message)
+	S.Message(" " + message)
 }
 
 func BStop() {

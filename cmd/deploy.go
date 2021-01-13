@@ -17,7 +17,9 @@ package cmd
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"github.com/fatih/color"
 	"github.com/let-sh/cli/log"
 	"github.com/let-sh/cli/requests"
 	"github.com/let-sh/cli/types"
@@ -101,7 +103,6 @@ var deployCmd = &cobra.Command{
 		// check Check Deploy Capability
 		hashID, _, err := requests.CheckDeployCapability(deploymentConfig.Name)
 		if err != nil {
-			log.BStop()
 			log.Error(err)
 			return
 		}
@@ -115,10 +116,12 @@ var deployCmd = &cobra.Command{
 		}
 
 		log.S.StopFail()
+
+		fmt.Println("")
+		fmt.Println(log.CyanBold("Detected Project Info"))
 		fmt.Printf("name: %s\n", deploymentConfig.Name)
 		fmt.Printf("type: %s\n", deploymentConfig.Type)
-		time.Sleep(time.Second * 2)
-
+		fmt.Println("")
 		// if contains static, upload static files to oss
 		if utils.ItemExists([]string{"static"}, deploymentConfig.Type) {
 			if err := oss.UploadDirToStaticSource(deploymentConfig.Static, deploymentConfig.Name, deploymentConfig.Name+"-"+hashID); err != nil {
@@ -160,6 +163,7 @@ var deployCmd = &cobra.Command{
 		}
 
 		log.BStart("deploying")
+
 		// awaiting deployment result
 		for {
 			currentStatus, err := requests.GetDeploymentStatus(deployment.ID)
@@ -170,13 +174,24 @@ var deployCmd = &cobra.Command{
 			log.BUpdate(" NetworkStage: " + currentStatus.NetworkStage + ", PackerStage: " + currentStatus.PackerStage + ", Status: " + currentStatus.Status)
 
 			if currentStatus.Done {
+				if currentStatus.Status == "Failed" {
+					log.Error(errors.New(currentStatus.ErrorMessage))
+					break
+				}
+
+				log.S.StopFail()
+				fmt.Println(
+					color.New(color.Bold).Sprint("Preview: ")+"https://"+currentStatus.TargetFQDN, "\n"+
+						color.New(color.Bold).Sprint("Details: ")+"https://alpha.let.sh.cn/console/project/"+deploymentConfig.Name+"/Details",
+				)
 				break
+
+				// interval
+				time.Sleep(1)
 			}
 
-			log.S.StopMessage(" deploy succeed\nyou could visit https://" + currentStatus.TargetFQDN)
 		}
 
-		log.BStop()
 		return
 	},
 }
@@ -196,4 +211,5 @@ func init() {
 	deployCmd.Flags().StringVarP(&inputProjectType, "type", "t", "", "current project type, e.g. react")
 	deployCmd.Flags().StringVarP(&inputStaticDir, "static", "", "", "static dir name (if deploy type is static)")
 	deployCmd.Flags().BoolVarP(&inputCN, "cn", "", true, "deploy in mainland of china")
+	deployCmd.Flags().MarkHidden("cn")
 }

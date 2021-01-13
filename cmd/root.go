@@ -17,18 +17,20 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/let-sh/cli/log"
 	"github.com/let-sh/cli/utils"
 	"github.com/spf13/cobra"
 	"os"
 )
 
 var cfgFile string
+var Debug bool
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "let.sh cli",
-	Short: "Launch your app with only one command",
-	Long:  `let.sh helps you test, preview and launch your app`,
+	Use:   "lets",
+	Short: log.CyanBold("\n🏝️ Launch your app with just one command"),
+	Long:  log.CyanBold("\n🏝️  let.sh helps you test, preview and launch your app"),
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	//	Run: func(cmd *cobra.Command, args []string) { },
@@ -49,7 +51,8 @@ func init() {
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
-
+	rootCmd.PersistentFlags().BoolVarP(&Debug, "debug", "", false, "debugging cli command")
+	rootCmd.PersistentFlags().MarkHidden("debug")
 	//rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cli.yaml)")
 
 	// Cobra also supports local flags, which will only run
@@ -59,8 +62,5 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	//fmt.Println(utils.Credentials)
-	//fmt.Println(utils.ProjectsInfo)
-
 	utils.Load()
 }

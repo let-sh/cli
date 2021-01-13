@@ -64,14 +64,15 @@ var loginCmd = &cobra.Command{
 			if err == nil && tokenInterface.String() != "" {
 				// verify response
 				utils.SetToken(tokenInterface.String())
+				log.S.StopMessage(" login succeed")
 				log.BStop()
 				return
 			}
 
 			time.Sleep(time.Second * 1)
 		}
-
-		log.BStop()
+		log.S.StopFailMessage(" login timeout")
+		log.S.StopFail()
 	},
 }
 
