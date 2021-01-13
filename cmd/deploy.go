@@ -28,7 +28,9 @@ import (
 	"github.com/mholt/archiver/v3"
 	c "github.com/otiai10/copy"
 	"github.com/spf13/cobra"
+	"io/ioutil"
 	"os"
+	"os/user"
 	"path/filepath"
 	"time"
 )
@@ -110,8 +112,20 @@ var deployCmd = &cobra.Command{
 		// get project type config from api
 
 		{
-			// TODO: check current dir, if too many files, alert user
-			// TODO: respect .gitignore
+			// check not home dir
+			dir, _ := os.Getwd()
+			usr, _ := user.Current()
+			if dir == usr.HomeDir {
+				log.Error(errors.New("currently under home dir, please switch to your project dir"))
+				return
+			}
+
+			// limit files to 10000
+			files, _ := ioutil.ReadDir("./")
+			if len(files) > 10000 {
+				log.Error(errors.New("too many files in current dir, please check whether in the correct directory"))
+				return
+			}
 
 		}
 
@@ -122,6 +136,7 @@ var deployCmd = &cobra.Command{
 		fmt.Printf("name: %s\n", deploymentConfig.Name)
 		fmt.Printf("type: %s\n", deploymentConfig.Type)
 		fmt.Println("")
+
 		// if contains static, upload static files to oss
 		if utils.ItemExists([]string{"static"}, deploymentConfig.Type) {
 			if err := oss.UploadDirToStaticSource(deploymentConfig.Static, deploymentConfig.Name, deploymentConfig.Name+"-"+hashID); err != nil {
@@ -181,8 +196,8 @@ var deployCmd = &cobra.Command{
 
 				log.S.StopFail()
 				fmt.Println(
-					color.New(color.Bold).Sprint("Preview: ")+"https://"+currentStatus.TargetFQDN, "\n"+
-						color.New(color.Bold).Sprint("Details: ")+"https://alpha.let.sh.cn/console/project/"+deploymentConfig.Name+"/Details",
+					color.New(color.Bold).Sprint("Preview: ")+color.New().Sprint("https://"+currentStatus.TargetFQDN), "\n"+
+						color.New(color.Bold).Sprint("Details: ")+color.New().Sprint("https://alpha.let.sh.cn/console/project/"+deploymentConfig.Name+"/details"),
 				)
 				break
 

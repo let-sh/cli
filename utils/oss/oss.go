@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
+	"github.com/denormal/go-gitignore"
 	"github.com/let-sh/cli/log"
 	"github.com/let-sh/cli/requests"
 	"github.com/vbauerster/mpb/v5"
@@ -109,6 +110,42 @@ func UploadDirToStaticSource(dirPath, projectName, bundleID string) error {
 		return err
 	}
 	dir.Close()
+
+	// respect .gitignore and .letignore
+	if _, err := os.Stat(dirPath + ".gitignore"); err == nil {
+		// match a file against a particular .gitignore
+		ignore, _ := gitignore.NewFromFile(dirPath + ".gitignore")
+
+		tmp := []string{}
+		for _, v := range names {
+			match := ignore.Match(v)
+			if match != nil {
+				if !match.Ignore() {
+					tmp = append(tmp, v)
+				}
+			}
+		}
+
+		names = tmp
+	}
+
+	// .letignore
+	if _, err := os.Stat(dirPath + ".letignore"); err == nil {
+		// match a file against a particular .gitignore
+		ignore, _ := gitignore.NewFromFile(dirPath + ".gitignore")
+
+		tmp := []string{}
+		for _, v := range names {
+			match := ignore.Match(v)
+			if match != nil {
+				if !match.Ignore() {
+					tmp = append(tmp, v)
+				}
+			}
+		}
+
+		names = tmp
+	}
 
 	// Copy names to a channel for workers to consume. Close the
 	// channel so that workers stop when all work is complete.

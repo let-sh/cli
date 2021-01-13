@@ -5,6 +5,8 @@ go 1.15
 require (
 	github.com/aliyun/aliyun-oss-go-sdk v2.1.5+incompatible
 	github.com/baiyubin/aliyun-sts-go-sdk v0.0.0-20180326062324-cfa1a18b161f // indirect
+	github.com/danwakefield/fnmatch v0.0.0-20160403171240-cbb64ac3d964 // indirect
+	github.com/denormal/go-gitignore v0.0.0-20180930084346-ae8ad1d07817
 	github.com/fatih/color v1.10.0
 	github.com/machinebox/graphql v0.2.2
 	github.com/matishsiao/goInfo v0.0.0-20200404012835-b5f882ee2288
