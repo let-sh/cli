@@ -30,8 +30,8 @@ builds:
       - amd64
     ldflags:
       - -X github.com/let-sh/cli/cmd.version={{.Version}}
-#    hooks:
-#      post: gon gon.hcl
+    hooks:
+      post: gon gon.hcl
 checksum:
   name_template: 'checksums.txt'
 snapshot:
