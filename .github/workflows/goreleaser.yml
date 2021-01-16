@@ -41,3 +41,7 @@ jobs:
           AC_PASSWORD: ${{ secrets.AC_PASSWORD }}
         run: |
           goreleaser --rm-dist
+      -
+        name: Check Binary
+        run: |
+          ./dist/lets_macos_darwin_amd64/lets version
