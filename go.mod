@@ -9,6 +9,7 @@ require (
 	github.com/denormal/go-gitignore v0.0.0-20180930084346-ae8ad1d07817
 	github.com/fatih/color v1.10.0
 	github.com/machinebox/graphql v0.2.2
+	github.com/manifoldco/promptui v0.8.0
 	github.com/matishsiao/goInfo v0.0.0-20200404012835-b5f882ee2288
 	github.com/matryer/is v1.4.0 // indirect
 	github.com/mholt/archiver/v3 v3.5.0

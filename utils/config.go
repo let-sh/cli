@@ -10,7 +10,6 @@ import (
 )
 
 var Credentials types.Credentials
-var ProjectsInfo types.ProjectsInfo
 
 func init() {
 	// check config dir exists
@@ -22,25 +21,19 @@ func init() {
 
 	_, err = os.Stat(home + "/.let/credentials.json")
 	if os.IsNotExist(err) {
-		f,_ := os.Create(home + "/.let/credentials.json")
+		f, _ := os.Create(home + "/.let/credentials.json")
 		f.WriteString("{}")
 	}
 
 	_, err = os.Stat(home + "/.let/projects.json")
 	if os.IsNotExist(err) {
-		f,_ := os.Create(home + "/.let/projects.json")
+		f, _ := os.Create(home + "/.let/projects.json")
 		f.WriteString("{}")
 	}
 
 	// bootstrap configs
 	credentialsFile, _ := ioutil.ReadFile(home + "/.let/credentials.json")
 	err = json.Unmarshal(credentialsFile, &Credentials)
-	if err != nil {
-		log.Error(err)
-	}
-
-	projectsInfoFile, _ := ioutil.ReadFile(home + "/.let/projects.json")
-	err = json.Unmarshal(projectsInfoFile, &ProjectsInfo)
 	if err != nil {
 		log.Error(err)
 	}

@@ -4,6 +4,7 @@ type Credentials struct {
 	Token string `json:"token"`
 }
 
+// project-name: info
 type ProjectsInfo map[string]Project
 
 type Project struct {

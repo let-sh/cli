@@ -24,7 +24,9 @@ import (
 	"github.com/let-sh/cli/requests"
 	"github.com/let-sh/cli/types"
 	"github.com/let-sh/cli/utils"
+	"github.com/let-sh/cli/utils/cache"
 	"github.com/let-sh/cli/utils/oss"
+	"github.com/manifoldco/promptui"
 	"github.com/mholt/archiver/v3"
 	c "github.com/otiai10/copy"
 	"github.com/spf13/cobra"
@@ -97,7 +99,6 @@ var deployCmd = &cobra.Command{
 			// Step3: load user config
 			_, err = os.Stat("let.json")
 			if !os.IsNotExist(err) {
-				// TODO: if file exists
 				jsonFile, err := os.Open("let.json")
 				// if we os.Open returns an error then handle it
 				if err != nil {
@@ -120,6 +121,39 @@ var deployCmd = &cobra.Command{
 			}
 		}
 
+		// check if user dir is changed
+		fmt.Println()
+		if _, ok := cache.ProjectsInfo[deploymentConfig.Name]; ok {
+			pwd, _ := os.Getwd()
+
+			if pwd != cache.ProjectsInfo[deploymentConfig.Name].Dir {
+				log.S.StopFail()
+				// if current dir is not previous dir
+				prompt := promptui.Prompt{
+					Label:   "Detected your project dir changed, continue deployment?[Y/n]",
+					Default: "Y",
+					Validate: func(input string) error {
+						if utils.ItemExists([]string{"", "n", "N", "No", "Y", "y", "yes", "Yes"}, input) {
+							return nil
+						}
+						return errors.New("no matching input")
+					},
+				}
+
+				result, err := prompt.Run()
+				if err != nil {
+					log.Error(err)
+					return
+				}
+
+				if utils.ItemExists([]string{"n", "N", "No"}, result) {
+					log.S.StopFail()
+					log.Warning("Deployment canceled")
+					return
+				}
+				log.BStart("deploying")
+			}
+		}
 		// check Check Deploy Capability
 		hashID, _, err := requests.CheckDeployCapability(deploymentConfig.Name)
 		if err != nil {
@@ -198,6 +232,15 @@ var deployCmd = &cobra.Command{
 
 		DeploymentID = deployment.ID
 
+		pwd, _ := os.Getwd()
+
+		// save deployment info
+		cache.SaveProjectInfo(types.Project{
+			Name: deploymentConfig.Name,
+			Dir:  pwd,
+			Type: deploymentConfig.Type,
+		})
+
 		log.BStart("deploying")
 
 		// awaiting deployment result
@@ -227,7 +270,6 @@ var deployCmd = &cobra.Command{
 			}
 
 		}
-
 		return
 	},
 }
