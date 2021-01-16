@@ -25,7 +25,7 @@ builds:
       - -w
     hooks:
       post:
-        - upx -7 {{ .Path }}
+        - upx {{ .Path }}
   - env:
       - CGO_ENABLED=0
     binary: lets
@@ -40,7 +40,7 @@ builds:
       - -w
     hooks:
       post:
-        - upx -7 {{ .Path }}
+        - upx {{ .Path }}
         - gon gon.hcl
 checksum:
   name_template: 'checksums.txt'

@@ -22,6 +22,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/let-sh/cli/log"
 	"github.com/let-sh/cli/requests"
+	"github.com/let-sh/cli/runner/deploy"
 	"github.com/let-sh/cli/types"
 	"github.com/let-sh/cli/utils"
 	"github.com/let-sh/cli/utils/oss"
@@ -41,6 +42,9 @@ var deployCmd = &cobra.Command{
 	Short: "Deploy your current project to let.sh",
 	Long:  `Deploy your current project to let.sh with a single command line`,
 	Run: func(cmd *cobra.Command, args []string) {
+		// Setup our Ctrl+C handler
+		deploy.SetupCloseHandler()
+
 		// check whether user is logged in
 		if utils.Credentials.Token == "" {
 			log.Warning("please login via `lets login` first")
@@ -90,13 +94,24 @@ var deployCmd = &cobra.Command{
 			// Step3: load user config
 			_, err = os.Stat("let.json")
 			if !os.IsNotExist(err) {
-				// if file exists
+				// TODO: if file exists
+				jsonFile, err := os.Open("let.json")
+				// if we os.Open returns an error then handle it
+				if err != nil {
+					log.Error(err)
+					return
+				}
+				// defer the closing of our jsonFile so that we can parse it later on
+				defer jsonFile.Close()
+				byteValue, _ := ioutil.ReadAll(jsonFile)
+				json.Unmarshal(byteValue, &deploymentConfig)
 			}
 
 			// Step4: merge cli flag config
 			if inputProjectName != "" {
 				deploymentConfig.Name = inputProjectName
 			}
+
 			if inputProjectType != "" {
 				deploymentConfig.Type = inputProjectType
 			}

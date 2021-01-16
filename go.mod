@@ -19,4 +19,5 @@ require (
 	github.com/theckman/yacspin v0.8.0
 	github.com/tidwall/gjson v1.6.7
 	github.com/vbauerster/mpb/v5 v5.4.0
+	google.golang.org/api v0.36.0
 )
