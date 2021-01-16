@@ -22,7 +22,6 @@ import (
 	"github.com/fatih/color"
 	"github.com/let-sh/cli/log"
 	"github.com/let-sh/cli/requests"
-	"github.com/let-sh/cli/runner/deploy"
 	"github.com/let-sh/cli/types"
 	"github.com/let-sh/cli/utils"
 	"github.com/let-sh/cli/utils/oss"
@@ -31,10 +30,14 @@ import (
 	"github.com/spf13/cobra"
 	"io/ioutil"
 	"os"
+	"os/signal"
 	"os/user"
 	"path/filepath"
+	"syscall"
 	"time"
 )
+
+var DeploymentID string
 
 // deployCmd represents the deploy command
 var deployCmd = &cobra.Command{
@@ -43,7 +46,7 @@ var deployCmd = &cobra.Command{
 	Long:  `Deploy your current project to let.sh with a single command line`,
 	Run: func(cmd *cobra.Command, args []string) {
 		// Setup our Ctrl+C handler
-		deploy.SetupCloseHandler()
+		SetupCloseHandler()
 
 		// check whether user is logged in
 		if utils.Credentials.Token == "" {
@@ -187,10 +190,13 @@ var deployCmd = &cobra.Command{
 
 		configBytes, _ := json.Marshal(deploymentConfig)
 		deployment, err := requests.Deploy(deploymentConfig.Type, deploymentConfig.Name, string(configBytes), inputCN)
+
 		if err != nil {
 			log.Error(err)
 			return
 		}
+
+		DeploymentID = deployment.ID
 
 		log.BStart("deploying")
 
@@ -242,4 +248,34 @@ func init() {
 	deployCmd.Flags().StringVarP(&inputStaticDir, "static", "", "", "static dir name (if deploy type is static)")
 	deployCmd.Flags().BoolVarP(&inputCN, "cn", "", true, "deploy in mainland of china")
 	deployCmd.Flags().MarkHidden("cn")
+}
+
+func SetupCloseHandler() {
+	c := make(chan os.Signal)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-c
+		if len(DeploymentID) > 0 {
+			succeed, err := requests.CancelDeployment(DeploymentID)
+			if err != nil {
+				log.S.StopFail()
+				log.Error(err)
+				os.Exit(0)
+			}
+			if succeed {
+				log.S.StopFail()
+				log.Warning("Deployment canceled")
+				os.Exit(0)
+			} else {
+				log.S.StopFail()
+				log.Warning("Deployment cancellation failed")
+				os.Exit(0)
+			}
+		} else {
+			log.S.StopFail()
+			log.Warning("Deployment canceled")
+			os.Exit(0)
+		}
+
+	}()
 }

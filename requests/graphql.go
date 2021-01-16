@@ -211,3 +211,25 @@ query($type: String!) {
 
 	return respData.BuildTemplate, nil
 }
+
+func CancelDeployment(deploymentID string) (
+	cancelDeploymentResult bool, err error) {
+	req := graphql.NewRequest(`
+mutation($deploymentID: UUID!) {
+	cancelDeployment(deploymentID:$deploymentID)
+}
+`)
+	req.Var("deploymentID", deploymentID)
+	req.Header.Set("Authorization", "Bearer "+utils.Credentials.Token)
+
+	// run it and capture the response
+	var respData struct {
+		CancelDeployment bool `json:"buildTemplate,omitempty"`
+	}
+	if err := Graphql.Run(context.Background(), req, &respData); err != nil {
+
+		return cancelDeploymentResult, err
+	}
+
+	return respData.CancelDeployment, nil
+}
