@@ -19,6 +19,12 @@ builds:
       - windows
     ldflags:
       - -X github.com/let-sh/cli/cmd.version={{.Version}}
+      - -s
+      - -w
+    hooks:
+      post:
+        - upx --brute lets
+        - gon gon.hcl
   - env:
       - CGO_ENABLED=0
     binary: lets
@@ -29,8 +35,12 @@ builds:
       - amd64
     ldflags:
       - -X github.com/let-sh/cli/cmd.version={{.Version}}
+      - -s
+      - -w
     hooks:
-      post: gon gon.hcl
+      post:
+        - upx --brute lets
+        - gon gon.hcl
 checksum:
   name_template: 'checksums.txt'
 snapshot:
