@@ -40,7 +40,7 @@ builds:
       - -w
     hooks:
       post:
-        - upx {{ .Path }}
+#        - upx "{{ .Path }}"
         - gon gon.hcl
 checksum:
   name_template: 'checksums.txt'
