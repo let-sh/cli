@@ -9,6 +9,8 @@ before:
     - go generate ./...
     - chmod +x ./scripts/gen_version.sh
     - ./scripts/gen_version.sh
+    # if npx not install, install it
+    -  command -v upx >/dev/null 2>&1 || { brew install upx >&2; }
 builds:
   - env:
       - CGO_ENABLED=0
@@ -19,6 +21,11 @@ builds:
       - windows
     ldflags:
       - -X github.com/let-sh/cli/cmd.version={{.Version}}
+      - -s
+      - -w
+    hooks:
+      post:
+        - upx --brute {{ .Path }}
   - env:
       - CGO_ENABLED=0
     binary: lets
@@ -29,8 +36,12 @@ builds:
       - amd64
     ldflags:
       - -X github.com/let-sh/cli/cmd.version={{.Version}}
+      - -s
+      - -w
     hooks:
-      post: gon gon.hcl
+      post:
+        - upx --brute {{ .Path }}
+        - gon gon.hcl
 checksum:
   name_template: 'checksums.txt'
 snapshot:

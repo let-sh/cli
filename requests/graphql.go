@@ -168,3 +168,46 @@ query($id: UUID!) {
 
 	return respData.Deployment, nil
 }
+
+func GetTemplate(typeArg string) (
+	buildTemplate struct {
+		ContainsStatic   bool     `json:"containsStatic"`
+		ContainsDynamic  bool     `json:"containsDynamic"`
+		RequireCompiling bool     `json:"requireCompiling"`
+		LocalCompiling   bool     `json:"localCompiling"`
+		CompileCommands  []string `json:"compileCommands"`
+		DistDir          string   `json:"distDir"`
+	}, err error) {
+	req := graphql.NewRequest(`
+query($type: String!) {
+  buildTemplate(type:$type) {
+    containsStatic
+    containsDynamic
+    requireCompiling
+    localCompiling
+    compileCommands
+    distDir
+  }
+}
+`)
+	req.Var("type", typeArg)
+	req.Header.Set("Authorization", "Bearer "+utils.Credentials.Token)
+
+	// run it and capture the response
+	var respData struct {
+		BuildTemplate struct {
+			ContainsStatic   bool     `json:"containsStatic"`
+			ContainsDynamic  bool     `json:"containsDynamic"`
+			RequireCompiling bool     `json:"requireCompiling"`
+			LocalCompiling   bool     `json:"localCompiling"`
+			CompileCommands  []string `json:"compileCommands"`
+			DistDir          string   `json:"distDir"`
+		} `json:"buildTemplate,omitempty"`
+	}
+	if err := Graphql.Run(context.Background(), req, &respData); err != nil {
+
+		return buildTemplate, err
+	}
+
+	return respData.BuildTemplate, nil
+}
