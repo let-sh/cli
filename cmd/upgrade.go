@@ -34,7 +34,7 @@ var upgradeCmd = &cobra.Command{
 		c.Stderr = os.Stderr
 		err := c.Run()
 		if err != nil {
-			fmt.Printf("cmd.Run() failed with %s\n", err)
+			fmt.Printf("commad run failed with %s\n", err)
 		}
 	},
 }

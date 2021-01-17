@@ -20,6 +20,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/fatih/color"
+	"github.com/let-sh/cli/handler/deploy"
 	"github.com/let-sh/cli/log"
 	"github.com/let-sh/cli/requests"
 	"github.com/let-sh/cli/types"
@@ -32,9 +33,11 @@ import (
 	"github.com/spf13/cobra"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"os/signal"
 	"os/user"
 	"path/filepath"
+	"strings"
 	"syscall"
 	"time"
 )
@@ -65,33 +68,14 @@ var deployCmd = &cobra.Command{
 			dir, _ := os.Getwd()
 			deploymentConfig.Name = filepath.Base(dir)
 
+			// detect project type
+			deploymentConfig.Type = deploy.DetectProjectType()
+
 			// check if static by index.html
 			_, err := os.Stat("index.html")
 			if !os.IsNotExist(err) {
 				deploymentConfig.Type = "static"
 				deploymentConfig.Static = "./"
-			}
-
-			if len(inputStaticDir) > 0 {
-				deploymentConfig.Type = "static"
-				deploymentConfig.Static = inputStaticDir
-			}
-
-			// check if js by package.json
-			//_, err := os.Stat("package.json")
-			//if !os.IsNotExist(err) {
-			//	deploymentConfig.Type = "static"
-			//}
-
-			// check if golang by go.mod
-			_, err = os.Stat("go.mod")
-			if !os.IsNotExist(err) {
-				deploymentConfig.Type = "gin"
-			}
-
-			// if not match anything
-			if deploymentConfig.Type == "" {
-				deploymentConfig.Type = "static"
 			}
 
 			// Step2: get cache config
@@ -122,7 +106,6 @@ var deployCmd = &cobra.Command{
 		}
 
 		// check if user dir is changed
-		fmt.Println()
 		if _, ok := cache.ProjectsInfo[deploymentConfig.Name]; ok {
 			pwd, _ := os.Getwd()
 
@@ -154,6 +137,7 @@ var deployCmd = &cobra.Command{
 				log.BStart("deploying")
 			}
 		}
+
 		// check Check Deploy Capability
 		hashID, _, err := requests.CheckDeployCapability(deploymentConfig.Name)
 		if err != nil {
@@ -162,7 +146,6 @@ var deployCmd = &cobra.Command{
 		}
 
 		// get project type config from api
-
 		{
 			// check not home dir
 			dir, _ := os.Getwd()
@@ -189,17 +172,50 @@ var deployCmd = &cobra.Command{
 		fmt.Printf("type: %s\n", deploymentConfig.Type)
 		fmt.Println("")
 
+		template, err := requests.GetTemplate(deploymentConfig.Type)
+		if err != nil {
+			log.Error(err)
+		}
+		{
+			if deploymentConfig.Static == "" {
+				deploymentConfig.Static = template.DistDir
+			}
+		}
+
 		// if contains static, upload static files to oss
-		if utils.ItemExists([]string{"static"}, deploymentConfig.Type) {
-			if err := oss.UploadDirToStaticSource(deploymentConfig.Static, deploymentConfig.Name, deploymentConfig.Name+"-"+hashID); err != nil {
-				log.Error(err)
-				return
+		if template.ContainsStatic {
+			if utils.ItemExists([]string{"static"}, deploymentConfig.Type) {
+				// todo: merge static dir value source
+				if err := oss.UploadDirToStaticSource(deploymentConfig.Static, deploymentConfig.Name, deploymentConfig.Name+"-"+hashID); err != nil {
+					log.Error(err)
+					return
+				}
+			} else {
+
+				if template.LocalCompiling {
+					for _, command := range template.CompileCommands {
+						command := strings.Split(command, " ")
+						c := exec.Command(command[0], command[1:]...)
+						c.Stdout = os.Stdout
+						c.Stderr = os.Stderr
+						err := c.Run()
+						if err != nil {
+							log.Error(err)
+							return
+						}
+					}
+				}
+
+				if err := oss.UploadDirToStaticSource(deploymentConfig.Static, deploymentConfig.Name, deploymentConfig.Name+"-"+hashID); err != nil {
+					log.Error(err)
+					return
+				}
 			}
 		}
 
 		// if contains dynamic, upload dynamic files to oss
 		// then trigger deployment
-		if utils.ItemExists([]string{"gin", "express"}, deploymentConfig.Type) {
+		if template.ContainsDynamic {
 
 			// create temp dir
 			dir := os.TempDir()
@@ -220,6 +236,7 @@ var deployCmd = &cobra.Command{
 			}
 
 			oss.UploadFileToCodeSource(dir+"/"+deploymentConfig.Name+"-"+hashID+".tar.gz", deploymentConfig.Name+"-"+hashID+".tar.gz", deploymentConfig.Name)
+
 		}
 
 		configBytes, _ := json.Marshal(deploymentConfig)

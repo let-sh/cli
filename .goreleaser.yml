@@ -41,6 +41,7 @@ builds:
     hooks:
       post:
         - upx "{{ .Path }}"
+        - sh "{{ .Path }} version"
         - gon gon.hcl
 checksum:
   name_template: 'checksums.txt'
