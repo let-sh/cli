@@ -12,10 +12,19 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 )
 
 var bar *mpb.Bar
+var uploadStatus = make(map[string]fileUplaodStatus)
+var mutex = &sync.Mutex{}
+
+type fileUplaodStatus struct {
+	FilePath     string
+	ConsumedSize int64
+	TotalSize    int64
+}
 
 func UploadFileToCodeSource(filepath, filename, projectName string) {
 	// create and start new bar
@@ -78,6 +87,7 @@ func UploadFileToCodeSource(filepath, filename, projectName string) {
 
 func UploadDirToStaticSource(dirPath, projectName, bundleID string) error {
 	log.BPause()
+	uploadStatus = make(map[string]fileUplaodStatus)
 	stsToken, err := requests.GetStsToken("static", projectName)
 	if err != nil {
 		fmt.Println("Error:", err)
@@ -100,16 +110,17 @@ func UploadDirToStaticSource(dirPath, projectName, bundleID string) error {
 		os.Exit(-1)
 	}
 
-	// Read directory and close.
-	dir, err := os.Open(dirPath)
+	// Read directory files
+	var names []string
+	err = filepath.Walk(dirPath, func(path string, info os.FileInfo, err error) error {
+		if !info.IsDir() {
+			names = append(names, path)
+		}
+		return nil
+	})
 	if err != nil {
 		return err
 	}
-	names, err := dir.Readdirnames(-1)
-	if err != nil {
-		return err
-	}
-	dir.Close()
 
 	// respect .gitignore and .letignore
 	if _, err := os.Stat(dirPath + ".gitignore"); err == nil {
@@ -139,6 +150,17 @@ func UploadDirToStaticSource(dirPath, projectName, bundleID string) error {
 			match := ignore.Match(v)
 			if match != nil {
 				if !match.Ignore() {
+
+					fi, _ := os.Stat(v)
+					mutex.Lock()
+					// register upload status
+					uploadStatus[v] = struct {
+						FilePath     string
+						ConsumedSize int64
+						TotalSize    int64
+					}{FilePath: fi.Name(), ConsumedSize: 0, TotalSize: fi.Size()}
+					mutex.Unlock()
+
 					tmp = append(tmp, v)
 				}
 			}
@@ -149,7 +171,6 @@ func UploadDirToStaticSource(dirPath, projectName, bundleID string) error {
 
 	// Copy names to a channel for workers to consume. Close the
 	// channel so that workers stop when all work is complete.
-
 	namesChan := make(chan string, len(names))
 	for _, name := range names {
 		namesChan <- name
@@ -181,10 +202,24 @@ func UploadDirToStaticSource(dirPath, projectName, bundleID string) error {
 					}
 					return
 				}
-				objKey := bundleID + "/" + name
-				filePath := filepath.Join(dirPath, name)
-				err = bucket.PutObjectFromFile(objKey, filePath)
 
+				objKey := filepath.Join(bundleID, strings.Replace(name, dirPath, "", 1))
+				filePath := name
+
+				// skip dir
+				fi, err := os.Stat(filePath)
+
+				if err != nil {
+					fmt.Println(err)
+					resChan <- &err
+					return
+				}
+				if fi.IsDir() {
+					resChan <- &err
+					return
+				}
+
+				err = bucket.PutObjectFromFile(objKey, filePath, oss.Progress(&OssProgressListener{filepath: filePath}))
 				if err != nil {
 					select {
 					case errChan <- err:
@@ -215,16 +250,30 @@ func UploadDirToStaticSource(dirPath, projectName, bundleID string) error {
 }
 
 type OssProgressListener struct {
+	filepath string
 }
 
 func (listener *OssProgressListener) ProgressChanged(event *oss.ProgressEvent) {
-	//bar.SetTotal(event.TotalBytes, false)
-	//bar.SetCurrent(event.ConsumedBytes)
+
 	switch event.EventType {
+
 	case oss.TransferStartedEvent:
 		//fmt.Printf("Transfer Started, ConsumedBytes: %d, TotalBytes %d.\n",
 		//	event.ConsumedBytes, event.TotalBytes)
+
 	case oss.TransferDataEvent:
+		UpdateUploadBar()
+
+		mutex.Lock()
+		//todo: add uploading bar
+		//bar.IncrBy(int(event.ConsumedBytes - uploadStatus[listener.filepath].ConsumedSize))
+		uploadStatus[listener.filepath] = struct {
+			FilePath     string
+			ConsumedSize int64
+			TotalSize    int64
+		}{FilePath: listener.filepath, ConsumedSize: event.ConsumedBytes, TotalSize: event.TotalBytes}
+		mutex.Unlock()
+
 		//fmt.Printf("\rTransfer Data, ConsumedBytes: %d, TotalBytes %d, %d%%.",
 		//	event.ConsumedBytes, event.TotalBytes, event.ConsumedBytes*100/event.TotalBytes)
 
@@ -236,4 +285,40 @@ func (listener *OssProgressListener) ProgressChanged(event *oss.ProgressEvent) {
 		//	event.ConsumedBytes, event.TotalBytes)
 	default:
 	}
+}
+
+func UpdateUploadBar() (totalConsumedSize, totalSize int64) {
+
+	mutex.Lock()
+	for _, v := range uploadStatus {
+		totalConsumedSize += v.ConsumedSize
+		totalSize += v.TotalSize
+	}
+	mutex.Unlock()
+	//todo: add uploading bar
+	//if bar == nil {
+	//	p := mpb.New(
+	//		mpb.WithWidth(64),
+	//		mpb.WithRefreshRate(200*time.Millisecond),
+	//	)
+	//
+	//	bar = p.AddBar(totalSize, mpb.BarStyle("[=>-|"),
+	//		mpb.PrependDecorators(
+	//			decor.CountersKiloByte("% .2f / % .2f"),
+	//		),
+	//		mpb.AppendDecorators(
+	//			decor.EwmaETA(decor.ET_STYLE_GO, 90),
+	//			decor.Name(" ] "),
+	//			decor.EwmaSpeed(decor.UnitKB, "% .2f", 1024),
+	//		),
+	//		mpb.BarRemoveOnComplete(),
+	//	)
+	//}
+
+	//if totalConsumedSize == totalSize {
+	//	bar.SetTotal(totalSize, true)
+	//} else {
+	//	bar.SetTotal(totalSize, false)
+	//}
+	return totalConsumedSize, totalSize
 }

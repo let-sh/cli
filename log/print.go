@@ -3,6 +3,7 @@ package log
 import (
 	"fmt"
 	"github.com/fatih/color"
+	"os"
 )
 
 func Error(err error) {
@@ -10,6 +11,7 @@ func Error(err error) {
 
 	red := color.New(color.FgRed).SprintFunc()
 	fmt.Printf("%s %s.\n", red("[error]"), err.Error())
+	os.Exit(-1)
 }
 
 func Success(msg string) {
