@@ -2,6 +2,7 @@ package requests
 
 import (
 	"context"
+	"fmt"
 	"github.com/let-sh/cli/utils"
 	"github.com/machinebox/graphql"
 )
@@ -233,3 +234,85 @@ mutation($deploymentID: UUID!) {
 
 	return respData.CancelDeployment, nil
 }
+
+func QueryDeployments(projectName string, count int) (
+	deployments struct {
+		Edges []struct {
+			Node struct {
+				ID string `json:"id"`
+			} `json:"node"`
+		} `json:"edges"`
+	}, err error) {
+	req := graphql.NewRequest(fmt.Sprintf(`
+query {
+  deployments(first:%d,projectName:"%s",orderBy:{
+    direction:DESC,
+    field:UPDATED_AT
+  }) {
+    edges{
+      node {
+        id
+      }
+    }
+  }
+}
+`, count, projectName))
+	req.Header.Set("Authorization", "Bearer "+utils.Credentials.Token)
+
+	// run it and capture the response
+	var respData struct {
+		Deployments struct {
+			Edges []struct {
+				Node struct {
+					ID string `json:"id"`
+				} `json:"node"`
+			} `json:"edges"`
+		} `json:"deployments"`
+	}
+	if err := Graphql.Run(context.Background(), req, &respData); err != nil {
+		return respData.Deployments, err
+	}
+
+	return respData.Deployments, nil
+}
+
+//func QueryLogs(deploymentID string, count int) (
+//	deployments struct {
+//		Edges []struct {
+//			Node struct {
+//				ID string `json:"id"`
+//			} `json:"node"`
+//		} `json:"edges"`
+//	}, err error) {
+//	req := graphql.NewRequest(fmt.Sprintf(`
+//query {
+//  deployments(first:%d,projectName:"%s",orderBy:{
+//    direction:DESC,
+//    field:UPDATED_AT
+//  }) {
+//    edges{
+//      node {
+//        id
+//      }
+//    }
+//  }
+//}
+//`, count, projectName))
+//	req.Header.Set("Authorization", "Bearer "+utils.Credentials.Token)
+//
+//	// run it and capture the response
+//	var respData struct {
+//		Deployments struct {
+//			Edges []struct {
+//				Node struct {
+//					ID string `json:"id"`
+//				} `json:"node"`
+//			} `json:"edges"`
+//		} `json:"deployments"`
+//	}
+//	if err := Graphql.Run(context.Background(), req, &respData); err != nil {
+//		return respData.Deployments, err
+//	}
+//
+//	return respData.Deployments, nil
+//}
