@@ -17,38 +17,50 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/let-sh/cli/log"
+	"github.com/let-sh/cli/requests"
 	"os"
-	"os/exec"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 )
 
-// upgradeCmd represents the upgrade command
-var upgradeCmd = &cobra.Command{
-	Use:   "upgrade",
-	Short: "Upgrade let.sh cli ",
-	Long:  `Upgrade let.sh cli to latest version.`,
+// logCmd represents the log command
+var logCmd = &cobra.Command{
+	Use:   "log",
+	Short: "Show latest logs",
+	Long: `Show latest logs under current project.
+
+e.g. 
+"lets logs --tail 10"         print latest 10 line logs
+"lets logs -p hello-world"    print latest logs under project hello-world
+`,
 	Run: func(cmd *cobra.Command, args []string) {
-		c := exec.Command("sh", "-c", "curl install.let.sh.cn | bash")
-		c.Stdout = os.Stdout
-		c.Stderr = os.Stderr
-		err := c.Run()
+		data, err := requests.QueryDeployments("gin", 1)
 		if err != nil {
-			fmt.Printf("commad run failed with %s\n", err)
+			log.Error(err)
 		}
+		fmt.Println(data)
+		fmt.Println("log called")
 	},
 }
 
+var inputLines int
+var logInputProjectName string
+
 func init() {
-	rootCmd.AddCommand(upgradeCmd)
+	rootCmd.AddCommand(logCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// upgradeCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// logCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// upgradeCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	dir, _ := os.Getwd()
+
+	logCmd.Flags().IntVarP(&inputLines, "lines", "l", 10, "latest lines of logs")
+	logCmd.Flags().StringVarP(&logInputProjectName, "project", "p", filepath.Base(dir), "project name, e.g. react")
 }
