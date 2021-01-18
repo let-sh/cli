@@ -44,6 +44,10 @@ func DetectProjectType() (projectType string) {
 		json.Unmarshal(jsonBytes, &packageConfig)
 
 		for k, _ := range packageConfig.Dependencies {
+			if strings.Contains(k, "@docusaurus") {
+				return "docusaurus"
+			}
+
 			if strings.Contains(k, "next") {
 				return "react"
 			}
