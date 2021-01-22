@@ -88,7 +88,6 @@ to quickly create a Cobra application.`,
 			log.BStart("let.sh: awaiting service local port binding")
 			// awaiting port binding
 			for i := 0; i < 10; i++ {
-
 				// get local port by pid
 				ports = process.GetPortByProcessID(currentCmd.Process.Pid)
 
@@ -108,6 +107,15 @@ to quickly create a Cobra application.`,
 
 				if len(ports) > 0 {
 					break
+				}
+
+				if _, err := ps.FindProcess(currentCmd.Process.Pid); err != nil {
+					log.Error(errors.New("service process existed, please check logs above"))
+					return
+				}
+
+				if i == 9 {
+					log.Error(errors.New("timeout waiting for service port, please check your service status"))
 				}
 			}
 		}
@@ -197,6 +205,7 @@ func SetupCloseDevelopmentHandler() {
 		//	log.Warning("Deployment canceled")
 		//	os.Exit(0)
 		//}
+		log.Warning("exited deployment")
 		os.Exit(0)
 	}()
 }
