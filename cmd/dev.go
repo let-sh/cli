@@ -16,10 +16,22 @@ limitations under the License.
 package cmd
 
 import (
+	"bufio"
 	"errors"
 	"github.com/let-sh/cli/handler/dev"
+	"github.com/let-sh/cli/handler/dev/process"
 	"github.com/let-sh/cli/log"
+	"github.com/manifoldco/promptui"
+	"github.com/mitchellh/go-ps"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"os"
+	"os/exec"
+	"os/signal"
+	"strconv"
+	"strings"
+	"syscall"
+	"time"
 )
 
 // devCmd represents the dev command
@@ -33,16 +45,118 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		if inputRemoteEndpoint == "" || inputLocalEndpoint == "" {
+		SetupCloseDevelopmentHandler()
+		var endpoint string
+		var ports []int
+		if len(inputCommand) > 0 {
+			// run server command
+			cmdSlice := strings.Split(inputCommand, " ")
+			currentCmd := exec.Command(cmdSlice[0], cmdSlice[1:]...)
+			go func() {
+				l := logrus.New()
+				customFormatter := new(logrus.TextFormatter)
+				//customFormatter.
+				customFormatter.DisableTimestamp = true
+				customFormatter.EnvironmentOverrideColors = true
+				customFormatter.ForceColors = false
+				customFormatter.FullTimestamp = true
+				customFormatter.DisableColors = false
+				l.Formatter = customFormatter
+
+				stdout, err := currentCmd.StdoutPipe()
+				if err != nil {
+					l.Error(err)
+					return
+				}
+
+				// start the command after having set up the pipe
+				if err := currentCmd.Start(); err != nil {
+					l.Error(err)
+					return
+				}
+
+				// read command's stdout line by line
+				in := bufio.NewScanner(stdout)
+
+				for in.Scan() {
+					l.Info(in.Text()) // write each line to your log, or anything you need
+				}
+				if err := in.Err(); err != nil {
+					l.Errorf("error: %s", err)
+				}
+			}()
+
+			for {
+				// wait for process to start
+				if currentCmd.Process != nil {
+					break
+				}
+			}
+
+			// awaiting port binding
+			for i := 0; i < 10; i++ {
+				// get local port by pid
+				ports = process.GetPortByProcessID(currentCmd.Process.Pid)
+
+				// get port by process child pid
+				processes, err := ps.Processes()
+				if err != nil {
+					log.Error(err)
+					return
+				}
+				for _, p := range processes {
+					if p.PPid() == currentCmd.Process.Pid {
+						ports = append(ports, process.GetPortByProcessID(p.Pid())...)
+					}
+				}
+
+				time.Sleep(time.Second * 2)
+
+				if len(ports) > 0 {
+					break
+				}
+			}
+		}
+
+		if len(inputLocalEndpoint) == 0 {
+			if len(ports) == 0 {
+				log.Warning("please specify a local endpoint")
+			}
+
+			if len(ports) == 1 {
+				endpoint = "localhost:" + strconv.Itoa(ports[0])
+			}
+
+			if len(ports) > 1 {
+				// if current dir is not previous dir
+				prompt := promptui.Select{
+					Label: "Please select a port to listen: ",
+					Items: ports,
+				}
+
+				_, result, err := prompt.Run()
+				if err != nil {
+					log.Error(err)
+					return
+				}
+				endpoint = "localhost:" + result
+			}
+		} else {
+			endpoint = inputLocalEndpoint
+		}
+
+		if inputRemoteEndpoint == "" || endpoint == "" {
 			log.Error(errors.New("currently under development"))
 		}
+
 		log.Success("you can visit http://" + inputRemoteEndpoint)
-		dev.StartClient(inputRemoteEndpoint, inputLocalEndpoint)
+		dev.StartClient(inputRemoteEndpoint, endpoint)
 	},
 }
 
 var inputRemoteEndpoint string
 var inputLocalEndpoint string
+var inputCommand string
 
 func init() {
 	rootCmd.AddCommand(devCmd)
@@ -56,6 +170,38 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// devCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	devCmd.Flags().StringVarP(&inputCommand, "command", "c", "", "command to serve service, e.g. `yarn start`, `go run main.go`")
 	devCmd.Flags().StringVarP(&inputRemoteEndpoint, "remote", "r", "", "custom remote endpoint, e.g. 127.0.0.1")
 	devCmd.Flags().StringVarP(&inputLocalEndpoint, "local", "l", "", "custom local upstream endpoint, e.g. 127.0.0.1")
+}
+
+func SetupCloseDevelopmentHandler() {
+	// TODO: trigger stop tunnel
+	c := make(chan os.Signal)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-c
+		//if len(DeploymentID) > 0 {
+		//	succeed, err := requests.CancelDeployment(DeploymentID)
+		//	if err != nil {
+		//		log.S.StopFail()
+		//		log.Error(err)
+		//		os.Exit(0)
+		//	}
+		//	if succeed {
+		//		log.S.StopFail()
+		//		log.Warning("Deployment canceled")
+		//		os.Exit(0)
+		//	} else {
+		//		log.S.StopFail()
+		//		log.Warning("Deployment cancellation failed")
+		//		os.Exit(0)
+		//	}
+		//} else {
+		//	log.S.StopFail()
+		//	log.Warning("Deployment canceled")
+		//	os.Exit(0)
+		//}
+		os.Exit(0)
+	}()
 }
