@@ -16,7 +16,7 @@ func Error(err error) {
 
 func Success(msg string) {
 	green := color.New(color.FgGreen).SprintFunc()
-	fmt.Printf("%s %s.\n", green("[success]"), msg)
+	fmt.Printf("%s %s\n", green("[success]"), msg)
 }
 
 func Warning(msg string) {

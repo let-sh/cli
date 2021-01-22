@@ -16,7 +16,6 @@ limitations under the License.
 package cmd
 
 import (
-	"bufio"
 	"errors"
 	"github.com/let-sh/cli/handler/dev"
 	"github.com/let-sh/cli/handler/dev/process"
@@ -63,27 +62,30 @@ to quickly create a Cobra application.`,
 				customFormatter.DisableColors = false
 				l.Formatter = customFormatter
 
-				stdout, err := currentCmd.StdoutPipe()
-				if err != nil {
-					l.Error(err)
-					return
-				}
+				//stdout, err := currentCmd.StdoutPipe()
+				//if err != nil {
+				//	l.Error(err)
+				//	return
+				//}
 
+				currentCmd.Stdin = os.Stdin
+				currentCmd.Stdout = os.Stdout
+				currentCmd.Stderr = os.Stderr
 				// start the command after having set up the pipe
 				if err := currentCmd.Start(); err != nil {
 					l.Error(err)
 					return
 				}
-
-				// read command's stdout line by line
-				in := bufio.NewScanner(stdout)
-
-				for in.Scan() {
-					l.Info(in.Text()) // write each line to your log, or anything you need
-				}
-				if err := in.Err(); err != nil {
-					l.Errorf("error: %s", err)
-				}
+				//
+				//// read command's stdout line by line
+				//in := bufio.NewScanner(stdout)
+				//
+				//for in.Scan() {
+				//	l.Info(string(in.Bytes())) // write each line to your log, or anything you need
+				//}
+				//if err := in.Err(); err != nil {
+				//	l.Errorf("error: %s", err)
+				//}
 			}()
 
 			for {
@@ -93,8 +95,10 @@ to quickly create a Cobra application.`,
 				}
 			}
 
+			log.BStart("let.sh: awaiting service local port binding")
 			// awaiting port binding
 			for i := 0; i < 10; i++ {
+
 				// get local port by pid
 				ports = process.GetPortByProcessID(currentCmd.Process.Pid)
 
@@ -117,6 +121,7 @@ to quickly create a Cobra application.`,
 				}
 			}
 		}
+		log.S.StopFail()
 
 		if len(inputLocalEndpoint) == 0 {
 			if len(ports) == 0 {
@@ -149,7 +154,7 @@ to quickly create a Cobra application.`,
 			log.Error(errors.New("currently under development"))
 		}
 
-		log.Success("you can visit http://" + inputRemoteEndpoint)
+		log.Success("you can visit remotely at:\nhttp://" + inputRemoteEndpoint)
 		dev.StartClient(inputRemoteEndpoint, endpoint)
 	},
 }
