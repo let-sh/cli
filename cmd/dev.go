@@ -16,14 +16,12 @@ limitations under the License.
 package cmd
 
 import (
-	"bufio"
 	"errors"
 	"github.com/let-sh/cli/handler/dev"
 	"github.com/let-sh/cli/handler/dev/process"
 	"github.com/let-sh/cli/log"
 	"github.com/manifoldco/promptui"
 	"github.com/mitchellh/go-ps"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"os"
 	"os/exec"
@@ -46,43 +44,37 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		SetupCloseDevelopmentHandler()
+		var command string
 		var endpoint string
 		var ports []int
-		if len(inputCommand) > 0 {
+
+		if len(inputCommand) == 0 {
+			// if current dir is not previous dir
+			prompt := promptui.Prompt{
+				Label: "Please enter your command to start service: ",
+			}
+			result, err := prompt.Run()
+			if err != nil {
+				log.Error(err)
+				return
+			}
+			command = result
+		} else {
+			command = inputCommand
+		}
+
+		{
 			// run server command
-			cmdSlice := strings.Split(inputCommand, " ")
+			cmdSlice := strings.Split(command, " ")
 			currentCmd := exec.Command(cmdSlice[0], cmdSlice[1:]...)
 			go func() {
-				l := logrus.New()
-				customFormatter := new(logrus.TextFormatter)
-				//customFormatter.
-				customFormatter.DisableTimestamp = true
-				customFormatter.EnvironmentOverrideColors = true
-				customFormatter.ForceColors = false
-				customFormatter.FullTimestamp = true
-				customFormatter.DisableColors = false
-				l.Formatter = customFormatter
-
-				stdout, err := currentCmd.StdoutPipe()
-				if err != nil {
-					l.Error(err)
-					return
-				}
-
 				// start the command after having set up the pipe
+				currentCmd.Stdin = os.Stdin
+				currentCmd.Stdout = os.Stdout
+				currentCmd.Stderr = os.Stderr
 				if err := currentCmd.Start(); err != nil {
-					l.Error(err)
+					log.Error(err)
 					return
-				}
-
-				// read command's stdout line by line
-				in := bufio.NewScanner(stdout)
-
-				for in.Scan() {
-					l.Info(in.Text()) // write each line to your log, or anything you need
-				}
-				if err := in.Err(); err != nil {
-					l.Errorf("error: %s", err)
 				}
 			}()
 
@@ -93,8 +85,10 @@ to quickly create a Cobra application.`,
 				}
 			}
 
+			log.BStart("let.sh: awaiting service local port binding")
 			// awaiting port binding
 			for i := 0; i < 10; i++ {
+
 				// get local port by pid
 				ports = process.GetPortByProcessID(currentCmd.Process.Pid)
 
@@ -117,6 +111,7 @@ to quickly create a Cobra application.`,
 				}
 			}
 		}
+		log.S.StopFail()
 
 		if len(inputLocalEndpoint) == 0 {
 			if len(ports) == 0 {
@@ -149,7 +144,7 @@ to quickly create a Cobra application.`,
 			log.Error(errors.New("currently under development"))
 		}
 
-		log.Success("you can visit http://" + inputRemoteEndpoint)
+		log.Success("you can visit remotely at:\nhttp://" + inputRemoteEndpoint)
 		dev.StartClient(inputRemoteEndpoint, endpoint)
 	},
 }
