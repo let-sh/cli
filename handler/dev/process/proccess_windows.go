@@ -5,6 +5,7 @@ package process
 import (
 	"fmt"
 	"github.com/let-sh/cli/log"
+	"github.com/shirou/gopsutil/process"
 	"os/exec"
 	"strconv"
 	"strings"
