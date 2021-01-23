@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"github.com/let-sh/cli/log"
 	"github.com/let-sh/cli/requests"
-	"github.com/let-sh/cli/utils"
+	"github.com/let-sh/cli/utils/config"
 	"github.com/matishsiao/goInfo"
 	"github.com/spf13/cobra"
 	"os/exec"
@@ -63,7 +63,7 @@ var loginCmd = &cobra.Command{
 			tokenInterface, err := requests.GetJsonWithPath("https://api.let.sh/oauth/ticket/"+tickeIDInterface.String(), "data.token")
 			if err == nil && tokenInterface.String() != "" {
 				// verify response
-				utils.SetToken(tokenInterface.String())
+				config.SetToken(tokenInterface.String())
 				log.S.StopMessage(" login succeed")
 				log.BStop()
 				return

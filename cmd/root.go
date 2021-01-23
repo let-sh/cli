@@ -18,7 +18,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/let-sh/cli/log"
-	"github.com/let-sh/cli/utils"
+	"github.com/let-sh/cli/utils/config"
 	"github.com/spf13/cobra"
 	"os"
 )
@@ -62,5 +62,5 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	utils.Load()
+	config.Load()
 }

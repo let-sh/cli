@@ -19,8 +19,10 @@ builds:
     goos:
       - linux
       - windows
+    flags:
+      - -trimpath
     ldflags:
-      - -X github.com/let-sh/cli/cmd.Version={{.Version}}
+      - -X github.com/let-sh/cli/info.Version={{.Version}}
       - -s
       - -w
     hooks:
@@ -34,8 +36,10 @@ builds:
       - darwin
     goarch:
       - amd64
+    flags:
+      - -trimpath
     ldflags:
-      - -X github.com/let-sh/cli/cmd.Version={{.Version}}
+      - -X github.com/let-sh/cli/info.Version={{.Version}}
       - -s
       - -w
     hooks:

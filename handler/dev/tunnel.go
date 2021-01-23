@@ -2,7 +2,7 @@ package dev
 
 import (
 	"github.com/let-sh/cli/handler/dev/tunnel"
-	"github.com/let-sh/cli/utils"
+	"github.com/let-sh/cli/info"
 )
 
 func StartClient(endpoint, local string) {
@@ -11,7 +11,7 @@ func StartClient(endpoint, local string) {
 		UpstreamMap: map[string]string{
 			"": local,
 		},
-		Token:            utils.Credentials.Token,
+		Token:            info.Credentials.Token,
 		StrictForwarding: false,
 	}
 
