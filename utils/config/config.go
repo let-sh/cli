@@ -1,15 +1,13 @@
-package utils
+package config
 
 import (
 	"encoding/json"
+	"github.com/let-sh/cli/info"
 	"github.com/let-sh/cli/log"
-	"github.com/let-sh/cli/types"
 	"github.com/mitchellh/go-homedir"
 	"io/ioutil"
 	"os"
 )
-
-var Credentials types.Credentials
 
 func init() {
 	// check config dir exists
@@ -33,18 +31,16 @@ func init() {
 
 	// bootstrap configs
 	credentialsFile, _ := ioutil.ReadFile(home + "/.let/credentials.json")
-	err = json.Unmarshal(credentialsFile, &Credentials)
+	err = json.Unmarshal(credentialsFile, &info.Credentials)
 	if err != nil {
 		log.Error(err)
 	}
 }
 
-func Load() {}
-
 func SetToken(token string) {
-	Credentials.Token = token
+	info.Credentials.Token = token
 	home, _ := homedir.Dir()
 
-	file, _ := json.MarshalIndent(Credentials, "", "  ")
+	file, _ := json.MarshalIndent(&info.Credentials, "", "  ")
 	_ = ioutil.WriteFile(home+"/.let/credentials.json", file, 0644)
 }

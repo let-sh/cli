@@ -3,7 +3,7 @@ package requests
 import (
 	"context"
 	"fmt"
-	"github.com/let-sh/cli/utils"
+	"github.com/let-sh/cli/info"
 	"github.com/machinebox/graphql"
 )
 
@@ -21,7 +21,7 @@ func CheckDeployCapability(projectName string) (hashID string, exists bool, err 
 `)
 
 	req.Var("name", projectName)
-	req.Header.Set("Authorization", "Bearer "+utils.Credentials.Token)
+	req.Header.Set("Authorization", "Bearer "+info.Credentials.Token)
 
 	// run it and capture the response
 	var respData struct {
@@ -60,7 +60,7 @@ query($type: String!, $name: String!) {
 
 	req.Var("type", uploadType)
 	req.Var("name", projectName)
-	req.Header.Set("Authorization", "Bearer "+utils.Credentials.Token)
+	req.Header.Set("Authorization", "Bearer "+info.Credentials.Token)
 
 	// run it and capture the response
 	var respData struct {
@@ -105,7 +105,7 @@ mutation($type: String!, $name: String!, $config: String, $cn: Boolean) {
 	req.Var("name", projectName)
 	req.Var("config", config)
 	req.Var("cn", cn)
-	req.Header.Set("Authorization", "Bearer "+utils.Credentials.Token)
+	req.Header.Set("Authorization", "Bearer "+info.Credentials.Token)
 
 	// run it and capture the response
 	var respData struct {
@@ -149,7 +149,7 @@ query($id: UUID!) {
 }
 `)
 	req.Var("id", id)
-	req.Header.Set("Authorization", "Bearer "+utils.Credentials.Token)
+	req.Header.Set("Authorization", "Bearer "+info.Credentials.Token)
 
 	// run it and capture the response
 	var respData struct {
@@ -192,7 +192,7 @@ query($type: String!) {
 }
 `)
 	req.Var("type", typeArg)
-	req.Header.Set("Authorization", "Bearer "+utils.Credentials.Token)
+	req.Header.Set("Authorization", "Bearer "+info.Credentials.Token)
 
 	// run it and capture the response
 	var respData struct {
@@ -221,7 +221,7 @@ mutation($deploymentID: UUID!) {
 }
 `)
 	req.Var("deploymentID", deploymentID)
-	req.Header.Set("Authorization", "Bearer "+utils.Credentials.Token)
+	req.Header.Set("Authorization", "Bearer "+info.Credentials.Token)
 
 	// run it and capture the response
 	var respData struct {
@@ -257,7 +257,7 @@ query {
   }
 }
 `, count, projectName))
-	req.Header.Set("Authorization", "Bearer "+utils.Credentials.Token)
+	req.Header.Set("Authorization", "Bearer "+info.Credentials.Token)
 
 	// run it and capture the response
 	var respData struct {
