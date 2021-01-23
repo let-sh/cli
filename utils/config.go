@@ -43,7 +43,6 @@ func Load() {}
 
 func SetToken(token string) {
 	Credentials.Token = token
-
 	home, _ := homedir.Dir()
 
 	file, _ := json.MarshalIndent(Credentials, "", "  ")

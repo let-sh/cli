@@ -21,7 +21,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var version string
+var Version string
 
 // versionCmd represents the version command
 var versionCmd = &cobra.Command{
@@ -29,7 +29,7 @@ var versionCmd = &cobra.Command{
 	Short: "Print current cli version",
 	Long:  `usage 'lets version' or 'lets --version'`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println(version)
+		fmt.Println(Version)
 	},
 }
 

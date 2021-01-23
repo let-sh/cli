@@ -17,9 +17,11 @@ package cmd
 
 import (
 	"errors"
+	"github.com/fatih/color"
 	"github.com/let-sh/cli/handler/dev"
 	"github.com/let-sh/cli/handler/dev/process"
 	"github.com/let-sh/cli/log"
+	"github.com/let-sh/cli/utils"
 	"github.com/manifoldco/promptui"
 	"github.com/mitchellh/go-ps"
 	"github.com/spf13/cobra"
@@ -47,6 +49,8 @@ var devCmd = &cobra.Command{
 		var command string
 		var endpoint string
 		var ports []int
+
+		//detectedType :=deploy.DetectProjectType()
 
 		if len(inputCommand) == 0 {
 			// if current dir is not previous dir
@@ -94,7 +98,7 @@ var devCmd = &cobra.Command{
 
 				FindAllChildrenProcess(currentCmd.Process.Pid)
 				for _, p := range processPids {
-					ports = append(ports, process.GetPortByProcessID(p)...)
+					ports = utils.RemoveDuplicates(append(ports, process.GetPortByProcessID(p)...))
 				}
 
 				time.Sleep(time.Second * 2)
@@ -130,7 +134,7 @@ var devCmd = &cobra.Command{
 			if len(ports) > 1 {
 				// if current dir is not previous dir
 				prompt := promptui.Select{
-					Label: "Please select a port to listen: ",
+					Label: "Please select a port to listen",
 					Items: ports,
 				}
 
@@ -150,7 +154,7 @@ var devCmd = &cobra.Command{
 			log.Error(errors.New("currently under development"))
 		}
 
-		log.Success("you can visit remotely at:\nhttp://" + inputRemoteEndpoint)
+		log.Success("you can visit remotely at: " + color.New(color.Bold).Sprint("http://"+inputRemoteEndpoint))
 		dev.StartClient(inputRemoteEndpoint, endpoint)
 	},
 }
@@ -179,7 +183,7 @@ func SetupCloseDevelopmentHandler() {
 	go func() {
 		<-c
 		KillServiceProcess()
-		log.Warning("exited deployment")
+		log.Warning("exited development")
 		os.Exit(0)
 	}()
 }
