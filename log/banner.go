@@ -1,6 +1,7 @@
 package log
 
 import (
+	"github.com/let-sh/cli/log/sentry"
 	"github.com/theckman/yacspin"
 	"time"
 )
@@ -21,7 +22,8 @@ func init() {
 		}
 		S, _ = yacspin.New(cfg)
 	}
-	//s = spinner.New(spinner.CharSets[14], 50*time.Millisecond)
+
+	sentry.Init()
 }
 
 func BStart(message string) {

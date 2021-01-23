@@ -92,7 +92,7 @@ var devCmd = &cobra.Command{
 
 			log.BStart("let.sh: awaiting service local port binding")
 			// awaiting port binding
-			for i := 0; i < 10; i++ {
+			for i := 0; i < 15; i++ {
 				// get local port by pid
 				processPids = append(processPids, currentCmd.Process.Pid)
 
@@ -101,7 +101,7 @@ var devCmd = &cobra.Command{
 					ports = utils.RemoveDuplicates(append(ports, process.GetPortByProcessID(p)...))
 				}
 
-				time.Sleep(time.Second * 2)
+				time.Sleep(time.Second)
 
 				if len(ports) > 0 {
 					break
