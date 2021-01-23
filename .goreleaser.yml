@@ -20,7 +20,7 @@ builds:
       - linux
       - windows
     ldflags:
-      - -X github.com/let-sh/cli/cmd.Version={{.Version}}
+      - -X github.com/let-sh/cli/info.Version={{.Version}}
       - -s
       - -w
     hooks:
@@ -35,7 +35,7 @@ builds:
     goarch:
       - amd64
     ldflags:
-      - -X github.com/let-sh/cli/cmd.Version={{.Version}}
+      - -X github.com/let-sh/cli/info.Version={{.Version}}
       - -s
       - -w
     hooks:

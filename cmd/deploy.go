@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"github.com/fatih/color"
 	"github.com/let-sh/cli/handler/deploy"
+	"github.com/let-sh/cli/info"
 	"github.com/let-sh/cli/log"
 	"github.com/let-sh/cli/requests"
 	"github.com/let-sh/cli/types"
@@ -54,7 +55,7 @@ var deployCmd = &cobra.Command{
 		SetupCloseHandler()
 
 		// check whether user is logged in
-		if utils.Credentials.Token == "" {
+		if info.Credentials.Token == "" {
 			log.Warning("please login via `lets login` first")
 			return
 		}
