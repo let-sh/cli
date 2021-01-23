@@ -1,5 +1,5 @@
 /*
-Copyright © 2021 NAME HERE <EMAIL ADDRESS>
+Copyright © 2021 Fred Liang <fred@oasis.ac>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -32,16 +32,16 @@ import (
 	"time"
 )
 
+var inputRemoteEndpoint string
+var inputLocalEndpoint string
+var inputCommand string
+var processPids []int
+
 // devCmd represents the dev command
 var devCmd = &cobra.Command{
 	Use:   "dev",
 	Short: "Start development environment",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Long:  `Start development environment, let.sh cli will automatically export your service with development endpoint`,
 	Run: func(cmd *cobra.Command, args []string) {
 		SetupCloseDevelopmentHandler()
 		var command string
@@ -51,7 +51,7 @@ to quickly create a Cobra application.`,
 		if len(inputCommand) == 0 {
 			// if current dir is not previous dir
 			prompt := promptui.Prompt{
-				Label: "Please enter your command to start service: ",
+				Label: "Please enter your command to start service",
 			}
 			result, err := prompt.Run()
 			if err != nil {
@@ -73,6 +73,7 @@ to quickly create a Cobra application.`,
 				currentCmd.Stdout = os.Stdout
 				currentCmd.Stderr = os.Stderr
 				if err := currentCmd.Start(); err != nil {
+					KillServiceProcess()
 					log.Error(err)
 					return
 				}
@@ -89,18 +90,11 @@ to quickly create a Cobra application.`,
 			// awaiting port binding
 			for i := 0; i < 10; i++ {
 				// get local port by pid
-				ports = process.GetPortByProcessID(currentCmd.Process.Pid)
+				processPids = append(processPids, currentCmd.Process.Pid)
 
-				// get port by process child pid
-				processes, err := ps.Processes()
-				if err != nil {
-					log.Error(err)
-					return
-				}
-				for _, p := range processes {
-					if p.PPid() == currentCmd.Process.Pid {
-						ports = append(ports, process.GetPortByProcessID(p.Pid())...)
-					}
+				FindAllChildrenProcess(currentCmd.Process.Pid)
+				for _, p := range processPids {
+					ports = append(ports, process.GetPortByProcessID(p)...)
 				}
 
 				time.Sleep(time.Second * 2)
@@ -111,11 +105,14 @@ to quickly create a Cobra application.`,
 
 				if _, err := ps.FindProcess(currentCmd.Process.Pid); err != nil {
 					log.Error(errors.New("service process existed, please check logs above"))
+					KillServiceProcess()
 					return
 				}
 
 				if i == 9 {
 					log.Error(errors.New("timeout waiting for service port, please check your service status"))
+					KillServiceProcess()
+					return
 				}
 			}
 		}
@@ -139,6 +136,7 @@ to quickly create a Cobra application.`,
 
 				_, result, err := prompt.Run()
 				if err != nil {
+					KillServiceProcess()
 					log.Error(err)
 					return
 				}
@@ -156,10 +154,6 @@ to quickly create a Cobra application.`,
 		dev.StartClient(inputRemoteEndpoint, endpoint)
 	},
 }
-
-var inputRemoteEndpoint string
-var inputLocalEndpoint string
-var inputCommand string
 
 func init() {
 	rootCmd.AddCommand(devCmd)
@@ -184,28 +178,30 @@ func SetupCloseDevelopmentHandler() {
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
-		//if len(DeploymentID) > 0 {
-		//	succeed, err := requests.CancelDeployment(DeploymentID)
-		//	if err != nil {
-		//		log.S.StopFail()
-		//		log.Error(err)
-		//		os.Exit(0)
-		//	}
-		//	if succeed {
-		//		log.S.StopFail()
-		//		log.Warning("Deployment canceled")
-		//		os.Exit(0)
-		//	} else {
-		//		log.S.StopFail()
-		//		log.Warning("Deployment cancellation failed")
-		//		os.Exit(0)
-		//	}
-		//} else {
-		//	log.S.StopFail()
-		//	log.Warning("Deployment canceled")
-		//	os.Exit(0)
-		//}
+		KillServiceProcess()
 		log.Warning("exited deployment")
 		os.Exit(0)
 	}()
+}
+
+func KillServiceProcess() {
+	for _, pid := range processPids {
+		process.Kill(pid)
+	}
+}
+
+func FindAllChildrenProcess(pid int) (exists bool, childrenPid int) {
+	processes, err := ps.Processes()
+	if err != nil {
+		log.Error(err)
+		KillServiceProcess()
+		return
+	}
+	for _, p := range processes {
+		if p.PPid() == pid {
+			processPids = append(processPids, p.Pid())
+			return FindAllChildrenProcess(p.Pid())
+		}
+	}
+	return false, 0
 }

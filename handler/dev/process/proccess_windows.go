@@ -35,3 +35,8 @@ func GetPortByProcessID(pid int) []int {
 	}
 	return ports
 }
+
+func Kill(pid int) {
+	p := process.Process{Pid: int32(pid)}
+	p.Kill()
+}

@@ -4,6 +4,7 @@ package process
 
 import (
 	"github.com/let-sh/cli/log"
+	"github.com/shirou/gopsutil/process"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -29,4 +30,9 @@ func GetPortByProcessID(pid int) []int {
 		ports = append(ports, port)
 	}
 	return ports
+}
+
+func Kill(pid int) {
+	p := process.Process{Pid: int32(pid)}
+	p.Kill()
 }
