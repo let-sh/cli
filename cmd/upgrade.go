@@ -16,10 +16,7 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
-	"os"
-	"os/exec"
-
+	"github.com/let-sh/cli/utils/update"
 	"github.com/spf13/cobra"
 )
 
@@ -29,13 +26,7 @@ var upgradeCmd = &cobra.Command{
 	Short: "Upgrade let.sh cli ",
 	Long:  `Upgrade let.sh cli to latest version.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		c := exec.Command("sh", "-c", "curl install.let.sh.cn | bash")
-		c.Stdout = os.Stdout
-		c.Stderr = os.Stderr
-		err := c.Run()
-		if err != nil {
-			fmt.Printf("commad run failed with %s\n", err)
-		}
+		update.UpgradeCli("stable")
 	},
 }
 

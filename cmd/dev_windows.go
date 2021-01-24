@@ -1,4 +1,4 @@
-// +build !windows
+// +build windows
 /*
 Copyright © 2021 Fred Liang <fred@oasis.ac>
 
@@ -19,7 +19,6 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"github.com/creack/pty"
 	"github.com/let-sh/cli/handler/dev"
 	"github.com/let-sh/cli/handler/dev/process"
 	"github.com/let-sh/cli/log"
@@ -29,7 +28,6 @@ import (
 	"github.com/mitchellh/go-ps"
 	"github.com/segmentio/textio"
 	"github.com/spf13/cobra"
-	"golang.org/x/term"
 	"io"
 	"os"
 	"os/exec"
@@ -80,42 +78,15 @@ var devCmd = &cobra.Command{
 			cmdSlice := strings.Split(command, " ")
 			currentCmd := exec.Command(cmdSlice[0], cmdSlice[1:]...)
 			go func() {
-				// Start the command with a pty.
-				ptmx, err := pty.Start(currentCmd)
-				if err != nil {
+				// start the command after having set up the pipe
+				currentCmd.Stdin = os.Stdin
+				currentCmd.Stdout = os.Stdout
+				currentCmd.Stderr = os.Stderr
+				if err := currentCmd.Start(); err != nil {
+					KillServiceProcess()
 					log.Error(err)
 					return
 				}
-				// Make sure to close the pty at the end.
-				defer func() { _ = ptmx.Close() }() // Best effort.
-
-				// Handle pty size.
-				ch := make(chan os.Signal, 1)
-				signal.Notify(ch, syscall.SIGWINCH)
-				go func() {
-					for range ch {
-						size, _ := pty.GetsizeFull(ptmx)
-						pty.Setsize(ptmx, size)
-
-						//if err := pty.InheritSize(os.Stdin, ptmx); err != nil {
-						//	log.Errorf("error resizing pty: %s", err.Error())
-						//}
-					}
-				}()
-				ch <- syscall.SIGWINCH // Initial resize.
-
-				// Set stdin in raw mode.
-				oldState, err := term.MakeRaw(int(os.Stdin.Fd()))
-				if err != nil {
-					panic(err)
-				}
-				defer func() { _ = term.Restore(int(os.Stdin.Fd()), oldState) }() // Best effort.
-
-				// Copy stdin to the pty and the pty to stdout.
-				go func() {
-					_, _ = io.Copy(ptmx, os.Stdin)
-				}()
-				copyIndent(os.Stdout, ptmx)
 			}()
 
 			for {
