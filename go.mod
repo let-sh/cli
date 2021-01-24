@@ -13,6 +13,7 @@ require (
 	github.com/golang/protobuf v1.3.4 // indirect
 	github.com/google/go-cmp v0.5.4 // indirect
 	github.com/gorilla/websocket v1.4.2
+	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/machinebox/graphql v0.2.2
 	github.com/manifoldco/promptui v0.8.0
 	github.com/matishsiao/goInfo v0.0.0-20200404012835-b5f882ee2288
@@ -26,6 +27,7 @@ require (
 	github.com/rancher/remotedialer v0.2.6-0.20201012155453-8b1b7bb7d05f
 	github.com/rogpeppe/go-internal v1.3.0
 	github.com/satori/go.uuid v1.2.0 // indirect
+	github.com/segmentio/textio v1.2.0
 	github.com/shirou/gopsutil v3.20.12+incompatible
 	github.com/sirupsen/logrus v1.7.0
 	github.com/spf13/cobra v1.1.1

@@ -17,14 +17,19 @@ package cmd
 
 import (
 	"errors"
-	"github.com/fatih/color"
+	"fmt"
+	"github.com/creack/pty"
 	"github.com/let-sh/cli/handler/dev"
 	"github.com/let-sh/cli/handler/dev/process"
 	"github.com/let-sh/cli/log"
 	"github.com/let-sh/cli/utils"
+	"github.com/logrusorgru/aurora"
 	"github.com/manifoldco/promptui"
 	"github.com/mitchellh/go-ps"
+	"github.com/segmentio/textio"
 	"github.com/spf13/cobra"
+	"golang.org/x/term"
+	"io"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -46,6 +51,8 @@ var devCmd = &cobra.Command{
 	Long:  `Start development environment, let.sh cli will automatically export your service with development endpoint`,
 	Run: func(cmd *cobra.Command, args []string) {
 		SetupCloseDevelopmentHandler()
+		defer KillServiceProcess()
+
 		var command string
 		var endpoint string
 		var ports []int
@@ -72,15 +79,43 @@ var devCmd = &cobra.Command{
 			cmdSlice := strings.Split(command, " ")
 			currentCmd := exec.Command(cmdSlice[0], cmdSlice[1:]...)
 			go func() {
-				// start the command after having set up the pipe
-				currentCmd.Stdin = os.Stdin
-				currentCmd.Stdout = os.Stdout
-				currentCmd.Stderr = os.Stderr
-				if err := currentCmd.Start(); err != nil {
-					KillServiceProcess()
+				// Start the command with a pty.
+				ptmx, err := pty.Start(currentCmd)
+				if err != nil {
 					log.Error(err)
 					return
 				}
+				// Make sure to close the pty at the end.
+				defer func() { _ = ptmx.Close() }() // Best effort.
+
+				// Handle pty size.
+				ch := make(chan os.Signal, 1)
+				signal.Notify(ch, syscall.SIGWINCH)
+				go func() {
+					for range ch {
+						size, _ := pty.GetsizeFull(ptmx)
+						pty.Setsize(ptmx, size)
+
+						//if err := pty.InheritSize(os.Stdin, ptmx); err != nil {
+						//	log.Errorf("error resizing pty: %s", err.Error())
+						//}
+					}
+				}()
+				ch <- syscall.SIGWINCH // Initial resize.
+
+				// Set stdin in raw mode.
+				oldState, err := term.MakeRaw(int(os.Stdin.Fd()))
+				if err != nil {
+					panic(err)
+				}
+				defer func() { _ = term.Restore(int(os.Stdin.Fd()), oldState) }() // Best effort.
+
+				// Copy stdin to the pty and the pty to stdout.
+				// TODO: currently stop stdin
+				//go func() {
+				//	_, _ = io.Copy(ptmx, os.Stdin)
+				//}()
+				copyIndent(os.Stdout, ptmx)
 			}()
 
 			for {
@@ -90,7 +125,6 @@ var devCmd = &cobra.Command{
 				}
 			}
 
-			log.BStart("let.sh: awaiting service local port binding")
 			// awaiting port binding
 			for i := 0; i < 15; i++ {
 				// get local port by pid
@@ -120,7 +154,6 @@ var devCmd = &cobra.Command{
 				}
 			}
 		}
-		log.S.StopFail()
 
 		if len(inputLocalEndpoint) == 0 {
 			if len(ports) == 0 {
@@ -153,8 +186,8 @@ var devCmd = &cobra.Command{
 		if inputRemoteEndpoint == "" || endpoint == "" {
 			log.Error(errors.New("currently under development"))
 		}
+		fmt.Println("\n"+aurora.BrightCyan("[msg]").String(), "you can visit remotely at: "+aurora.Bold("http://"+inputRemoteEndpoint).String()+"\n")
 
-		log.Success("you can visit remotely at: " + color.New(color.Bold).Sprint("http://"+inputRemoteEndpoint))
 		dev.StartClient(inputRemoteEndpoint, endpoint)
 	},
 }
@@ -171,9 +204,9 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// devCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	devCmd.Flags().StringVarP(&inputCommand, "command", "c", "", "command to serve service, e.g. `yarn start`, `go run main.go`")
-	devCmd.Flags().StringVarP(&inputRemoteEndpoint, "remote", "r", "", "custom remote endpoint, e.g. 127.0.0.1")
-	devCmd.Flags().StringVarP(&inputLocalEndpoint, "local", "l", "", "custom local upstream endpoint, e.g. 127.0.0.1")
+	devCmd.Flags().StringVarP(&inputCommand, "command", "c", "", "command to serve service, e.g. 'yarn start', 'go run main.go'")
+	devCmd.Flags().StringVarP(&inputRemoteEndpoint, "remote", "r", "", "custom remote endpoint, e.g. remote.example.com:3000")
+	devCmd.Flags().StringVarP(&inputLocalEndpoint, "local", "l", "", "custom local upstream endpoint, e.g. 127.0.0.1:3000")
 }
 
 func SetupCloseDevelopmentHandler() {
@@ -208,4 +241,18 @@ func FindAllChildrenProcess(pid int) (exists bool, childrenPid int) {
 		}
 	}
 	return false, 0
+}
+
+func copyIndent(w io.Writer, r io.Reader) error {
+	p := textio.NewPrefixWriter(w, aurora.Gray(5, "[log] ").String())
+
+	// Copy data from an input stream into the PrefixWriter, all lines will
+	// be prefixed with a '\t' character.
+	if _, err := io.Copy(p, r); err != nil {
+		return err
+	}
+
+	// Flushes any data buffered in the PrefixWriter, this is important in
+	// case the last line was not terminated by a '\n' character.
+	return p.Flush()
 }
