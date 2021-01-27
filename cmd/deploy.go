@@ -255,10 +255,11 @@ var deployCmd = &cobra.Command{
 
 		// save deployment info
 		cache.SaveProjectInfo(types.Project{
-			ID:   deployment.Project.ID,
-			Name: deploymentConfig.Name,
-			Dir:  pwd,
-			Type: deploymentConfig.Type,
+			ID:           deployment.Project.ID,
+			Name:         deploymentConfig.Name,
+			Dir:          pwd,
+			Type:         deploymentConfig.Type,
+			ServeCommand: cache.ProjectsInfo[deploymentConfig.Name].ServeCommand,
 		})
 
 		log.BStart("deploying")

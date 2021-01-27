@@ -50,8 +50,6 @@ var devCmd = &cobra.Command{
 	Short: "Start development environment",
 	Long:  `Start development environment, let.sh cli will automatically export your service with development endpoint`,
 	Run: func(cmd *cobra.Command, args []string) {
-		SetupCloseDevelopmentHandler()
-		defer KillServiceProcess()
 
 		var command string
 		var endpoint string
@@ -89,6 +87,9 @@ var devCmd = &cobra.Command{
 
 		p.ServeCommand = command
 		cache.SaveProjectInfo(p)
+		SetupCloseDevelopmentHandler(p.ID)
+
+		defer KillServiceProcess(p.ID)
 
 		// request to start tunnel
 		result, err := requests.StartDevelopment(p.ID)
@@ -130,13 +131,13 @@ var devCmd = &cobra.Command{
 
 				if _, err := ps.FindProcess(currentCmd.Process.Pid); err != nil {
 					log.Error(errors.New("service process existed, please check logs above"))
-					KillServiceProcess()
+					KillServiceProcess(p.ID)
 					return
 				}
 
 				if i == 9 {
 					log.Error(errors.New("timeout waiting for service port, please check your service status"))
-					KillServiceProcess()
+					KillServiceProcess(p.ID)
 					return
 				}
 			}
@@ -160,7 +161,7 @@ var devCmd = &cobra.Command{
 
 				_, result, err := prompt.Run()
 				if err != nil {
-					KillServiceProcess()
+					KillServiceProcess(p.ID)
 					log.Error(err)
 					return
 				}
@@ -199,19 +200,20 @@ func init() {
 	devCmd.Flags().StringVarP(&inputLocalEndpoint, "local", "l", "", "custom local upstream endpoint, e.g. 127.0.0.1:3000")
 }
 
-func SetupCloseDevelopmentHandler() {
+func SetupCloseDevelopmentHandler(projectID string) {
 	// TODO: trigger stop tunnel
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
-		KillServiceProcess()
+		KillServiceProcess(projectID)
 		log.Warning("exited development")
 		os.Exit(0)
 	}()
 }
 
-func KillServiceProcess() {
+func KillServiceProcess(projectID string) {
+	requests.StopDevelopment(projectID)
 	for _, pid := range processPids {
 		process.Kill(pid)
 	}
@@ -221,7 +223,6 @@ func FindAllChildrenProcess(pid int) (exists bool, childrenPid int) {
 	processes, err := ps.Processes()
 	if err != nil {
 		log.Error(err)
-		KillServiceProcess()
 		return
 	}
 	for _, p := range processes {
