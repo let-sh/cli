@@ -80,6 +80,7 @@ var deployCmd = &cobra.Command{
 			}
 
 			// Step2: get cache config
+			//cache.GetProjectInfo(deploymentConfig.Name)
 
 			// Step3: load user config
 			_, err = os.Stat("let.json")

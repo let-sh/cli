@@ -24,6 +24,11 @@ func CheckUpdate() {
 		return
 	}
 
+	if strings.Contains(info.Version, "development") {
+		return
+	}
+
+	// else
 	if latest, err := requests.GetLatestVersion("stable"); info.Version != latest && err != nil {
 		NotifyUpgrade("stable")
 	}

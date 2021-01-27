@@ -9,6 +9,10 @@ type ProjectsInfo map[string]Project
 
 type Project struct {
 	Name string `json:"name"`
-	Dir  string `json:"dir"`
-	Type string `json:"type"`
+
+	// local dir
+	Dir string `json:"dir"`
+
+	Type         string `json:"type"`
+	ServeCommand string `json:"serve_command"`
 }

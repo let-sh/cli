@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"github.com/let-sh/cli/log"
 	"github.com/let-sh/cli/utils/config"
+	"github.com/let-sh/cli/utils/update"
 	"github.com/spf13/cobra"
 	"os"
 )
@@ -46,7 +47,7 @@ func Execute() {
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
+	cobra.OnInitialize(initConfig, update.CheckUpdate)
 
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
@@ -63,5 +64,4 @@ func init() {
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
 	config.Load()
-
 }

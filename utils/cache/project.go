@@ -2,6 +2,7 @@ package cache
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/let-sh/cli/log"
 	"github.com/let-sh/cli/types"
 	"github.com/mitchellh/go-homedir"
@@ -35,4 +36,13 @@ func SaveProjectInfo(projectInfo types.Project) error {
 	home, _ := homedir.Dir()
 	err = ioutil.WriteFile(home+"/.let/projects.json", byteValue, 0644)
 	return nil
+}
+
+func GetProjectInfo(dir string) (project types.Project, err error) {
+	for _, v := range ProjectsInfo {
+		if v.Dir == dir {
+			return v, nil
+		}
+	}
+	return project, fmt.Errorf("project not found: %v", dir)
 }
