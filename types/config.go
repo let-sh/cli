@@ -8,6 +8,7 @@ type Credentials struct {
 type ProjectsInfo map[string]Project
 
 type Project struct {
+	ID   string `json:"id"`
 	Name string `json:"name"`
 
 	// local dir

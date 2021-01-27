@@ -22,6 +22,7 @@ import (
 	c "github.com/let-sh/cli/handler/dev/command"
 	"github.com/let-sh/cli/handler/dev/process"
 	"github.com/let-sh/cli/log"
+	"github.com/let-sh/cli/requests"
 	"github.com/let-sh/cli/utils"
 	"github.com/let-sh/cli/utils/cache"
 	"github.com/logrusorgru/aurora"
@@ -88,6 +89,14 @@ var devCmd = &cobra.Command{
 
 		p.ServeCommand = command
 		cache.SaveProjectInfo(p)
+
+		// request to start tunnel
+		result, err := requests.StartDevelopment(p.ID)
+		if err != nil {
+			log.Error(err)
+			return
+		}
+		remoteEndpoint := result.RemoteAddress + ":" + strconv.Itoa(result.RemotePort)
 
 		{
 			// run server command
@@ -158,7 +167,7 @@ var devCmd = &cobra.Command{
 				endpoint = "localhost:" + result
 			}
 		} else {
-			endpoint = inputLocalEndpoint
+			endpoint = remoteEndpoint
 		}
 
 		if inputRemoteEndpoint == "" || endpoint == "" {
@@ -183,7 +192,10 @@ func init() {
 	// is called directly, e.g.:
 	// devCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	devCmd.Flags().StringVarP(&inputCommand, "command", "c", "", "command to serve service, e.g. 'yarn start', 'go run main.go'")
+
 	devCmd.Flags().StringVarP(&inputRemoteEndpoint, "remote", "r", "", "custom remote endpoint, e.g. remote.example.com:3000")
+	deployCmd.Flags().MarkHidden("remote")
+
 	devCmd.Flags().StringVarP(&inputLocalEndpoint, "local", "l", "", "custom local upstream endpoint, e.g. 127.0.0.1:3000")
 }
 

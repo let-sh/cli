@@ -88,6 +88,9 @@ func Deploy(projectType, projectName, config string, cn bool) (deployment struct
 	NetworkStage string `json:"networkStage"`
 	PackerStage  string `json:"packerStage"`
 	Status       string `json:"status"`
+	Project      struct {
+		ID string `json:"id"`
+	} `json:"project"`
 }, err error) {
 	req := graphql.NewRequest(`
 mutation($type: String!, $name: String!, $config: String, $cn: Boolean) {
@@ -115,6 +118,9 @@ mutation($type: String!, $name: String!, $config: String, $cn: Boolean) {
 			NetworkStage string `json:"networkStage"`
 			PackerStage  string `json:"packerStage"`
 			Status       string `json:"status"`
+			Project      struct {
+				ID string `json:"id"`
+			} `json:"project"`
 		} `json:"deploy,omitempty"`
 	}
 	if err := Graphql.Run(context.Background(), req, &respData); err != nil {
@@ -274,6 +280,58 @@ query {
 	}
 
 	return respData.Deployments, nil
+}
+
+func StartDevelopment(projectID string) (
+	startDevelopmentResult struct {
+		RemotePort    int    `json:"remotePort,omitempty"`
+		RemoteAddress string `json:"remoteAddress,omitempty"`
+	}, err error) {
+	req := graphql.NewRequest(`
+mutation($projectID: UUID!) {
+	startDevelopment(projectID:$projectID) {
+		remotePort
+    	remoteAddress
+	}
+}
+`)
+	req.Var("projectID", projectID)
+	req.Header.Set("Authorization", "Bearer "+info.Credentials.Token)
+
+	// run it and capture the response
+	var respData struct {
+		StartDevelopment struct {
+			RemotePort    int    `json:"remotePort,omitempty"`
+			RemoteAddress string `json:"remoteAddress,omitempty"`
+		} `json:"startDevelopment,omitempty"`
+	}
+	if err := Graphql.Run(context.Background(), req, &respData); err != nil {
+		return startDevelopmentResult, err
+	}
+
+	return respData.StartDevelopment, nil
+}
+
+func StopDevelopment(projectID string) (
+	stopDevelopmentResult bool, err error) {
+	req := graphql.NewRequest(`
+mutation($projectID: UUID!) {
+	stopDevelopment(projectID:$projectID) 
+}
+`)
+	req.Var("projectID", projectID)
+	req.Header.Set("Authorization", "Bearer "+info.Credentials.Token)
+
+	// run it and capture the response
+	var respData struct {
+		StopDevelopment bool `json:"stopDevelopment,omitempty"`
+	}
+	if err := Graphql.Run(context.Background(), req, &respData); err != nil {
+
+		return stopDevelopmentResult, err
+	}
+
+	return respData.StopDevelopment, nil
 }
 
 //func QueryLogs(deploymentID string, count int) (

@@ -255,6 +255,7 @@ var deployCmd = &cobra.Command{
 
 		// save deployment info
 		cache.SaveProjectInfo(types.Project{
+			ID:   deployment.Project.ID,
 			Name: deploymentConfig.Name,
 			Dir:  pwd,
 			Type: deploymentConfig.Type,
