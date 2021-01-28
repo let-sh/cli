@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/let-sh/cli/info"
 	"github.com/machinebox/graphql"
+	"github.com/sirupsen/logrus"
 )
 
 // create a client (safe to share across requests)
@@ -100,6 +101,9 @@ mutation($type: String!, $name: String!, $config: String, $cn: Boolean) {
 		networkStage
 		packerStage
 		status
+		project {
+			id
+		}
 	  }
 }
 `)
@@ -123,6 +127,7 @@ mutation($type: String!, $name: String!, $config: String, $cn: Boolean) {
 			} `json:"project"`
 		} `json:"deploy,omitempty"`
 	}
+
 	if err := Graphql.Run(context.Background(), req, &respData); err != nil {
 		//if len(respData.Error.Errors) > 0 {
 		//	return "", false, errors.New(respData.Error.Errors[0].Message)
@@ -130,7 +135,8 @@ mutation($type: String!, $name: String!, $config: String, $cn: Boolean) {
 
 		return deployment, err
 	}
-
+	logrus.Debugln(respData)
+	logrus.Debug(Graphql.Log)
 	return respData.Deploy, nil
 }
 
