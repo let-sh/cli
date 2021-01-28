@@ -52,7 +52,7 @@ var devCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 
 		var command string
-		var endpoint string
+		var localEndpoint string
 		var ports []int
 
 		//detectedType :=deploy.DetectProjectType()
@@ -143,13 +143,15 @@ var devCmd = &cobra.Command{
 			}
 		}
 
+		// if no input local port
+		// detect service port
 		if len(inputLocalEndpoint) == 0 {
 			if len(ports) == 0 {
 				log.Warning("please specify a local endpoint")
 			}
 
 			if len(ports) == 1 {
-				endpoint = "localhost:" + strconv.Itoa(ports[0])
+				localEndpoint = "localhost:" + strconv.Itoa(ports[0])
 			}
 
 			if len(ports) > 1 {
@@ -165,18 +167,20 @@ var devCmd = &cobra.Command{
 					log.Error(err)
 					return
 				}
-				endpoint = "localhost:" + result
+				localEndpoint = "localhost:" + result
 			}
 		} else {
-			endpoint = remoteEndpoint
+			localEndpoint = inputLocalEndpoint
 		}
 
-		if inputRemoteEndpoint == "" || endpoint == "" {
+		// if remote or local endpoint not exists
+		if remoteEndpoint == "" || localEndpoint == "" {
 			log.Error(errors.New("currently under development"))
 		}
-		fmt.Println("\n"+aurora.BrightCyan("[msg]").Bold().String(), "you can visit remotely at: "+aurora.Bold("http://"+inputRemoteEndpoint).String()+"\n\r")
 
-		dev.StartClient(inputRemoteEndpoint, endpoint)
+		fmt.Println("\n"+aurora.BrightCyan("[msg]").Bold().String(), "you can visit remotely at: "+aurora.Bold("https://"+result.Fqdn).String()+"\n\r")
+
+		dev.StartClient(remoteEndpoint, localEndpoint)
 	},
 }
 

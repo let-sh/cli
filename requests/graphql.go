@@ -286,12 +286,14 @@ func StartDevelopment(projectID string) (
 	startDevelopmentResult struct {
 		RemotePort    int    `json:"remotePort,omitempty"`
 		RemoteAddress string `json:"remoteAddress,omitempty"`
+		Fqdn          string `json:"fqdn,omitempty"`
 	}, err error) {
 	req := graphql.NewRequest(`
 mutation($projectID: UUID!) {
 	startDevelopment(projectID:$projectID) {
 		remotePort
     	remoteAddress
+		fqdn
 	}
 }
 `)
@@ -303,6 +305,7 @@ mutation($projectID: UUID!) {
 		StartDevelopment struct {
 			RemotePort    int    `json:"remotePort,omitempty"`
 			RemoteAddress string `json:"remoteAddress,omitempty"`
+			Fqdn          string `json:"fqdn,omitempty"`
 		} `json:"startDevelopment,omitempty"`
 	}
 	if err := Graphql.Run(context.Background(), req, &respData); err != nil {
