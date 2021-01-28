@@ -18,7 +18,7 @@ type ConnectAuthorizer func(proto, address string) bool
 func ClientConnect(ctx context.Context, wsURL string, headers http.Header, dialer *websocket.Dialer,
 	auth remotedialer.ConnectAuthorizer, onConnect func(context.Context, *remotedialer.Session) error) error {
 	if err := ConnectToProxy(ctx, wsURL, headers, auth, dialer, onConnect); err != nil {
-		logrus.WithError(err).Error("Remotedialer proxy error")
+		logrus.WithError(err).Debug("Remotedialer proxy error")
 		time.Sleep(time.Duration(5) * time.Second)
 		return err
 	}
