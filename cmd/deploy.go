@@ -31,6 +31,7 @@ import (
 	"github.com/manifoldco/promptui"
 	"github.com/mholt/archiver/v3"
 	c "github.com/otiai10/copy"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"io/ioutil"
 	"os"
@@ -84,7 +85,7 @@ var deployCmd = &cobra.Command{
 
 			// Step3: load user config
 			_, err = os.Stat("let.json")
-			if !os.IsNotExist(err) {
+			if err == nil {
 				jsonFile, err := os.Open("let.json")
 				// if we os.Open returns an error then handle it
 				if err != nil {
@@ -94,7 +95,13 @@ var deployCmd = &cobra.Command{
 				// defer the closing of our jsonFile so that we can parse it later on
 				defer jsonFile.Close()
 				byteValue, _ := ioutil.ReadAll(jsonFile)
-				json.Unmarshal(byteValue, &deploymentConfig)
+				configStr := string(byteValue)
+				logrus.WithFields(logrus.Fields{"configFile": configStr}).Debugln("let.json")
+				err = json.Unmarshal(byteValue, &deploymentConfig)
+				if err != nil {
+					logrus.Error(err)
+					return
+				}
 			}
 
 			// Step4: merge cli flag config
@@ -241,7 +248,13 @@ var deployCmd = &cobra.Command{
 
 		}
 
+		logrus.WithFields(logrus.Fields{
+			"json": deploymentConfig,
+		}).Debugln("deploymentConfig")
+
 		configBytes, _ := json.Marshal(deploymentConfig)
+
+		logrus.Debugln(configBytes)
 		deployment, err := requests.Deploy(deploymentConfig.Type, deploymentConfig.Name, string(configBytes), inputCN)
 
 		if err != nil {

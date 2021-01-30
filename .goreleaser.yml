@@ -18,6 +18,17 @@ builds:
     id: lets
     goos:
       - linux
+    flags:
+      - -trimpath
+    ldflags:
+      - -X github.com/let-sh/cli/info.Version={{.Version}}
+      - -s
+      - -w
+  - env:
+      - CGO_ENABLED=0
+    binary: lets
+    id: lets_windows
+    goos:
       - windows
     flags:
       - -trimpath
@@ -27,7 +38,7 @@ builds:
       - -w
     hooks:
       post:
-#        - upx {{ .Path }}
+        - go-msi make --msi let.sh.msi --version {{.Version}}
   - env:
       - CGO_ENABLED=0
     binary: lets
@@ -44,7 +55,7 @@ builds:
       - -w
     hooks:
       post:
-#        - upx "{{ .Path }}"
+        - upx "{{ .Path }}"
         - gon gon.hcl
 checksum:
   name_template: 'checksums.txt'

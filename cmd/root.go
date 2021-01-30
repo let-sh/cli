@@ -20,6 +20,7 @@ import (
 	"github.com/let-sh/cli/log"
 	"github.com/let-sh/cli/utils/config"
 	"github.com/let-sh/cli/utils/update"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"os"
 )
@@ -64,4 +65,9 @@ func init() {
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
 	config.Load()
+	if Debug {
+		logrus.SetLevel(logrus.DebugLevel)
+	} else {
+		logrus.SetLevel(logrus.ErrorLevel)
+	}
 }

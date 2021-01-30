@@ -1,8 +1,8 @@
 package types
 
 type LetConfig struct {
-	Name string `json:"name,omitempty"`
-	Type string `json:"type,omitempty"`
+	Name string            `json:"name,omitempty"`
+	Type string            `json:"type,omitempty"`
 	Env  map[string]string `json:"env,omitempty"`
 	//Build struct {
 	//	Env struct {
@@ -16,11 +16,10 @@ type LetConfig struct {
 		Source      string `json:"source,omitempty"`
 		Destination string `json:"destination,omitempty"`
 		Type        int    `json:"type,omitempty"`
-	} `json:"redirect,omitempty"`
-	Rewrite  []struct {
+	} `json:"redirects,omitempty"`
+	Rewrite []struct {
 		Source      string `json:"source,omitempty"`
 		Destination string `json:"destination,omitempty"`
-		Type        int    `json:"type,omitempty"`
-	} `json:"rewrite,omitempty"`
-	Link    []string      `json:"link,omitempty"`
+	} `json:"rewrites,omitempty"`
+	Link []string `json:"link,omitempty"`
 }
