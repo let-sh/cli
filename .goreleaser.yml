@@ -36,9 +36,9 @@ builds:
       - -X github.com/let-sh/cli/info.Version={{.Version}}
       - -s
       - -w
-    hooks:
-      post:
-        - go-msi make --msi let.sh.msi --version {{.Version}}
+#    hooks:
+#      post:
+#        - go-msi make --msi let.sh.msi --version {{.Version}}
   - env:
       - CGO_ENABLED=0
     binary: lets
