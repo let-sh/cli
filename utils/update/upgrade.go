@@ -8,12 +8,16 @@ import (
 	"github.com/let-sh/cli/log"
 	"github.com/let-sh/cli/requests"
 	"github.com/sirupsen/logrus"
+	"github.com/vbauerster/mpb/v5"
+	"github.com/vbauerster/mpb/v5/decor"
 	"io"
 	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strconv"
+	"time"
 )
 
 func UpgradeCli() {
@@ -116,12 +120,40 @@ func DownloadBinaryCompressedFile(filename, tempDir string) error {
 		}).WithError(err).Debugln("download binary compressed file error")
 		return fmt.Errorf("bad status: %s", resp.Status)
 	}
+	bodySize, err := strconv.ParseInt(resp.Header["Content-Length"][0], 10, 64)
+	if err != nil {
+		return fmt.Errorf("error requests")
+	}
+
+	p := mpb.New(
+		mpb.WithWidth(64),
+		mpb.WithRefreshRate(200*time.Millisecond),
+	)
+
+	bar := p.AddBar(bodySize, mpb.BarStyle("[=>-|"),
+		mpb.PrependDecorators(
+			decor.CountersKiloByte("% .2f / % .2f"),
+		),
+		mpb.AppendDecorators(
+			decor.EwmaETA(decor.ET_STYLE_GO, 90),
+			decor.Name(" ] "),
+			decor.EwmaSpeed(decor.UnitKB, "% .2f", 1024),
+		),
+		mpb.BarRemoveOnComplete(),
+	)
+
+	// create proxy reader
+	proxyReader := bar.ProxyReader(resp.Body)
+	defer proxyReader.Close()
+
+	// copy from proxyReader, ignoring errors
+	io.Copy(out, proxyReader)
 
 	// Writer the body to file
-	_, err = io.Copy(out, resp.Body)
-	if err != nil {
-		return err
-	}
+	//_, err = io.Copy(out, resp.Body)
+	//if err != nil {
+	//	return err
+	//}
 
 	return nil
 }
