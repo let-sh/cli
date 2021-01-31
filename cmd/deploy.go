@@ -299,10 +299,9 @@ var deployCmd = &cobra.Command{
 				)
 				break
 
-				// interval
-				time.Sleep(1)
 			}
-
+			// interval
+			time.Sleep(time.Second)
 		}
 		return
 	},
