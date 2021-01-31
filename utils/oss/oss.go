@@ -123,9 +123,9 @@ func UploadDirToStaticSource(dirPath, projectName, bundleID string) error {
 	}
 
 	// respect .gitignore and .letignore
-	if _, err := os.Stat(dirPath + ".gitignore"); err == nil {
+	if _, err := os.Stat(filepath.Join(dirPath, ".gitignore")); err == nil {
 		// match a file against a particular .gitignore
-		ignore, _ := gitignore.NewFromFile(dirPath + ".gitignore")
+		ignore, _ := gitignore.NewFromFile(filepath.Join(dirPath, ".gitignore"))
 
 		tmp := []string{}
 		for _, v := range names {
@@ -141,9 +141,9 @@ func UploadDirToStaticSource(dirPath, projectName, bundleID string) error {
 	}
 
 	// .letignore
-	if _, err := os.Stat(dirPath + ".letignore"); err == nil {
+	if _, err := os.Stat(filepath.Join(dirPath + ".letignore")); err == nil {
 		// match a file against a particular .gitignore
-		ignore, _ := gitignore.NewFromFile(dirPath + ".gitignore")
+		ignore, _ := gitignore.NewFromFile(filepath.Join(dirPath + ".letignore"))
 
 		tmp := []string{}
 		for _, v := range names {

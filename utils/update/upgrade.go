@@ -5,6 +5,7 @@ import (
 	"compress/gzip"
 	"fmt"
 	"github.com/let-sh/cli/info"
+	"github.com/let-sh/cli/log"
 	"github.com/let-sh/cli/requests"
 	"github.com/sirupsen/logrus"
 	"io"
@@ -15,7 +16,7 @@ import (
 	"runtime"
 )
 
-func UpgradeCli(channel string) {
+func UpgradeCli() {
 	tempDir := os.TempDir()
 	if GetCurrentReleaseChannel() != "dev" {
 		version, err := requests.GetLatestVersion(GetCurrentReleaseChannel())
@@ -25,6 +26,7 @@ func UpgradeCli(channel string) {
 		}
 
 		if version == info.Version {
+			log.Success("currently is the latest version: " + info.Version)
 			return
 		}
 
@@ -68,6 +70,8 @@ func UpgradeCli(channel string) {
 			return
 		}
 
+	} else {
+		log.Warning("currently at development channel, no need to upgrade")
 	}
 }
 
