@@ -49,18 +49,21 @@ letsh_get_binary() {
     url="https://install.let.sh.cn/cli_${version}_${os}_amd64.tar.gz"
   fi
 
-  mkdir -p ~/.let/bin
-
 #  if [ $os = 'win' ]; then
 #    url="$url.exe"
 #  fi
 
   # Get both the tarball and its GPG signature
   # if curl --fail --progress-bar -L -o ~/.let/bin/lets "$url"; then
-  if curl --fail --progress-bar -L "$url" | tar xzvf - -C ~/.let/bin/ > /dev/null 2>&1; then
+  tmpfile=$(mktemp /tmp/let-sh-bundle.XXXXXX)
+  if curl --fail --progress-bar -L "$url" > $tmpfile; then
+    mkdir -p ~/.let/bin
+    tar xzvf $tmpfile -C ~/.let/bin/ > /dev/null 2>&1
     printf "$cyan> Chmod-ing file ~/.let/bin/lets...$reset\n"
     chmod +x ~/.let/bin/lets
+    rm -f $tmpfile
   else
+    rm -f $tmpfile
     printf "$red> Failed to download $url.$reset\n"
     exit 1
   fi
