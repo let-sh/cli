@@ -2,6 +2,7 @@ package requests
 
 import (
 	"errors"
+	"github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 	"io/ioutil"
 	"log"
@@ -28,14 +29,17 @@ func GetJsonWithPath(url string, path string) (data gjson.Result, err error) {
 }
 
 func GetLatestVersion(channel string) (version string, err error) {
-	resp, err := http.Get("http://install.let.sh/version")
+	resp, err := http.Get("https://install.let.sh.cn/version")
 	if err != nil {
 		return "", err
 	}
 
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
-
+	logrus.WithFields(logrus.Fields{
+		"status_code": resp.StatusCode,
+		"body":        body,
+	}).Debugln("get latest version")
 	for _, latest := range strings.Split(string(body), "\n") {
 		switch channel {
 		case "beta":

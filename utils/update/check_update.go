@@ -11,26 +11,21 @@ import (
 )
 
 func CheckUpdate() {
-	if strings.Contains(info.Version, "beta") {
+	switch GetCurrentReleaseChannel() {
+	case "beta":
 		if latest, err := requests.GetLatestVersion("beta"); info.Version != latest && err != nil {
 			NotifyUpgrade("beta")
 		}
-		return
-	}
-	if strings.Contains(info.Version, "rc") {
-		if latest, err := requests.GetLatestVersion("rc"); info.Version != latest && err != nil {
-			NotifyUpgrade("rc")
+	case "rc":
+		if latest, err := requests.GetLatestVersion("beta"); info.Version != latest && err != nil {
+			NotifyUpgrade("beta")
 		}
+	case "dev":
 		return
-	}
-
-	if strings.Contains(info.Version, "development") {
-		return
-	}
-
-	// else
-	if latest, err := requests.GetLatestVersion("stable"); info.Version != latest && err != nil {
-		NotifyUpgrade("stable")
+	default:
+		if latest, err := requests.GetLatestVersion("stable"); info.Version != latest && err != nil {
+			NotifyUpgrade("stable")
+		}
 	}
 }
 
@@ -55,4 +50,19 @@ func NotifyUpgrade(channel string) {
 	if utils.ItemExists([]string{"Y", "y", "yes", "Yes"}, result) {
 		UpgradeCli(channel)
 	}
+}
+
+func GetCurrentReleaseChannel() (channel string) {
+	if strings.Contains(info.Version, "beta") {
+		return "beta"
+	}
+	if strings.Contains(info.Version, "rc") {
+		return "rc"
+	}
+
+	if strings.Contains(info.Version, "dev") {
+		return "dev"
+	}
+
+	return "stable"
 }

@@ -26,6 +26,7 @@ var upgradeCmd = &cobra.Command{
 	Short: "Upgrade let.sh cli ",
 	Long:  `Upgrade let.sh cli to latest version.`,
 	Run: func(cmd *cobra.Command, args []string) {
+
 		update.UpgradeCli("stable")
 	},
 }

@@ -17,6 +17,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/let-sh/cli/info"
 	"github.com/let-sh/cli/log"
 	"github.com/let-sh/cli/utils/config"
 	"github.com/let-sh/cli/utils/update"
@@ -65,7 +66,8 @@ func init() {
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
 	config.Load()
-	if Debug {
+
+	if Debug || info.Version == "development" {
 		logrus.SetLevel(logrus.DebugLevel)
 	} else {
 		logrus.SetLevel(logrus.ErrorLevel)
