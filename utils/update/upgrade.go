@@ -49,6 +49,7 @@ func UpgradeCli(force bool) {
 			return
 		}
 
+		logrus.Debugf("open compressed file: %s", filepath.Join(tempDir, GetBinaryCompressedFileName(version)))
 		f, err := os.Open(filepath.Join(tempDir, GetBinaryCompressedFileName(version)))
 		if err != nil {
 			log.Warning("upgrade failed: " + err.Error())
@@ -57,7 +58,7 @@ func UpgradeCli(force bool) {
 		}
 		logrus.Debugf("compressed file: %s", f.Name())
 
-		err = Untar(filepath.Join(tempDir, binaryName), f)
+		err = Untar(tempDir, f)
 		if err != nil {
 			log.Warning("upgrade failed: " + err.Error())
 			logrus.WithError(err).Debugln("get compressed file")
