@@ -58,7 +58,9 @@ func UpgradeCli(force bool) {
 		}
 		logrus.Debugf("compressed file: %s", f.Name())
 
-		err = Untar(tempDir, f)
+		untarDir := filepath.Join(tempDir, "let.sh")
+		os.Mkdir(untarDir, 0755)
+		err = Untar(untarDir, f)
 		if err != nil {
 			log.Warning("upgrade failed: " + err.Error())
 			logrus.WithError(err).Debugln("get compressed file")
@@ -66,12 +68,12 @@ func UpgradeCli(force bool) {
 		}
 
 		// add permission
-		err = os.Chmod(filepath.Join(tempDir, binaryName), 0755)
+		err = os.Chmod(filepath.Join(untarDir, binaryName), 0755)
 		if err != nil {
 			logrus.WithError(err).Debugln("get compressed file")
 			return
 		}
-		logrus.Debugf("add permission: %s", filepath.Join(tempDir, binaryName))
+		logrus.Debugf("add permission: %s", filepath.Join(untarDir, binaryName))
 
 		// replace binary
 		path, err := exec.LookPath(binaryName)
@@ -81,13 +83,17 @@ func UpgradeCli(force bool) {
 			return
 		}
 
-		err = os.Rename(filepath.Join(tempDir, binaryName), path)
+		err = os.Rename(filepath.Join(untarDir, binaryName), path)
 		if err != nil {
 			log.Warning("upgrade failed: " + err.Error())
 			logrus.WithError(err).Debugln("get compressed file")
 			return
 		}
 		logrus.Debugf("mv binary: %s -> %s", filepath.Join(tempDir, binaryName), path)
+
+		// clean up temporary files
+		os.RemoveAll(untarDir)
+		os.RemoveAll(filepath.Join(tempDir, GetBinaryCompressedFileName(version)))
 
 		log.Success(fmt.Sprintf("Successfully installed let.sh %s!", version))
 
