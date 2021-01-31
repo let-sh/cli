@@ -7,6 +7,7 @@ import (
 	"github.com/denormal/go-gitignore"
 	"github.com/let-sh/cli/log"
 	"github.com/let-sh/cli/requests"
+	"github.com/sirupsen/logrus"
 	"github.com/vbauerster/mpb/v5"
 	"github.com/vbauerster/mpb/v5/decor"
 	"os"
@@ -77,6 +78,9 @@ func UploadFileToCodeSource(filepath, filename, projectName string) {
 	proxyReader := bar.ProxyReader(r)
 	defer proxyReader.Close()
 
+	logrus.WithFields(logrus.Fields{
+		"objKey": filename,
+	}).Debug("put object from file")
 	err = bucket.PutObject(filename, proxyReader, oss.Progress(&OssProgressListener{}))
 	if err != nil {
 		fmt.Println("Error:", err)
@@ -219,6 +223,10 @@ func UploadDirToStaticSource(dirPath, projectName, bundleID string) error {
 					return
 				}
 
+				logrus.WithFields(logrus.Fields{
+					"objKey":   objKey,
+					"filePath": filePath,
+				}).Debug("put object from file")
 				err = bucket.PutObjectFromFile(objKey, filePath, oss.Progress(&OssProgressListener{filepath: filePath}))
 				if err != nil {
 					select {
