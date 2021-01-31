@@ -100,7 +100,7 @@ var devCmd = &cobra.Command{
 			Fqdn          string `json:"fqdn,omitempty"`
 		}
 		if !forceLocal {
-			result, err := requests.StartDevelopment(p.ID)
+			result, err = requests.StartDevelopment(p.ID)
 			if err != nil {
 				log.Error(err)
 				return
