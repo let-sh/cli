@@ -43,6 +43,7 @@ var inputRemoteEndpoint string
 var inputLocalEndpoint string
 var inputCommand string
 var processPids []int
+var forceLocal bool
 
 // devCmd represents the dev command
 var devCmd = &cobra.Command{
@@ -92,12 +93,21 @@ var devCmd = &cobra.Command{
 		defer KillServiceProcess(p.ID)
 
 		// request to start tunnel
-		result, err := requests.StartDevelopment(p.ID)
-		if err != nil {
-			log.Error(err)
-			return
+		remoteEndpoint  := inputRemoteEndpoint
+		var result struct {
+			RemotePort    int    `json:"remotePort,omitempty"`
+			RemoteAddress string `json:"remoteAddress,omitempty"`
+			Fqdn          string `json:"fqdn,omitempty"`
 		}
-		remoteEndpoint := result.RemoteAddress + ":" + strconv.Itoa(result.RemotePort)
+		if !forceLocal {
+			result, err := requests.StartDevelopment(p.ID)
+			if err != nil {
+				log.Error(err)
+				return
+			}
+			remoteEndpoint = result.RemoteAddress + ":" + strconv.Itoa(result.RemotePort)
+		}
+
 
 		{
 			// run server command
@@ -180,7 +190,7 @@ var devCmd = &cobra.Command{
 
 		fmt.Println("\n"+aurora.BrightCyan("[msg]").Bold().String(), "you can visit remotely at: "+aurora.Bold("https://"+result.Fqdn).String()+"\n\r")
 
-		dev.StartClient(remoteEndpoint, localEndpoint)
+		dev.StartClient(remoteEndpoint, localEndpoint,result.Fqdn)
 	},
 }
 
@@ -202,6 +212,9 @@ func init() {
 	deployCmd.Flags().MarkHidden("remote")
 
 	devCmd.Flags().StringVarP(&inputLocalEndpoint, "local", "l", "", "custom local upstream endpoint, e.g. 127.0.0.1:3000")
+
+	devCmd.Flags().BoolVarP(&forceLocal,"force","f",false, "force local test development")
+	deployCmd.Flags().MarkHidden("force")
 }
 
 func SetupCloseDevelopmentHandler(projectID string) {

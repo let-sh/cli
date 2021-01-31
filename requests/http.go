@@ -52,7 +52,7 @@ func GetLatestVersion(channel string) (version string, err error) {
 				return strings.TrimSpace(strings.Split(
 					latest, ":")[1]), nil
 			}
-		case "stable":
+		default:
 			if strings.Contains(latest, "latest") || strings.Contains(latest, "stable") {
 				return strings.TrimSpace(strings.Split(
 					latest, ":")[1]), nil

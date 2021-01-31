@@ -5,11 +5,11 @@ import (
 	"github.com/let-sh/cli/info"
 )
 
-func StartClient(endpoint, local string) {
+func StartClient(endpoint, local, exposeFqdn string) {
 	client := tunnel.Client{
 		Remote: endpoint,
 		UpstreamMap: map[string]string{
-			"": local,
+			exposeFqdn: local,
 		},
 		Token:            info.Credentials.Token,
 		StrictForwarding: false,
