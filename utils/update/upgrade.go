@@ -27,6 +27,7 @@ func UpgradeCli() {
 	if GetCurrentReleaseChannel() != "dev" {
 		version, err := requests.GetLatestVersion(GetCurrentReleaseChannel())
 		if err != nil {
+			log.Warning("upgrade failed: " + err.Error())
 			logrus.WithError(err).Debugln("get latest version")
 			return
 		}
@@ -46,6 +47,7 @@ func UpgradeCli() {
 
 		f, err := os.Open(filepath.Join(tempDir, GetBinaryCompressedFileName(version)))
 		if err != nil {
+			log.Warning("upgrade failed: " + err.Error())
 			logrus.WithError(err).Debugln("get compressed file")
 			return
 		}
@@ -53,6 +55,7 @@ func UpgradeCli() {
 
 		err = Untar(filepath.Join(tempDir, binaryName), f)
 		if err != nil {
+			log.Warning("upgrade failed: " + err.Error())
 			logrus.WithError(err).Debugln("get compressed file")
 			return
 		}
@@ -68,12 +71,14 @@ func UpgradeCli() {
 		// replace binary
 		path, err := exec.LookPath(binaryName)
 		if err != nil {
+			log.Warning("upgrade failed: " + err.Error())
 			logrus.WithError(err).Debugln("get compressed file")
 			return
 		}
 
 		err = os.Rename(filepath.Join(tempDir, binaryName), path)
 		if err != nil {
+			log.Warning("upgrade failed: " + err.Error())
 			logrus.WithError(err).Debugln("get compressed file")
 			return
 		}
