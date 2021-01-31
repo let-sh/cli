@@ -18,6 +18,7 @@ import (
 
 func UpgradeCli() {
 	tempDir := os.TempDir()
+	logrus.Debugf("tempDir: %s", tempDir)
 	if GetCurrentReleaseChannel() != "dev" {
 		version, err := requests.GetLatestVersion(GetCurrentReleaseChannel())
 		if err != nil {
@@ -43,6 +44,7 @@ func UpgradeCli() {
 			logrus.WithError(err).Debugln("get compressed file")
 			return
 		}
+		logrus.Debugf("compressed file: %s", f.Name())
 
 		err = Untar(filepath.Join(tempDir, "lets"), f)
 		if err != nil {
@@ -69,6 +71,7 @@ func UpgradeCli() {
 			logrus.WithError(err).Debugln("get compressed file")
 			return
 		}
+		log.Success(fmt.Sprintf("Successfully installed let.sh %s!", version))
 
 	} else {
 		log.Warning("currently at development channel, no need to upgrade")
