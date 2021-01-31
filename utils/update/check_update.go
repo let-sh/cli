@@ -13,17 +13,18 @@ import (
 func CheckUpdate() {
 	switch GetCurrentReleaseChannel() {
 	case "beta":
-		if latest, err := requests.GetLatestVersion("beta"); info.Version != latest && err != nil {
+		if latest, err := requests.GetLatestVersion("beta"); info.Version != latest && err == nil {
 			NotifyUpgrade("beta")
 		}
 	case "rc":
-		if latest, err := requests.GetLatestVersion("beta"); info.Version != latest && err != nil {
+		if latest, err := requests.GetLatestVersion("beta"); info.Version != latest && err == nil {
 			NotifyUpgrade("beta")
 		}
 	case "dev":
 		return
 	default:
-		if latest, err := requests.GetLatestVersion("stable"); info.Version != latest && err != nil {
+		latest, err := requests.GetLatestVersion("stable")
+		if info.Version != latest && err == nil {
 			NotifyUpgrade("stable")
 		}
 	}
