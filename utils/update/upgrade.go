@@ -17,6 +17,11 @@ import (
 )
 
 func UpgradeCli() {
+	binaryName := "lets"
+	if runtime.GOOS == "windows" {
+		binaryName = "lets.exe"
+	}
+
 	tempDir := os.TempDir()
 	logrus.Debugf("tempDir: %s", tempDir)
 	if GetCurrentReleaseChannel() != "dev" {
@@ -46,31 +51,34 @@ func UpgradeCli() {
 		}
 		logrus.Debugf("compressed file: %s", f.Name())
 
-		err = Untar(filepath.Join(tempDir, "lets"), f)
+		err = Untar(filepath.Join(tempDir, binaryName), f)
 		if err != nil {
 			logrus.WithError(err).Debugln("get compressed file")
 			return
 		}
 
 		// add permission
-		err = os.Chmod(filepath.Join(tempDir, "lets"), 0755)
+		err = os.Chmod(filepath.Join(tempDir, binaryName), 0755)
 		if err != nil {
 			logrus.WithError(err).Debugln("get compressed file")
 			return
 		}
+		logrus.Debugf("add permission: %s", filepath.Join(tempDir, binaryName))
 
 		// replace binary
-		path, err := exec.LookPath("lets")
+		path, err := exec.LookPath(binaryName)
 		if err != nil {
 			logrus.WithError(err).Debugln("get compressed file")
 			return
 		}
 
-		err = os.Rename(filepath.Join(tempDir, "lets"), path)
+		err = os.Rename(filepath.Join(tempDir, binaryName), path)
 		if err != nil {
 			logrus.WithError(err).Debugln("get compressed file")
 			return
 		}
+		logrus.Debugf("mv binary: %s -> %s", filepath.Join(tempDir, binaryName), path)
+
 		log.Success(fmt.Sprintf("Successfully installed let.sh %s!", version))
 
 	} else {

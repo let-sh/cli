@@ -38,7 +38,7 @@ func GetLatestVersion(channel string) (version string, err error) {
 	body, err := ioutil.ReadAll(resp.Body)
 	logrus.WithFields(logrus.Fields{
 		"status_code": resp.StatusCode,
-		"body":        body,
+		"body":        string(body),
 	}).Debugln("get latest version")
 	for _, latest := range strings.Split(string(body), "\n") {
 		switch channel {
