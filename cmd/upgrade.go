@@ -26,9 +26,12 @@ var upgradeCmd = &cobra.Command{
 	Short: "Upgrade let.sh cli ",
 	Long:  `Upgrade let.sh cli to latest version.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		update.UpgradeCli()
+		update.UpgradeCli(force)
 	},
 }
+
+// force upgrade
+var force bool
 
 func init() {
 	rootCmd.AddCommand(upgradeCmd)
@@ -42,4 +45,5 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// upgradeCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	upgradeCmd.Flags().BoolVarP(&force, "force", "f", false, "force upgrade")
 }

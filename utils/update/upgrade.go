@@ -8,15 +8,19 @@ import (
 	"github.com/let-sh/cli/log"
 	"github.com/let-sh/cli/requests"
 	"github.com/sirupsen/logrus"
+	"github.com/vbauerster/mpb/v5"
+	"github.com/vbauerster/mpb/v5/decor"
 	"io"
 	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strconv"
+	"time"
 )
 
-func UpgradeCli() {
+func UpgradeCli(force bool) {
 	binaryName := "lets"
 	if runtime.GOOS == "windows" {
 		binaryName = "lets.exe"
@@ -24,7 +28,7 @@ func UpgradeCli() {
 
 	tempDir := os.TempDir()
 	logrus.Debugf("tempDir: %s", tempDir)
-	if GetCurrentReleaseChannel() != "dev" {
+	if GetCurrentReleaseChannel() != "dev" || force {
 		version, err := requests.GetLatestVersion(GetCurrentReleaseChannel())
 		if err != nil {
 			log.Warning("upgrade failed: " + err.Error())
@@ -32,7 +36,7 @@ func UpgradeCli() {
 			return
 		}
 
-		if version == info.Version {
+		if version == info.Version && !force {
 			log.Success("currently is the latest version: " + info.Version)
 			return
 		}
@@ -45,6 +49,7 @@ func UpgradeCli() {
 			return
 		}
 
+		logrus.Debugf("open compressed file: %s", filepath.Join(tempDir, GetBinaryCompressedFileName(version)))
 		f, err := os.Open(filepath.Join(tempDir, GetBinaryCompressedFileName(version)))
 		if err != nil {
 			log.Warning("upgrade failed: " + err.Error())
@@ -53,7 +58,9 @@ func UpgradeCli() {
 		}
 		logrus.Debugf("compressed file: %s", f.Name())
 
-		err = Untar(filepath.Join(tempDir, binaryName), f)
+		untarDir := filepath.Join(tempDir, "let.sh")
+		os.Mkdir(untarDir, 0755)
+		err = Untar(untarDir, f)
 		if err != nil {
 			log.Warning("upgrade failed: " + err.Error())
 			logrus.WithError(err).Debugln("get compressed file")
@@ -61,12 +68,12 @@ func UpgradeCli() {
 		}
 
 		// add permission
-		err = os.Chmod(filepath.Join(tempDir, binaryName), 0755)
+		err = os.Chmod(filepath.Join(untarDir, binaryName), 0755)
 		if err != nil {
 			logrus.WithError(err).Debugln("get compressed file")
 			return
 		}
-		logrus.Debugf("add permission: %s", filepath.Join(tempDir, binaryName))
+		logrus.Debugf("add permission: %s", filepath.Join(untarDir, binaryName))
 
 		// replace binary
 		path, err := exec.LookPath(binaryName)
@@ -76,13 +83,17 @@ func UpgradeCli() {
 			return
 		}
 
-		err = os.Rename(filepath.Join(tempDir, binaryName), path)
+		err = os.Rename(filepath.Join(untarDir, binaryName), path)
 		if err != nil {
 			log.Warning("upgrade failed: " + err.Error())
 			logrus.WithError(err).Debugln("get compressed file")
 			return
 		}
 		logrus.Debugf("mv binary: %s -> %s", filepath.Join(tempDir, binaryName), path)
+
+		// clean up temporary files
+		os.RemoveAll(untarDir)
+		os.RemoveAll(filepath.Join(tempDir, GetBinaryCompressedFileName(version)))
 
 		log.Success(fmt.Sprintf("Successfully installed let.sh %s!", version))
 
@@ -116,12 +127,40 @@ func DownloadBinaryCompressedFile(filename, tempDir string) error {
 		}).WithError(err).Debugln("download binary compressed file error")
 		return fmt.Errorf("bad status: %s", resp.Status)
 	}
+	bodySize, err := strconv.ParseInt(resp.Header["Content-Length"][0], 10, 64)
+	if err != nil {
+		return fmt.Errorf("error requests")
+	}
+
+	p := mpb.New(
+		mpb.WithWidth(64),
+		mpb.WithRefreshRate(200*time.Millisecond),
+	)
+
+	bar := p.AddBar(bodySize, mpb.BarStyle("[=>-|"),
+		mpb.PrependDecorators(
+			decor.CountersKiloByte("% .2f / % .2f"),
+		),
+		mpb.AppendDecorators(
+			decor.EwmaETA(decor.ET_STYLE_GO, 90),
+			decor.Name(" ] "),
+			decor.EwmaSpeed(decor.UnitKB, "% .2f", 1024),
+		),
+		mpb.BarRemoveOnComplete(),
+	)
+
+	// create proxy reader
+	proxyReader := bar.ProxyReader(resp.Body)
+	defer proxyReader.Close()
+
+	// copy from proxyReader, ignoring errors
+	io.Copy(out, proxyReader)
 
 	// Writer the body to file
-	_, err = io.Copy(out, resp.Body)
-	if err != nil {
-		return err
-	}
+	//_, err = io.Copy(out, resp.Body)
+	//if err != nil {
+	//	return err
+	//}
 
 	return nil
 }
