@@ -12,6 +12,7 @@ import (
 	"github.com/vbauerster/mpb/v5/decor"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync"
 	"time"
@@ -27,11 +28,11 @@ type fileUplaodStatus struct {
 	TotalSize    int64
 }
 
-func UploadFileToCodeSource(filepath, filename, projectName string) {
+func UploadFileToCodeSource(filedir, filename, projectName string) {
 	// create and start new bar
-	fi, _ := os.Stat(filepath)
+	fi, _ := os.Stat(filedir)
 
-	file, _ := os.Open(filepath)
+	file, _ := os.Open(filedir)
 	r := bufio.NewReader(file)
 
 	p := mpb.New(
@@ -81,6 +82,7 @@ func UploadFileToCodeSource(filepath, filename, projectName string) {
 	logrus.WithFields(logrus.Fields{
 		"objKey": filename,
 	}).Debug("put object from file")
+
 	err = bucket.PutObject(filename, proxyReader, oss.Progress(&OssProgressListener{}))
 	if err != nil {
 		fmt.Println("Error:", err)
@@ -227,7 +229,12 @@ func UploadDirToStaticSource(dirPath, projectName, bundleID string) error {
 					"objKey":   objKey,
 					"filePath": filePath,
 				}).Debug("put object from file")
-				err = bucket.PutObjectFromFile(objKey, filePath, oss.Progress(&OssProgressListener{filepath: filePath}))
+				err = bucket.PutObjectFromFile(func() string {
+					if runtime.GOOS == "windows" {
+						return filepath.ToSlash(objKey)
+					}
+					return objKey
+				}(), filePath, oss.Progress(&OssProgressListener{filepath: filePath}))
 				if err != nil {
 					select {
 					case errChan <- err:
