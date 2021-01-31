@@ -1,5 +1,7 @@
 package types
 
+import "time"
+
 type Credentials struct {
 	Token string `json:"token"`
 }
@@ -16,4 +18,8 @@ type Project struct {
 
 	Type         string `json:"type"`
 	ServeCommand string `json:"serve_command"`
+}
+
+type Extra struct {
+	NotifyUpgradeTime time.Time `json:"notify"`
 }

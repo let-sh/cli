@@ -6,11 +6,17 @@ import (
 	"github.com/let-sh/cli/log"
 	"github.com/let-sh/cli/requests"
 	"github.com/let-sh/cli/utils"
+	"github.com/let-sh/cli/utils/config"
 	"github.com/manifoldco/promptui"
 	"strings"
+	"time"
 )
 
 func CheckUpdate() {
+	if time.Since(config.GetLastUpdateNotifyTime()) < time.Hour*24 {
+		return
+	}
+
 	switch GetCurrentReleaseChannel() {
 	case "beta":
 		if latest, err := requests.GetLatestVersion("beta"); info.Version != latest && err == nil {
