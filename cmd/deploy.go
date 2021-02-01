@@ -192,15 +192,18 @@ var deployCmd = &cobra.Command{
 		}
 
 		// if contains static, upload static files to oss
+		dirPath := deploymentConfig.Static
+		if len(dirPath) == 0 {
+			dirPath = "./"
+		}
 		if template.ContainsStatic {
 			if utils.ItemExists([]string{"static"}, deploymentConfig.Type) {
 				// todo: merge static dir value source
-				if err := oss.UploadDirToStaticSource(deploymentConfig.Static, deploymentConfig.Name, deploymentConfig.Name+"-"+hashID); err != nil {
+				if err := oss.UploadDirToStaticSource(dirPath, deploymentConfig.Name, deploymentConfig.Name+"-"+hashID); err != nil {
 					log.Error(err)
 					return
 				}
 			} else {
-
 				if template.LocalCompiling {
 					for _, command := range template.CompileCommands {
 						command := strings.Split(command, " ")

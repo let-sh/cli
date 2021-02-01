@@ -188,6 +188,10 @@ var devCmd = &cobra.Command{
 			log.Error(errors.New("currently under development"))
 		}
 
+		if len(result.Fqdn) == 0 {
+			log.Error(errors.New("missing public visit fqdn"))
+		}
+
 		fmt.Println("\n"+aurora.BrightCyan("[msg]").Bold().String(), "you can visit remotely at: "+aurora.Bold("https://"+result.Fqdn).String()+"\n\r")
 
 		dev.StartClient(remoteEndpoint, localEndpoint,result.Fqdn)
