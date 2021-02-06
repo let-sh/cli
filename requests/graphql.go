@@ -113,7 +113,7 @@ mutation($type: String!, $name: String!, $config: String, $cn: Boolean) {
 	req.Var("config", config)
 	req.Var("cn", cn)
 	req.Header.Set("Authorization", "Bearer "+info.Credentials.Token)
-
+	logrus.Debugln(projectType, projectName, config , cn )
 	// run it and capture the response
 	var respData struct {
 		Deploy struct {

@@ -181,6 +181,7 @@ var deployCmd = &cobra.Command{
 		fmt.Printf("type: %s\n", deploymentConfig.Type)
 		fmt.Println("")
 
+
 		template, err := requests.GetTemplate(deploymentConfig.Type)
 		if err != nil {
 			log.Error(err)
@@ -246,9 +247,7 @@ var deployCmd = &cobra.Command{
 				log.Error(err)
 				return
 			}
-
 			oss.UploadFileToCodeSource(dir+"/"+deploymentConfig.Name+"-"+hashID+".tar.gz", deploymentConfig.Name+"-"+hashID+".tar.gz", deploymentConfig.Name)
-
 		}
 
 		logrus.WithFields(logrus.Fields{
@@ -257,7 +256,8 @@ var deployCmd = &cobra.Command{
 
 		configBytes, _ := json.Marshal(deploymentConfig)
 
-		logrus.Debugln(configBytes)
+		var cn = inputCN
+		logrus.Debugln(string(configBytes),cn)
 		deployment, err := requests.Deploy(deploymentConfig.Type, deploymentConfig.Name, string(configBytes), inputCN)
 
 		if err != nil {
