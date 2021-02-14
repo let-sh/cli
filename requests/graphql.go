@@ -344,6 +344,54 @@ mutation($projectID: UUID!) {
 	return respData.StopDevelopment, nil
 }
 
+
+func Link(projectID string, domain string) (
+	linkResult bool, err error) {
+	req := graphql.NewRequest(`
+mutation($projectID: UUID!,$domain: UUID!) {
+	link(projectID:$projectID,domain:$domain)
+}
+`)
+	req.Var("projectID", projectID)
+	req.Var("domain", domain)
+	req.Header.Set("Authorization", "Bearer "+info.Credentials.Token)
+
+	// run it and capture the response
+	var respData struct {
+		Link bool `json:"link,omitempty"`
+	}
+	if err := Graphql.Run(context.Background(), req, &respData); err != nil {
+
+		return linkResult, err
+	}
+
+	return respData.Link, nil
+}
+
+
+
+func Unlink(projectID string, domain string) (
+	unlinkResult bool, err error) {
+	req := graphql.NewRequest(`
+mutation($projectID: UUID!,$domain: UUID!) {
+	unlink(projectID:$projectID,domain:$domain)
+}
+`)
+	req.Var("projectID", projectID)
+	req.Var("domain", domain)
+	req.Header.Set("Authorization", "Bearer "+info.Credentials.Token)
+
+	// run it and capture the response
+	var respData struct {
+		Unlink bool `json:"unlink,omitempty"`
+	}
+	if err := Graphql.Run(context.Background(), req, &respData); err != nil {
+
+		return unlinkResult, err
+	}
+
+	return respData.Unlink, nil
+}
 //func QueryLogs(deploymentID string, count int) (
 //	deployments struct {
 //		Edges []struct {

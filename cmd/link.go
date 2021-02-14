@@ -16,23 +16,47 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
-
+	"errors"
+	"github.com/let-sh/cli/log"
+	"github.com/let-sh/cli/requests"
+	"github.com/let-sh/cli/utils/cache"
+	"os"
 	"github.com/spf13/cobra"
+	"strings"
 )
 
 // linkCmd represents the link command
 var linkCmd = &cobra.Command{
 	Use:   "link",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Link domain to current project",
+	Long: `Link domain to current project
+e.g.: lets link test.let.sh.cn
+`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("link called")
+
+		//detectedType :=deploy.DetectProjectType()
+		dir, _ := os.Getwd()
+		p, err := cache.GetProjectInfo(dir)
+
+		// if cache exists
+		// todo: support query project
+		if err != nil {
+			log.Error(errors.New("please deploy first"))
+			return
+		}
+
+		result, err := requests.Link(p.ID, strings.TrimSpace(args[1]))
+		if err != nil {
+			log.Error(err)
+			return
+		}
+
+		if result == false {
+			log.Error(errors.New("link failed"))
+			return
+		}
+		log.Success("link success")
+		return
 	},
 }
 

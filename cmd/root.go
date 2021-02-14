@@ -54,6 +54,8 @@ func init() {
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
+
+	rootCmd.SetVersionTemplate(info.Version)
 	rootCmd.PersistentFlags().BoolVarP(&Debug, "debug", "", false, "debugging cli command")
 	rootCmd.PersistentFlags().MarkHidden("debug")
 	//rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cli.yaml)")
