@@ -54,12 +54,13 @@ var deployCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		// Setup our Ctrl+C handler
 		SetupCloseHandler()
-
 		// check whether user is logged in
 		if info.Credentials.Token == "" {
 			log.Warning("please login via `lets login` first")
 			return
 		}
+
+		var cn bool
 
 		log.BStart("deploying")
 		// merge config
@@ -111,6 +112,21 @@ var deployCmd = &cobra.Command{
 
 			if inputProjectType != "" {
 				deploymentConfig.Type = inputProjectType
+			}
+
+			// load cn
+			// if user customed cn flag
+			if 	cmd.Flags().Changed("cn") {
+				// user custom by cli flag
+				cn = inputCN
+			} else {
+				// user custom by json config
+				if deploymentConfig.CN != nil {
+					cn = *deploymentConfig.CN
+				} else {
+					// fall back to default
+					cn = false
+				}
 			}
 		}
 
@@ -200,7 +216,7 @@ var deployCmd = &cobra.Command{
 		if template.ContainsStatic {
 			if utils.ItemExists([]string{"static"}, deploymentConfig.Type) {
 				// todo: merge static dir value source
-				if err := oss.UploadDirToStaticSource(dirPath, deploymentConfig.Name, deploymentConfig.Name+"-"+hashID); err != nil {
+				if err := oss.UploadDirToStaticSource(dirPath, deploymentConfig.Name, deploymentConfig.Name+"-"+hashID,cn); err != nil {
 					log.Error(err)
 					return
 				}
@@ -219,7 +235,7 @@ var deployCmd = &cobra.Command{
 					}
 				}
 
-				if err := oss.UploadDirToStaticSource(deploymentConfig.Static, deploymentConfig.Name, deploymentConfig.Name+"-"+hashID); err != nil {
+				if err := oss.UploadDirToStaticSource(deploymentConfig.Static, deploymentConfig.Name, deploymentConfig.Name+"-"+hashID,cn); err != nil {
 					log.Error(err)
 					return
 				}
@@ -247,7 +263,7 @@ var deployCmd = &cobra.Command{
 				log.Error(err)
 				return
 			}
-			oss.UploadFileToCodeSource(dir+"/"+deploymentConfig.Name+"-"+hashID+".tar.gz", deploymentConfig.Name+"-"+hashID+".tar.gz", deploymentConfig.Name)
+			oss.UploadFileToCodeSource(dir+"/"+deploymentConfig.Name+"-"+hashID+".tar.gz", deploymentConfig.Name+"-"+hashID+".tar.gz", deploymentConfig.Name,cn)
 		}
 
 		logrus.WithFields(logrus.Fields{
@@ -256,20 +272,7 @@ var deployCmd = &cobra.Command{
 
 		configBytes, _ := json.Marshal(deploymentConfig)
 
-		var cn bool
-		// if user customed cn flag
-		if 	cmd.Flags().Changed("cn") {
-			// user custom by cli flag
-			cn = inputCN
-		} else {
-			// user custom by json config
-			if deploymentConfig.CN != nil {
-				cn = *deploymentConfig.CN
-			} else {
-				// fall back to default
-				cn = false
-			}
-		}
+
 		deployment, err := requests.Deploy(deploymentConfig.Type, deploymentConfig.Name, string(configBytes), cn)
 
 		if err != nil {
@@ -327,7 +330,7 @@ var inputProjectName string
 var inputProjectType string
 var inputCN bool
 var inputStaticDir string
-var inputDev bool
+var inputProd bool
 
 func init() {
 	rootCmd.AddCommand(deployCmd)
@@ -337,7 +340,8 @@ func init() {
 	deployCmd.Flags().StringVarP(&inputProjectName, "project", "p", "", "current project name")
 	deployCmd.Flags().StringVarP(&inputProjectType, "type", "t", "", "current project type, e.g. react")
 	deployCmd.Flags().StringVarP(&inputStaticDir, "static", "", "", "static dir name (if deploy type is static)")
-	deployCmd.Flags().BoolVarP(&inputDev, "dev", "d", true, "deploy in develop channel")
+
+	deployCmd.Flags().BoolVarP(&inputProd, "prod", "", false, "deploy in production mode, will assign linked domain")
 
 	// todo: handle input dev
 	deployCmd.Flags().BoolVarP(&inputCN, "cn", "", true, "deploy in mainland of china")

@@ -42,15 +42,15 @@ func CheckDeployCapability(projectName string) (hashID string, exists bool, err 
 	return respData.CheckDeployCapability.HashID, respData.CheckDeployCapability.Exists, nil
 }
 
-func GetStsToken(uploadType, projectName string) (data struct {
+func GetStsToken(uploadType, projectName string, cn bool) (data struct {
 	Host            string `json:"host"`
 	AccessKeyID     string `json:"accessKeyID"`
 	AccessKeySecret string `json:"accessKeySecret"`
 	SecurityToken   string `json:"securityToken"`
 }, err error) {
 	req := graphql.NewRequest(`
-query($type: String!, $name: String!) {
-	stsToken(type:$type,projectName:$name) {
+query($type: String!, $name: String!, !cn: Boolean!) {
+	stsToken(type:$type,projectName:$name,cn:$cn) {
 		host
 		accessKeyID
 		accessKeySecret
@@ -61,6 +61,7 @@ query($type: String!, $name: String!) {
 
 	req.Var("type", uploadType)
 	req.Var("name", projectName)
+	req.Var("cn", cn)
 	req.Header.Set("Authorization", "Bearer "+info.Credentials.Token)
 
 	// run it and capture the response

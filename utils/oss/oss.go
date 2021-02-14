@@ -28,7 +28,7 @@ type fileUplaodStatus struct {
 	TotalSize    int64
 }
 
-func UploadFileToCodeSource(filedir, filename, projectName string) {
+func UploadFileToCodeSource(filedir, filename, projectName string, cn bool) {
 	// create and start new bar
 	fi, _ := os.Stat(filedir)
 
@@ -52,7 +52,7 @@ func UploadFileToCodeSource(filedir, filename, projectName string) {
 		mpb.BarRemoveOnComplete(),
 	)
 
-	stsToken, err := requests.GetStsToken("buildBundle", projectName)
+	stsToken, err := requests.GetStsToken("buildBundle", projectName,cn)
 	if err != nil {
 		fmt.Println("Error:", err)
 		os.Exit(-1)
@@ -91,10 +91,10 @@ func UploadFileToCodeSource(filedir, filename, projectName string) {
 	bar.Completed()
 }
 
-func UploadDirToStaticSource(dirPath, projectName, bundleID string) error {
+func UploadDirToStaticSource(dirPath, projectName, bundleID string, cn bool) error {
 	log.BPause()
 	uploadStatus = make(map[string]fileUplaodStatus)
-	stsToken, err := requests.GetStsToken("static", projectName)
+	stsToken, err := requests.GetStsToken("static", projectName,cn)
 	if err != nil {
 		fmt.Println("Error:", err)
 		os.Exit(-1)
