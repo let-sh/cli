@@ -22,4 +22,5 @@ type LetConfig struct {
 		Destination string `json:"destination,omitempty"`
 	} `json:"rewrites,omitempty"`
 	Link []string `json:"link,omitempty"`
+	CN *bool `json:"cn"`
 }

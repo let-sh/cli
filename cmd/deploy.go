@@ -256,9 +256,21 @@ var deployCmd = &cobra.Command{
 
 		configBytes, _ := json.Marshal(deploymentConfig)
 
-		var cn = inputCN
-		logrus.Debugln(string(configBytes),cn)
-		deployment, err := requests.Deploy(deploymentConfig.Type, deploymentConfig.Name, string(configBytes), inputCN)
+		var cn bool
+		// if user customed cn flag
+		if 	cmd.Flags().Changed("cn") {
+			// user custom by cli flag
+			cn = inputCN
+		} else {
+			// user custom by json config
+			if deploymentConfig.CN != nil {
+				cn = *deploymentConfig.CN
+			} else {
+				// fall back to default
+				cn = false
+			}
+		}
+		deployment, err := requests.Deploy(deploymentConfig.Type, deploymentConfig.Name, string(configBytes), cn)
 
 		if err != nil {
 			log.Error(err)
@@ -315,6 +327,7 @@ var inputProjectName string
 var inputProjectType string
 var inputCN bool
 var inputStaticDir string
+var inputDev bool
 
 func init() {
 	rootCmd.AddCommand(deployCmd)
@@ -324,6 +337,9 @@ func init() {
 	deployCmd.Flags().StringVarP(&inputProjectName, "project", "p", "", "current project name")
 	deployCmd.Flags().StringVarP(&inputProjectType, "type", "t", "", "current project type, e.g. react")
 	deployCmd.Flags().StringVarP(&inputStaticDir, "static", "", "", "static dir name (if deploy type is static)")
+	deployCmd.Flags().BoolVarP(&inputDev, "dev", "d", true, "deploy in develop channel")
+
+	// todo: handle input dev
 	deployCmd.Flags().BoolVarP(&inputCN, "cn", "", true, "deploy in mainland of china")
 	deployCmd.Flags().MarkHidden("cn")
 }
