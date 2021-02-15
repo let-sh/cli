@@ -49,7 +49,7 @@ func GetStsToken(uploadType, projectName string, cn bool) (data struct {
 	SecurityToken   string `json:"securityToken"`
 }, err error) {
 	req := graphql.NewRequest(`
-query($type: String!, $name: String!, !cn: Boolean!) {
+query($type: String!, $name: String!, $cn: Boolean!) {
 	stsToken(type:$type,projectName:$name,cn:$cn) {
 		host
 		accessKeyID
