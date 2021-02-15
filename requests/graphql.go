@@ -84,7 +84,7 @@ query($type: String!, $name: String!, $cn: Boolean!) {
 	return respData.StsToken, nil
 }
 
-func Deploy(projectType, projectName, config string, cn bool) (deployment struct {
+func Deploy(projectType, projectName, config,channel  string, cn bool) (deployment struct {
 	ID           string `json:"id"`
 	TargetFQDN   string `json:"targetFQDN"`
 	NetworkStage string `json:"networkStage"`
@@ -95,8 +95,8 @@ func Deploy(projectType, projectName, config string, cn bool) (deployment struct
 	} `json:"project"`
 }, err error) {
 	req := graphql.NewRequest(`
-mutation($type: String!, $name: String!, $config: String, $cn: Boolean) {
-	  deploy(input:{type:$type, projectName:$name, config:$config, cn:$cn}) {
+mutation($type: String!, $name: String!, $config: String, $channel: String!, $cn: Boolean) {
+	  deploy(input:{type:$type, projectName:$name, config:$config, channel:$channel, cn:$cn}) {
 		id
 		targetFQDN
 		networkStage

@@ -273,7 +273,11 @@ var deployCmd = &cobra.Command{
 		configBytes, _ := json.Marshal(deploymentConfig)
 
 
-		deployment, err := requests.Deploy(deploymentConfig.Type, deploymentConfig.Name, string(configBytes), cn)
+		channel := "dev"
+		if inputProd {
+			channel = "prod"
+		}
+		deployment, err := requests.Deploy(deploymentConfig.Type, deploymentConfig.Name, string(configBytes),channel, cn)
 
 		if err != nil {
 			log.Error(err)
