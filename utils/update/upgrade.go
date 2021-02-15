@@ -46,6 +46,8 @@ func UpgradeCli(force bool) {
 			tempDir,
 		)
 		if err != nil {
+			log.Warning("upgrade failed: " + err.Error())
+			logrus.WithError(err).Debugln("download binary")
 			return
 		}
 
