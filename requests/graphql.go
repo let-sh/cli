@@ -112,6 +112,7 @@ mutation($type: String!, $name: String!, $config: String, $channel: String!, $cn
 	req.Var("type", projectType)
 	req.Var("name", projectName)
 	req.Var("config", config)
+	req.Var("channel", channel)
 	req.Var("cn", cn)
 	req.Header.Set("Authorization", "Bearer "+info.Credentials.Token)
 	logrus.Debugln(projectType, projectName, config , cn )
