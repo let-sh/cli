@@ -44,7 +44,7 @@ e.g.: lets unlink test.let.sh`,
 			return
 		}
 
-		result, err := requests.Unlink(p.ID, strings.TrimSpace(args[1]))
+		result, err := requests.Unlink(p.ID, strings.TrimSpace(args[0]))
 		if err != nil {
 			log.Error(err)
 			return
