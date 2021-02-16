@@ -375,7 +375,7 @@ func Unlink(projectID string, hostname string) (
 	unlinkResult bool, err error) {
 	req := graphql.NewRequest(`
 mutation($projectID: UUID!,$hostname: String!) {
-	unlink(projectID:$projectID,hostname:hostname)
+	unlink(projectID:$projectID,hostname:$hostname)
 }
 `)
 	req.Var("projectID", projectID)
