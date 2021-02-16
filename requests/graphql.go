@@ -346,15 +346,15 @@ mutation($projectID: UUID!) {
 }
 
 
-func Link(projectID string, domain string) (
+func Link(projectID string, hostname string) (
 	linkResult bool, err error) {
 	req := graphql.NewRequest(`
-mutation($projectID: UUID!,$domain: UUID!) {
-	link(projectID:$projectID,domain:$domain)
+mutation($projectID: UUID!,$hostname: String!) {
+	link(projectID:$projectID,hostname:$hostname)
 }
 `)
 	req.Var("projectID", projectID)
-	req.Var("domain", domain)
+	req.Var("hostname", hostname)
 	req.Header.Set("Authorization", "Bearer "+info.Credentials.Token)
 
 	// run it and capture the response
@@ -371,15 +371,15 @@ mutation($projectID: UUID!,$domain: UUID!) {
 
 
 
-func Unlink(projectID string, domain string) (
+func Unlink(projectID string, hostname string) (
 	unlinkResult bool, err error) {
 	req := graphql.NewRequest(`
-mutation($projectID: UUID!,$domain: UUID!) {
-	unlink(projectID:$projectID,domain:$domain)
+mutation($projectID: UUID!,$hostname: String!) {
+	unlink(projectID:$projectID,hostname:hostname)
 }
 `)
 	req.Var("projectID", projectID)
-	req.Var("domain", domain)
+	req.Var("hostname", hostname)
 	req.Header.Set("Authorization", "Bearer "+info.Credentials.Token)
 
 	// run it and capture the response
