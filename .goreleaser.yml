@@ -47,6 +47,7 @@ builds:
       - darwin
     goarch:
       - amd64
+      - arm64
     flags:
       - -trimpath
     ldflags:
