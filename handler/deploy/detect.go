@@ -31,6 +31,8 @@ func DetectProjectType() (projectType string) {
 				return "martini"
 			}
 		}
+
+		return "go"
 	}
 
 	// handle javascript framework

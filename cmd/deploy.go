@@ -310,7 +310,7 @@ var deployCmd = &cobra.Command{
 
 			if currentStatus.Done {
 				if currentStatus.Status == "Failed" {
-					log.Error(errors.New(currentStatus.ErrorMessage))
+					log.Error(errors.New(currentStatus.ErrorLogs))
 					break
 				}
 

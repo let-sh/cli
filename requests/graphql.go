@@ -148,7 +148,7 @@ func GetDeploymentStatus(id string) (deployment struct {
 	PackerStage  string `json:"packerStage"`
 	Status       string `json:"status"`
 	Done         bool   `json:"done"`
-	ErrorMessage string `json:"errorMessage"`
+	ErrorLogs string `json:"errorLogs"`
 }, err error) {
 	req := graphql.NewRequest(`
 query($id: UUID!) {
@@ -158,7 +158,7 @@ query($id: UUID!) {
 		packerStage
 		status
 		done
-		errorMessage
+		errorLogs
 	  }
 }
 `)
@@ -173,7 +173,7 @@ query($id: UUID!) {
 			PackerStage  string `json:"packerStage"`
 			Status       string `json:"status"`
 			Done         bool   `json:"done"`
-			ErrorMessage string `json:"errorMessage"`
+			ErrorLogs string `json:"errorLogs"`
 		} `json:"deployment,omitempty"`
 	}
 	if err := Graphql.Run(context.Background(), req, &respData); err != nil {
