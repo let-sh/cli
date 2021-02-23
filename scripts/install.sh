@@ -37,7 +37,7 @@ letsh_get_binary() {
   printf "$cyan> Downloading binary...$reset\n"
   if [ "$1" = '--version' ]; then
     # Validate that the version matches MAJOR.MINOR.PATCH to avoid garbage-in/garbage-out behavior
-    version=$2
+    version=${v#$2}
     if echo "$version" | grep -qE "^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$"; then
       url="https://install.let.sh.cn/cli_${version}_${os}_amd64.tar.gz"
     else
