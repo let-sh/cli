@@ -2,10 +2,14 @@ module github.com/let-sh/cli
 
 go 1.15
 
+replace github.com/charmbracelet/bubbles v0.7.6 => github.com/OasisNetworks/bubbles v0.7.7-0.20210226193817-28eb5c775530
+
 require (
 	github.com/StackExchange/wmi v0.0.0-20190523213315-cbe66965904d // indirect
 	github.com/aliyun/aliyun-oss-go-sdk v2.1.5+incompatible
 	github.com/baiyubin/aliyun-sts-go-sdk v0.0.0-20180326062324-cfa1a18b161f // indirect
+	github.com/charmbracelet/bubbles v0.7.6
+	github.com/charmbracelet/bubbletea v0.12.4
 	github.com/creack/pty v1.1.11
 	github.com/danwakefield/fnmatch v0.0.0-20160403171240-cbb64ac3d964 // indirect
 	github.com/denormal/go-gitignore v0.0.0-20180930084346-ae8ad1d07817
@@ -38,7 +42,7 @@ require (
 	github.com/twinj/uuid v1.0.0
 	github.com/vbauerster/mpb/v5 v5.4.0
 	github.com/weaveworks/procspy v0.0.0-20150706124340-cb970aa190c3
-	golang.org/x/term v0.0.0-20201210144234-2321bbc49cbf
+	github.com/yudai/pp v2.0.1+incompatible
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	gopkg.in/stretchr/testify.v1 v1.2.2 // indirect

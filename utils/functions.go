@@ -1,6 +1,9 @@
 package utils
 
-import "reflect"
+import (
+	"reflect"
+	"strings"
+)
 
 func ItemExists(slice interface{}, item interface{}) bool {
 	s := reflect.ValueOf(slice)
@@ -28,4 +31,14 @@ func RemoveDuplicates(intSlice []int) []int {
 		}
 	}
 	return list
+}
+
+func MatchPrefix(stringArray []string, prefix string) string {
+	for _,s := range stringArray {
+		if strings.HasPrefix(s,prefix) {
+			return s
+		}
+	}
+
+	return ""
 }

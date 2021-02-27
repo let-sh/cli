@@ -323,6 +323,34 @@ mutation($projectID: UUID!) {
 	return respData.StartDevelopment, nil
 }
 
+func QueryProject(projectName string) (
+	projectInfo struct{
+	ID string `json:"id,omitempty"`
+	Name string `json:"name,omitempty"`
+}, err error) {
+	req := graphql.NewRequest(`
+query($projectName: String!) {
+  project(name:$projectName){
+    id
+    name
+  }
+}
+`)
+	req.Var("projectName", projectName)
+	req.Header.Set("Authorization", "Bearer "+info.Credentials.Token)
+
+	// run it and capture the response
+	var respData struct {
+		ID string `json:"id,omitempty"`
+		Name string `json:"name,omitempty"`
+	}
+	if err := Graphql.Run(context.Background(), req, &respData); err != nil {
+		return projectInfo, err
+	}
+
+	return respData, nil
+}
+
 func StopDevelopment(projectID string) (
 	stopDevelopmentResult bool, err error) {
 	req := graphql.NewRequest(`

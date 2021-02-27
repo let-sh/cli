@@ -8,7 +8,7 @@ import (
 
 func init() {
 	sentry.Init(sentry.ClientOptions{
-		Dsn:     "https://f201c9f3cd0e473e98ad25cde46053dc@o310861.ingest.sentry.io/5604834",
+		Dsn:     "https://f201c9f3cd0e473e98ad25cde46053dc@o310861.ingest.sentry.ui/5604834",
 		Release: info.Version,
 	})
 

@@ -17,8 +17,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/let-sh/cli/log"
-	"github.com/let-sh/cli/requests"
+	"github.com/let-sh/cli/ui"
 	"os"
 	"path/filepath"
 
@@ -36,11 +35,22 @@ e.g.
 "lets logs -p hello-world"    print latest logs under project hello-world
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		data, err := requests.QueryDeployments("gin", 1)
-		if err != nil {
-			log.Error(err)
-		}
-		fmt.Println(data)
+		//data, err := requests.QueryDeployments("gin", 1)
+		//if err != nil {
+		//	log.Error(err)
+		//}
+		//fmt.Println(data)
+		//deploy.InitProject("gin")
+		//ui.Radio(ui.RadioConfig{
+		//	Prefix: "type: gin",
+		//})
+		ui.InputArea(ui.InputAreaConfig{
+			Layout:             "key",
+			DefaultValue:       "v",
+			DefaultPlaceholder: "value",
+			PlaceHolders:       []string{"value", "test"},
+		})
+
 		fmt.Println("log called")
 	},
 }

@@ -60,8 +60,6 @@ var deployCmd = &cobra.Command{
 			return
 		}
 
-		var cn bool
-
 		log.BStart("deploying")
 		// merge config
 		// cli flag > config file > auto saved config > detected config & types
@@ -69,72 +67,38 @@ var deployCmd = &cobra.Command{
 			// detect current project config first
 			// init current project name
 			dir, _ := os.Getwd()
-			deploymentConfig.Name = filepath.Base(dir)
+			deploymentCtx.Name = filepath.Base(dir)
 
-			// detect project type
-			deploymentConfig.Type = deploy.DetectProjectType()
-
-			// check if static by index.html
-			_, err := os.Stat("index.html")
-			if !os.IsNotExist(err) {
-				deploymentConfig.Type = "static"
-				deploymentConfig.Static = "./"
-			}
+			// detect current project info
+			deploymentCtx.DetectProjectType()
 
 			// Step2: get cache config
-			//cache.GetProjectInfo(deploymentConfig.Name)
+			deploymentCtx.LoadProjectInfoCache()
 
 			// Step3: load user config
-			_, err = os.Stat("let.json")
-			if err == nil {
-				jsonFile, err := os.Open("let.json")
-				// if we os.Open returns an error then handle it
-				if err != nil {
-					log.Error(err)
-					return
-				}
-				// defer the closing of our jsonFile so that we can parse it later on
-				defer jsonFile.Close()
-				byteValue, _ := ioutil.ReadAll(jsonFile)
-				configStr := string(byteValue)
-				logrus.WithFields(logrus.Fields{"configFile": configStr}).Debugln("let.json")
-				err = json.Unmarshal(byteValue, &deploymentConfig)
-				if err != nil {
-					logrus.Error(err)
-					return
-				}
-			}
+			deploymentCtx.LoadLetJson()
 
 			// Step4: merge cli flag config
-			if inputProjectName != "" {
-				deploymentConfig.Name = inputProjectName
-			}
-
-			if inputProjectType != "" {
-				deploymentConfig.Type = inputProjectType
-			}
+			deploymentCtx.LoadCliFlag(inputProjectName, inputProjectType)
 
 			// load cn
 			// if user customed cn flag
-			if 	cmd.Flags().Changed("cn") {
-				// user custom by cli flag
-				cn = inputCN
-			} else {
-				// user custom by json config
-				if deploymentConfig.CN != nil {
-					cn = *deploymentConfig.CN
-				} else {
-					// fall back to default
-					cn = false
-				}
-			}
+			deploymentCtx.LoadRegion(cmd, inputCN)
+		}
+
+		// check project exists
+		// if not exists, tell to create
+		// and confirm project configuration
+		if !deploymentCtx.ConfirmProject() {
+			log.Warning("deploy canceled")
+			return
 		}
 
 		// check if user dir is changed
-		if _, ok := cache.ProjectsInfo[deploymentConfig.Name]; ok {
+		if _, ok := cache.ProjectsInfo[deploymentCtx.Name]; ok {
 			pwd, _ := os.Getwd()
 
-			if pwd != cache.ProjectsInfo[deploymentConfig.Name].Dir {
+			if pwd != cache.ProjectsInfo[deploymentCtx.Name].Dir {
 				log.S.StopFail()
 				// if current dir is not previous dir
 				prompt := promptui.Prompt{
@@ -164,7 +128,7 @@ var deployCmd = &cobra.Command{
 		}
 
 		// check Check Deploy Capability
-		hashID, _, err := requests.CheckDeployCapability(deploymentConfig.Name)
+		hashID, _, err := requests.CheckDeployCapability(deploymentCtx.Name)
 		if err != nil {
 			log.Error(err)
 			return
@@ -193,30 +157,29 @@ var deployCmd = &cobra.Command{
 
 		fmt.Println("")
 		fmt.Println(log.CyanBold("Detected Project Info"))
-		fmt.Printf("name: %s\n", deploymentConfig.Name)
-		fmt.Printf("type: %s\n", deploymentConfig.Type)
+		fmt.Printf("name: %s\n", deploymentCtx.Name)
+		fmt.Printf("type: %s\n", deploymentCtx.Type)
 		fmt.Println("")
 
-
-		template, err := requests.GetTemplate(deploymentConfig.Type)
+		template, err := requests.GetTemplate(deploymentCtx.Type)
 		if err != nil {
 			log.Error(err)
 		}
 		{
-			if deploymentConfig.Static == "" {
-				deploymentConfig.Static = template.DistDir
+			if deploymentCtx.Static == "" {
+				deploymentCtx.Static = template.DistDir
 			}
 		}
 
 		// if contains static, upload static files to oss
-		dirPath := deploymentConfig.Static
+		dirPath := deploymentCtx.Static
 		if len(dirPath) == 0 {
 			dirPath = "./"
 		}
 		if template.ContainsStatic {
-			if utils.ItemExists([]string{"static"}, deploymentConfig.Type) {
+			if utils.ItemExists([]string{"static"}, deploymentCtx.Type) {
 				// todo: merge static dir value source
-				if err := oss.UploadDirToStaticSource(dirPath, deploymentConfig.Name, deploymentConfig.Name+"-"+hashID,cn); err != nil {
+				if err := oss.UploadDirToStaticSource(dirPath, deploymentCtx.Name, deploymentCtx.Name+"-"+hashID, *deploymentCtx.CN); err != nil {
 					log.Error(err)
 					return
 				}
@@ -235,7 +198,7 @@ var deployCmd = &cobra.Command{
 					}
 				}
 
-				if err := oss.UploadDirToStaticSource(deploymentConfig.Static, deploymentConfig.Name, deploymentConfig.Name+"-"+hashID,cn); err != nil {
+				if err := oss.UploadDirToStaticSource(deploymentCtx.Static, deploymentCtx.Name, deploymentCtx.Name+"-"+hashID, *deploymentCtx.CN); err != nil {
 					log.Error(err)
 					return
 				}
@@ -254,30 +217,29 @@ var deployCmd = &cobra.Command{
 			//os.MkdirAll(dir+"/source", os.ModePerm)
 
 			// copy current dir to temp dir
-			c.Copy("./", dir+"/"+deploymentConfig.Name+"-"+hashID)
+			c.Copy("./", dir+"/"+deploymentCtx.Name+"-"+hashID)
 
 			// remove if not clean
-			os.Remove(dir + "/" + deploymentConfig.Name + "-" + hashID + ".tar.gz")
-			err = archiver.Archive([]string{"."}, dir+"/"+deploymentConfig.Name+"-"+hashID+".tar.gz")
+			os.Remove(dir + "/" + deploymentCtx.Name + "-" + hashID + ".tar.gz")
+			err = archiver.Archive([]string{"."}, dir+"/"+deploymentCtx.Name+"-"+hashID+".tar.gz")
 			if err != nil {
 				log.Error(err)
 				return
 			}
-			oss.UploadFileToCodeSource(dir+"/"+deploymentConfig.Name+"-"+hashID+".tar.gz", deploymentConfig.Name+"-"+hashID+".tar.gz", deploymentConfig.Name,cn)
+			oss.UploadFileToCodeSource(dir+"/"+deploymentCtx.Name+"-"+hashID+".tar.gz", deploymentCtx.Name+"-"+hashID+".tar.gz", deploymentCtx.Name, *deploymentCtx.CN)
 		}
 
 		logrus.WithFields(logrus.Fields{
-			"json": deploymentConfig,
-		}).Debugln("deploymentConfig")
+			"json": deploymentCtx,
+		}).Debugln("deploymentCtx")
 
-		configBytes, _ := json.Marshal(deploymentConfig)
-
+		configBytes, _ := json.Marshal(deploymentCtx)
 
 		channel := "dev"
 		if inputProd {
 			channel = "prod"
 		}
-		deployment, err := requests.Deploy(deploymentConfig.Type, deploymentConfig.Name, string(configBytes),channel, cn)
+		deployment, err := requests.Deploy(deploymentCtx.Type, deploymentCtx.Name, string(configBytes), channel, *deploymentCtx.CN)
 
 		if err != nil {
 			log.Error(err)
@@ -291,10 +253,10 @@ var deployCmd = &cobra.Command{
 		// save deployment info
 		cache.SaveProjectInfo(types.Project{
 			ID:           deployment.Project.ID,
-			Name:         deploymentConfig.Name,
+			Name:         deploymentCtx.Name,
 			Dir:          pwd,
-			Type:         deploymentConfig.Type,
-			ServeCommand: cache.ProjectsInfo[deploymentConfig.Name].ServeCommand,
+			Type:         deploymentCtx.Type,
+			ServeCommand: cache.ProjectsInfo[deploymentCtx.Name].ServeCommand,
 		})
 
 		log.BStart("deploying")
@@ -317,7 +279,7 @@ var deployCmd = &cobra.Command{
 				log.S.StopFail()
 				fmt.Println(
 					color.New(color.Bold).Sprint("Preview: ")+color.New().Sprint("https://"+currentStatus.TargetFQDN), "\n"+
-						color.New(color.Bold).Sprint("Details: ")+color.New().Sprint("https://alpha.let.sh.cn/console/project/"+deploymentConfig.Name+"/details"),
+						color.New(color.Bold).Sprint("Details: ")+color.New().Sprint("https://alpha.let.sh.cn/console/project/"+deploymentCtx.Name+"/details"),
 				)
 				break
 
@@ -329,7 +291,7 @@ var deployCmd = &cobra.Command{
 	},
 }
 
-var deploymentConfig types.LetConfig
+var deploymentCtx deploy.DeployContext
 var inputProjectName string
 var inputProjectType string
 var inputCN bool

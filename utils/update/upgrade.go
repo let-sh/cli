@@ -159,7 +159,7 @@ func DownloadBinaryCompressedFile(filename, tempDir string) error {
 	io.Copy(out, proxyReader)
 
 	// Writer the body to file
-	//_, err = io.Copy(out, resp.Body)
+	//_, err = ui.Copy(out, resp.Body)
 	//if err != nil {
 	//	return err
 	//}
