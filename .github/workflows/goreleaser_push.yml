@@ -1,15 +1,17 @@
-name: goreleaser
+name: goreleaser_push
 
 on:
   push:
+    branches:
+      - '*'
     tags-ignore:
-      - *
+      - '0.*'
   pull_request:
     branches:
       - main
 
 jobs:
-  goreleaser:
+  goreleaser_push:
     runs-on: [self-hosted, macos-latest]
     steps:
       -
@@ -43,8 +45,8 @@ jobs:
           AC_USERNAME: ${{ secrets.AC_USERNAME }}
           AC_PASSWORD: ${{ secrets.AC_PASSWORD }}
         run: |
-          goreleaser --rm-dist --skip-publish
+          goreleaser --rm-dist --skip-publish --skip-validate
       -
         name: Check Binary
         run: |
-          ./dist/lets_macos_darwin_amd64/lets version
+          ./dist/lets_macos_amd_darwin_amd64/lets version

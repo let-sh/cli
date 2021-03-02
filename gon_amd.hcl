@@ -1,6 +1,6 @@
 # The path follows a pattern
 # ./dist/BUILD-ID_TARGET/BINARY-NAME
-source = ["./dist/lets_macos_darwin_amd64/lets"]
+source = ["./dist/lets_macos_amd_darwin_amd64/lets"]
 bundle_id = "com.oasis-networks.cli"
 
 apple_id {

@@ -44,4 +44,4 @@ jobs:
       -
         name: Check Binary
         run: |
-          ./dist/lets_macos_darwin_amd64/lets version
+          ./dist/lets_macos_amd_darwin_amd64/lets version
