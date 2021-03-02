@@ -17,7 +17,6 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/let-sh/cli/ui"
 	"os"
 	"path/filepath"
 
@@ -32,9 +31,10 @@ var logCmd = &cobra.Command{
 
 e.g. 
 "lets logs --tail 10"         print latest 10 line logs
-"lets logs -p hello-world"    print latest logs under project hello-world
+"lets logs -p hello-world"    print latest logs under project 'hello-world'
 `,
 	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("not implemented yet")
 		//data, err := requests.QueryDeployments("gin", 1)
 		//if err != nil {
 		//	log.Error(err)
@@ -44,14 +44,14 @@ e.g.
 		//ui.Radio(ui.RadioConfig{
 		//	Prefix: "type: gin",
 		//})
-		ui.InputArea(ui.InputAreaConfig{
-			Layout:             "key",
-			DefaultValue:       "v",
-			DefaultPlaceholder: "value",
-			PlaceHolders:       []string{"value", "test"},
-		})
-
-		fmt.Println("log called")
+		//ui.InputArea(ui.InputAreaConfig{
+		//	Layout:             "key",
+		//	DefaultValue:       "v",
+		//	DefaultPlaceholder: "value",
+		//	PlaceHolders:       []string{"value", "test"},
+		//})
+		//
+		//fmt.Println("log called")
 	},
 }
 

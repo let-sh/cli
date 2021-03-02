@@ -75,8 +75,13 @@ var deployCmd = &cobra.Command{
 			// Step2: get cache config
 			deploymentCtx.LoadProjectInfoCache()
 
-			// Step3: load user config
+			// Step3: load user config and environment variables
 			deploymentCtx.LoadLetJson()
+			err := deploymentCtx.LoadEnvFiles()
+			if err != nil {
+				log.Error(err)
+				return
+			}
 
 			// Step4: merge cli flag config
 			deploymentCtx.LoadCliFlag(inputProjectName, inputProjectType)
@@ -150,7 +155,6 @@ var deployCmd = &cobra.Command{
 				log.Error(errors.New("too many files in current dir, please check whether in the correct directory"))
 				return
 			}
-
 		}
 
 		log.S.StopFail()

@@ -1,5 +1,5 @@
 /*
-Copyright © 2021 NAME HERE <EMAIL ADDRESS>
+Copyright © 2021 Fred Liang <fred@oasis.ac>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@ import (
 	"github.com/let-sh/cli/log"
 	"github.com/let-sh/cli/requests"
 	"github.com/let-sh/cli/utils/cache"
-	"os"
 	"github.com/spf13/cobra"
+	"os"
 	"strings"
 )
 

@@ -19,6 +19,7 @@ require (
 	github.com/golang/protobuf v1.3.4 // indirect
 	github.com/google/go-cmp v0.5.4 // indirect
 	github.com/gorilla/websocket v1.4.2
+	github.com/joho/godotenv v1.3.0 // indirect
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/machinebox/graphql v0.2.2
 	github.com/manifoldco/promptui v0.8.0
