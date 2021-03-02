@@ -42,7 +42,7 @@ builds:
   - env:
       - CGO_ENABLED=0
     binary: lets
-    id: lets_macos
+    id: lets_macos_amd
     goos:
       - darwin
     goarch:
@@ -59,7 +59,7 @@ builds:
   - env:
       - CGO_ENABLED=0
     binary: lets
-    id: lets_macos
+    id: lets_macos_arm
     goos:
       - darwin
     goarch:
