@@ -13,10 +13,10 @@ sign {
 }
 
 dmg{
-  output_path= "./dist/lets_macos_darwin_arm64/lets.dmg"
+  output_path= "./dist/lets_macos_arm_darwin_arm64/lets.dmg"
   volume_name= "let.sh cli"
 }
 
 zip {
-  output_path = "./dist/lets_macos_darwin_arm64/lets.zip"
+  output_path = "./dist/lets_macos_arm_darwin_arm64/lets.zip"
 }

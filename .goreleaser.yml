@@ -95,8 +95,8 @@ release:
     name: cli
   prerelease: auto
   extra_files:
-    - glob: ./dist/lets_macos_darwin_amd64/*.zip
-    - glob: ./dist/lets_macos_darwin_amd64/*.dmg
+    - glob: ./dist/lets_macos_amd_darwin_amd64/*.zip
+    - glob: ./dist/lets_macos_amd_darwin_amd64/*.dmg
 blobs:
   -
     provider: s3
@@ -107,8 +107,8 @@ blobs:
     extra_files:
       - glob: ./version
       - glob: ./scripts/install.sh
-      - glob: ./dist/lets_macos_darwin_amd64/*.zip
-      - glob: ./dist/lets_macos_darwin_amd64/*.dmg
+      - glob: ./dist/lets_macos_arm_darwin_amd64/*.zip
+      - glob: ./dist/lets_macos_arm_darwin_amd64/*.dmg
 brews:
   -
     name: lets
