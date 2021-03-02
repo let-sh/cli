@@ -18,9 +18,10 @@ package cmd
 import (
 	"fmt"
 	"github.com/let-sh/cli/info"
-	"github.com/let-sh/cli/log"
+	"github.com/let-sh/cli/ui"
 	"github.com/let-sh/cli/utils/config"
 	"github.com/let-sh/cli/utils/update"
+	"github.com/logrusorgru/aurora"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"os"
@@ -32,8 +33,8 @@ var Debug bool
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "lets",
-	Short: log.CyanBold("\n🏝️ Launch your app with just one command"),
-	Long:  log.CyanBold("\n🏝️  let.sh helps you test, preview and launch your app"),
+	Short: aurora.Index(ui.MainColor, "λ").String() + "️ Launch your app with just one command",
+	Long:  aurora.Index(ui.MainColor, "λ").String() + " let.sh helps you test, preview and launch your app",
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	//	Run: func(cmd *cobra.Command, args []string) { },

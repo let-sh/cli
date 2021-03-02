@@ -1,5 +1,5 @@
 package ui
 
 var (
-	MainColor = 51
+	MainColor = uint8(51)
 )
