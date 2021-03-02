@@ -58,21 +58,21 @@ builds:
         - gon gon_amd.hcl
   - env:
       - CGO_ENABLED=0
-      binary: lets
-      id: lets_macos
-      goos:
-        - darwin
-      goarch:
-        - arm64
-      flags:
-        - -trimpath
-      ldflags:
-        - -X github.com/let-sh/cli/info.Version={{.Version}}
-        - -s
-        - -w
-      hooks:
-        post:
-          - gon gon_arm.hcl
+    binary: lets
+    id: lets_macos
+    goos:
+      - darwin
+    goarch:
+      - arm64
+    flags:
+      - -trimpath
+    ldflags:
+      - -X github.com/let-sh/cli/info.Version={{.Version}}
+      - -s
+      - -w
+    hooks:
+      post:
+        - gon gon_arm.hcl
 checksum:
   name_template: 'checksums.txt'
 snapshot:
