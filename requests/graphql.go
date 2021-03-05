@@ -9,7 +9,7 @@ import (
 )
 
 // create a client (safe to share across requests)
-var Graphql = graphql.NewClient("https://api.let.sh.cn/query")
+var Graphql = graphql.NewClient("https://api.let.sh/query")
 
 func CheckDeployCapability(projectName string) (hashID string, exists bool, err error) {
 	req := graphql.NewRequest(`
@@ -84,7 +84,7 @@ query($type: String!, $name: String!, $cn: Boolean!) {
 	return respData.StsToken, nil
 }
 
-func Deploy(projectType, projectName, config,channel  string, cn bool) (deployment struct {
+func Deploy(projectType, projectName, config, channel string, cn bool) (deployment struct {
 	ID           string `json:"id"`
 	TargetFQDN   string `json:"targetFQDN"`
 	NetworkStage string `json:"networkStage"`
@@ -115,7 +115,7 @@ mutation($type: String!, $name: String!, $config: String, $channel: String!, $cn
 	req.Var("channel", channel)
 	req.Var("cn", cn)
 	req.Header.Set("Authorization", "Bearer "+info.Credentials.Token)
-	logrus.Debugln(projectType, projectName, config , cn )
+	logrus.Debugln(projectType, projectName, config, cn)
 	// run it and capture the response
 	var respData struct {
 		Deploy struct {
@@ -148,7 +148,7 @@ func GetDeploymentStatus(id string) (deployment struct {
 	PackerStage  string `json:"packerStage"`
 	Status       string `json:"status"`
 	Done         bool   `json:"done"`
-	ErrorLogs string `json:"errorLogs"`
+	ErrorLogs    string `json:"errorLogs"`
 }, err error) {
 	req := graphql.NewRequest(`
 query($id: UUID!) {
@@ -173,7 +173,7 @@ query($id: UUID!) {
 			PackerStage  string `json:"packerStage"`
 			Status       string `json:"status"`
 			Done         bool   `json:"done"`
-			ErrorLogs string `json:"errorLogs"`
+			ErrorLogs    string `json:"errorLogs"`
 		} `json:"deployment,omitempty"`
 	}
 	if err := Graphql.Run(context.Background(), req, &respData); err != nil {
@@ -324,10 +324,10 @@ mutation($projectID: UUID!) {
 }
 
 func QueryProject(projectName string) (
-	projectInfo struct{
-	ID string `json:"id,omitempty"`
-	Name string `json:"name,omitempty"`
-}, err error) {
+	projectInfo struct {
+		ID   string `json:"id,omitempty"`
+		Name string `json:"name,omitempty"`
+	}, err error) {
 	req := graphql.NewRequest(`
 query($projectName: String!) {
   project(name:$projectName){
@@ -341,7 +341,7 @@ query($projectName: String!) {
 
 	// run it and capture the response
 	var respData struct {
-		ID string `json:"id,omitempty"`
+		ID   string `json:"id,omitempty"`
 		Name string `json:"name,omitempty"`
 	}
 	if err := Graphql.Run(context.Background(), req, &respData); err != nil {
@@ -373,7 +373,6 @@ mutation($projectID: UUID!) {
 	return respData.StopDevelopment, nil
 }
 
-
 func Link(projectID string, hostname string) (
 	linkResult bool, err error) {
 	req := graphql.NewRequest(`
@@ -397,8 +396,6 @@ mutation($projectID: UUID!,$hostname: String!) {
 	return respData.Link, nil
 }
 
-
-
 func Unlink(projectID string, hostname string) (
 	unlinkResult bool, err error) {
 	req := graphql.NewRequest(`
@@ -421,6 +418,7 @@ mutation($projectID: UUID!,$hostname: String!) {
 
 	return respData.Unlink, nil
 }
+
 //func QueryLogs(deploymentID string, count int) (
 //	deployments struct {
 //		Edges []struct {
