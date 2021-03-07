@@ -19,7 +19,7 @@ require (
 	github.com/golang/protobuf v1.3.4 // indirect
 	github.com/google/go-cmp v0.5.4 // indirect
 	github.com/gorilla/websocket v1.4.2
-	github.com/joho/godotenv v1.3.0 // indirect
+	github.com/joho/godotenv v1.3.0
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/machinebox/graphql v0.2.2
 	github.com/manifoldco/promptui v0.8.0
@@ -28,6 +28,7 @@ require (
 	github.com/mholt/archiver/v3 v3.5.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/go-ps v1.0.0
+	github.com/muesli/termenv v0.7.4
 	github.com/myesui/uuid v1.0.0 // indirect
 	github.com/otiai10/copy v1.4.2
 	github.com/prometheus/procfs v0.0.10 // indirect

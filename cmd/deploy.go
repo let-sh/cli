@@ -283,7 +283,7 @@ var deployCmd = &cobra.Command{
 				log.S.StopFail()
 				fmt.Println(
 					color.New(color.Bold).Sprint("Preview: ")+color.New().Sprint("https://"+currentStatus.TargetFQDN), "\n"+
-						color.New(color.Bold).Sprint("Details: ")+color.New().Sprint("https://alpha.let.sh.cn/console/project/"+deploymentCtx.Name+"/details"),
+						color.New(color.Bold).Sprint("Details: ")+color.New().Sprint("https://alpha.let.sh/console/project/"+deploymentCtx.Name+"/details"),
 				)
 				break
 
