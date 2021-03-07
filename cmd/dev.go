@@ -93,7 +93,7 @@ var devCmd = &cobra.Command{
 		defer KillServiceProcess(p.ID)
 
 		// request to start tunnel
-		remoteEndpoint  := inputRemoteEndpoint
+		remoteEndpoint := inputRemoteEndpoint
 		var result struct {
 			RemotePort    int    `json:"remotePort,omitempty"`
 			RemoteAddress string `json:"remoteAddress,omitempty"`
@@ -107,7 +107,6 @@ var devCmd = &cobra.Command{
 			}
 			remoteEndpoint = result.RemoteAddress + ":" + strconv.Itoa(result.RemotePort)
 		}
-
 
 		{
 			// run server command
@@ -193,8 +192,8 @@ var devCmd = &cobra.Command{
 		}
 
 		fmt.Println("\n"+aurora.BrightCyan("[msg]").Bold().String(), "you can visit remotely at: "+aurora.Bold("https://"+result.Fqdn).String()+"\n\r")
-
-		dev.StartClient(remoteEndpoint, localEndpoint,result.Fqdn)
+		openBrowser("https://" + result.Fqdn)
+		dev.StartClient(remoteEndpoint, localEndpoint, result.Fqdn)
 	},
 }
 
@@ -217,7 +216,7 @@ func init() {
 
 	devCmd.Flags().StringVarP(&inputLocalEndpoint, "local", "l", "", "custom local upstream endpoint, e.g. 127.0.0.1:3000")
 
-	devCmd.Flags().BoolVarP(&forceLocal,"force","f",false, "force local test development")
+	devCmd.Flags().BoolVarP(&forceLocal, "force", "f", false, "force local test development")
 	deployCmd.Flags().MarkHidden("force")
 }
 
