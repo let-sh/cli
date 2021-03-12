@@ -52,7 +52,7 @@ func UploadFileToCodeSource(filedir, filename, projectName string, cn bool) {
 		mpb.BarRemoveOnComplete(),
 	)
 
-	stsToken, err := requests.GetStsToken("buildBundle", projectName,cn)
+	stsToken, err := requests.GetStsToken("buildBundle", projectName, cn)
 	if err != nil {
 		fmt.Println("Error:", err)
 		os.Exit(-1)
@@ -94,7 +94,7 @@ func UploadFileToCodeSource(filedir, filename, projectName string, cn bool) {
 func UploadDirToStaticSource(dirPath, projectName, bundleID string, cn bool) error {
 	log.BPause()
 	uploadStatus = make(map[string]fileUplaodStatus)
-	stsToken, err := requests.GetStsToken("static", projectName,cn)
+	stsToken, err := requests.GetStsToken("static", projectName, cn)
 	if err != nil {
 		fmt.Println("Error:", err)
 		os.Exit(-1)
@@ -229,6 +229,11 @@ func UploadDirToStaticSource(dirPath, projectName, bundleID string, cn bool) err
 					"objKey":   objKey,
 					"filePath": filePath,
 				}).Debug("put object from file")
+
+				// TODO:
+				// * check file exists in previous deployment
+				// * if matched etag, copy file
+				// * else upload file
 				err = bucket.PutObjectFromFile(func() string {
 					if runtime.GOOS == "windows" {
 						return filepath.ToSlash(objKey)
