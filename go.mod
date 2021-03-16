@@ -18,6 +18,7 @@ require (
 	github.com/go-ole/go-ole v1.2.5 // indirect
 	github.com/golang/protobuf v1.3.4 // indirect
 	github.com/google/go-cmp v0.5.4 // indirect
+	github.com/google/go-github/v33 v33.0.0 // indirect
 	github.com/gorilla/websocket v1.4.2
 	github.com/joho/godotenv v1.3.0
 	github.com/logrusorgru/aurora v2.0.3+incompatible

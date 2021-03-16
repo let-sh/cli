@@ -47,6 +47,15 @@ func init() {
 	if err != nil {
 		log.Error(err)
 	}
+
+	// handle github actions
+	if len(info.GitHub.GetToken()) > 0 {
+		repo, err := info.GitHub.GetRepositoryNameWithOwner()
+		if err != nil {
+			log.Error(err)
+		}
+		info.Credentials.Token = "GITHUB:" + repo + ":" + info.GitHub.GetToken()
+	}
 }
 
 func Load() {}
