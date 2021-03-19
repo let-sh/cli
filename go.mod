@@ -38,6 +38,8 @@ require (
 	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/segmentio/textio v1.2.0
 	github.com/shirou/gopsutil v3.20.12+incompatible
+	github.com/shurcooL/githubv4 v0.0.0-20201206200315-234843c633fa // indirect
+	github.com/shurcooL/graphql v0.0.0-20200928012149-18c5c3165e3a // indirect
 	github.com/sirupsen/logrus v1.7.0
 	github.com/spf13/cobra v1.1.1
 	github.com/theckman/yacspin v0.8.0
@@ -46,6 +48,7 @@ require (
 	github.com/vbauerster/mpb/v5 v5.4.0
 	github.com/weaveworks/procspy v0.0.0-20150706124340-cb970aa190c3
 	github.com/yudai/pp v2.0.1+incompatible
+	golang.org/x/net v0.0.0-20210316092652-d523dce5a7f4 // indirect
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	gopkg.in/stretchr/testify.v1 v1.2.2 // indirect

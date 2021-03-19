@@ -42,10 +42,12 @@ func init() {
 	}
 
 	// bootstrap configs
-	credentialsFile, _ := ioutil.ReadFile(home + "/.let/credentials.json")
-	err = json.Unmarshal(credentialsFile, &info.Credentials)
-	if err != nil {
-		log.Error(err)
+	if len(info.Credentials.Token) == 0 {
+		credentialsFile, _ := ioutil.ReadFile(home + "/.let/credentials.json")
+		err = json.Unmarshal(credentialsFile, &info.Credentials)
+		if err != nil {
+			log.Error(err)
+		}
 	}
 
 	// handle github actions
