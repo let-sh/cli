@@ -18,7 +18,7 @@ require (
 	github.com/go-ole/go-ole v1.2.5 // indirect
 	github.com/golang/protobuf v1.3.4 // indirect
 	github.com/google/go-cmp v0.5.4 // indirect
-	github.com/google/go-github/v33 v33.0.0 // indirect
+	github.com/google/go-github/v33 v33.0.0
 	github.com/gorilla/websocket v1.4.2
 	github.com/joho/godotenv v1.3.0
 	github.com/logrusorgru/aurora v2.0.3+incompatible
@@ -29,7 +29,6 @@ require (
 	github.com/mholt/archiver/v3 v3.5.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/go-ps v1.0.0
-	github.com/muesli/termenv v0.7.4
 	github.com/myesui/uuid v1.0.0 // indirect
 	github.com/otiai10/copy v1.4.2
 	github.com/prometheus/procfs v0.0.10 // indirect
@@ -46,6 +45,8 @@ require (
 	github.com/vbauerster/mpb/v5 v5.4.0
 	github.com/weaveworks/procspy v0.0.0-20150706124340-cb970aa190c3
 	github.com/yudai/pp v2.0.1+incompatible
+	golang.org/x/net v0.0.0-20210316092652-d523dce5a7f4 // indirect
+	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	gopkg.in/stretchr/testify.v1 v1.2.2 // indirect

@@ -42,14 +42,16 @@ func init() {
 	}
 
 	// bootstrap configs
-	credentialsFile, _ := ioutil.ReadFile(home + "/.let/credentials.json")
-	err = json.Unmarshal(credentialsFile, &info.Credentials)
-	if err != nil {
-		log.Error(err)
+	if len(info.Credentials.Token) == 0 {
+		credentialsFile, _ := ioutil.ReadFile(home + "/.let/credentials.json")
+		err = json.Unmarshal(credentialsFile, &info.Credentials)
+		if err != nil {
+			log.Error(err)
+		}
 	}
 
 	// handle github actions
-	if len(info.GitHub.GetToken()) > 0 {
+	if len(info.GitHub.GetToken()) > 0 && len(os.Getenv("GITHUB_REPOSITORY")) > 0 {
 		repo, err := info.GitHub.GetRepositoryNameWithOwner()
 		if err != nil {
 			log.Error(err)
