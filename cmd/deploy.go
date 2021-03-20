@@ -54,6 +54,7 @@ var deployCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		// Setup our Ctrl+C handler
 		SetupCloseHandler()
+
 		// check whether user is logged in
 		if info.Credentials.Token == "" {
 			log.Warning("please login via `lets login` first")

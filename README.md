@@ -3,7 +3,8 @@
 ## Installation
 
 ```shell
-curl install.let.sh | bash
+# install cli
+curl -o- -sL https://install.let.sh.cn/install.sh | bash
 ```
 
 ## Login
