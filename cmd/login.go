@@ -53,7 +53,8 @@ var loginCmd = &cobra.Command{
 
 		// valid response
 		start := time.Now()
-		log.BUpdate("waiting for login result")
+		log.BUpdate("waiting for login result, you could also manually visit: "+"https://api.let.sh/oauth/login?method=github&client=cli&ticket_id=" + tickeIDInterface.String() + "&device=" + goInfo.GetInfo().OS + goInfo.GetInfo().Core)
+
 		for {
 			// Code to measure
 			duration := time.Since(start)
