@@ -4,13 +4,37 @@ import (
 	"encoding/json"
 	"github.com/let-sh/cli/log"
 	"github.com/let-sh/cli/types"
+	"github.com/pelletier/go-toml"
 	"github.com/rogpeppe/go-internal/modfile"
 	"io/ioutil"
 	"os"
 	"strings"
 )
 
-func (c *DeployContext)DetectProjectType() (projectType string) {
+func (c *DeployContext) DetectProjectType() (projectType string) {
+	// handle rust project
+	if FileExists("Cargo.toml") {
+		content, err := ioutil.ReadFile("Cargo.toml")
+
+		if err != nil {
+			log.Error(err)
+			return
+		}
+		cargo, err := toml.Load(string(content))
+		if err != nil {
+			log.Error(err)
+			return
+		}
+
+		dependencies := cargo.Get("dependencies").(*toml.Tree)
+
+		if dependencies.Has("rocket") {
+			c.Type = "rocket"
+			return "rocket"
+		}
+
+	}
+
 	// handle golang framework
 	if FileExists("go.mod") {
 		b, err := ioutil.ReadFile("go.mod")
