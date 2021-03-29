@@ -19,6 +19,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/c2h5oh/datasize"
 	"github.com/fatih/color"
 	"github.com/let-sh/cli/handler/deploy"
 	"github.com/let-sh/cli/info"
@@ -272,6 +273,21 @@ var deployCmd = &cobra.Command{
 				names = tmp
 			}
 
+			// calculate files size
+			if size, err := utils.GetFilesSize(names); err != nil {
+				log.Error(err)
+				return
+			} else {
+				// source code is too big
+				// < 20 MB directly upload
+				// 20 MB <= files < 40 MB confirm
+				// >= 40 MB abort
+				if uint64(size) > 20*datasize.MB.Bytes() {
+					log.Warning(`your directory is too big, larger than 20 MB.
+you could remove the irrelevant via .letignore or gitignore.`)
+					return
+				}
+			}
 			err = archiver.Archive(names, dir+"/"+deploymentCtx.Name+"-"+hashID+".tar.gz")
 			if err != nil {
 				log.Error(err)
