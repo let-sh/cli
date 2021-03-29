@@ -31,6 +31,7 @@ import (
 	"github.com/manifoldco/promptui"
 	"github.com/mholt/archiver/v3"
 	c "github.com/otiai10/copy"
+	ignore "github.com/sabhiram/go-gitignore"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"io/ioutil"
@@ -223,10 +224,55 @@ var deployCmd = &cobra.Command{
 
 			// copy current dir to temp dir
 			c.Copy("./", dir+"/"+deploymentCtx.Name+"-"+hashID)
+			dirPath, _ = os.Getwd()
 
 			// remove if not clean
 			os.Remove(dir + "/" + deploymentCtx.Name + "-" + hashID + ".tar.gz")
-			err = archiver.Archive([]string{"."}, dir+"/"+deploymentCtx.Name+"-"+hashID+".tar.gz")
+
+			// Read directory files
+			var names []string
+			err = filepath.Walk(dirPath, func(path string, info os.FileInfo, err error) error {
+				if !info.IsDir() {
+					names = append(names, path)
+				}
+				return nil
+			})
+			if err != nil {
+				log.Error(err)
+				return
+			}
+
+			// respect .gitignore and .letignore
+			if _, err := os.Stat(filepath.Join(dirPath, ".gitignore")); err == nil {
+				// match a file against a particular .gitignore
+				i, _ := ignore.CompileIgnoreFile(filepath.Join(dirPath, ".gitignore"))
+
+				tmp := []string{}
+				for _, v := range names {
+
+					if !i.MatchesPath(v) {
+						tmp = append(tmp, v)
+					}
+				}
+
+				names = tmp
+			}
+
+			// .letignore
+			if _, err := os.Stat(filepath.Join(dirPath + ".letignore")); err == nil {
+				// match a file against a particular .gitignore
+				i, _ := ignore.CompileIgnoreFile(filepath.Join(dirPath + ".letignore"))
+
+				tmp := []string{}
+				for _, v := range names {
+					if !i.MatchesPath(v) {
+						tmp = append(tmp, v)
+					}
+				}
+				names = tmp
+			}
+
+			err = archiver.Archive(names, dir+"/"+deploymentCtx.Name+"-"+hashID+".tar.gz")
 			if err != nil {
 				log.Error(err)
 				return
