@@ -31,6 +31,7 @@ require (
 	github.com/mitchellh/go-ps v1.0.0
 	github.com/myesui/uuid v1.0.0 // indirect
 	github.com/otiai10/copy v1.4.2
+	github.com/pelletier/go-toml v1.8.1 // indirect
 	github.com/prometheus/procfs v0.0.10 // indirect
 	github.com/rancher/remotedialer v0.2.6-0.20201012155453-8b1b7bb7d05f
 	github.com/rogpeppe/go-internal v1.3.0
