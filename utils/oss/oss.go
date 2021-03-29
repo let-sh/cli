@@ -4,9 +4,9 @@ import (
 	"bufio"
 	"fmt"
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
-	"github.com/denormal/go-gitignore"
 	"github.com/let-sh/cli/log"
 	"github.com/let-sh/cli/requests"
+	ignore "github.com/sabhiram/go-gitignore"
 	"github.com/sirupsen/logrus"
 	"github.com/vbauerster/mpb/v5"
 	"github.com/vbauerster/mpb/v5/decor"
@@ -131,15 +131,13 @@ func UploadDirToStaticSource(dirPath, projectName, bundleID string, cn bool) err
 	// respect .gitignore and .letignore
 	if _, err := os.Stat(filepath.Join(dirPath, ".gitignore")); err == nil {
 		// match a file against a particular .gitignore
-		ignore, _ := gitignore.NewFromFile(filepath.Join(dirPath, ".gitignore"))
+		i, _ := ignore.CompileIgnoreFile(filepath.Join(dirPath, ".gitignore"))
 
 		tmp := []string{}
 		for _, v := range names {
-			match := ignore.Match(v)
-			if match != nil {
-				if !match.Ignore() {
-					tmp = append(tmp, v)
-				}
+
+			if !i.MatchesPath(v) {
+				tmp = append(tmp, v)
 			}
 		}
 
@@ -149,26 +147,22 @@ func UploadDirToStaticSource(dirPath, projectName, bundleID string, cn bool) err
 	// .letignore
 	if _, err := os.Stat(filepath.Join(dirPath + ".letignore")); err == nil {
 		// match a file against a particular .gitignore
-		ignore, _ := gitignore.NewFromFile(filepath.Join(dirPath + ".letignore"))
+		i, _ := ignore.CompileIgnoreFile(filepath.Join(dirPath + ".letignore"))
 
 		tmp := []string{}
 		for _, v := range names {
-			match := ignore.Match(v)
-			if match != nil {
-				if !match.Ignore() {
+			if !i.MatchesPath(v) {
+				fi, _ := os.Stat(v)
+				mutex.Lock()
+				// register upload status
+				uploadStatus[v] = struct {
+					FilePath     string
+					ConsumedSize int64
+					TotalSize    int64
+				}{FilePath: fi.Name(), ConsumedSize: 0, TotalSize: fi.Size()}
+				mutex.Unlock()
 
-					fi, _ := os.Stat(v)
-					mutex.Lock()
-					// register upload status
-					uploadStatus[v] = struct {
-						FilePath     string
-						ConsumedSize int64
-						TotalSize    int64
-					}{FilePath: fi.Name(), ConsumedSize: 0, TotalSize: fi.Size()}
-					mutex.Unlock()
-
-					tmp = append(tmp, v)
-				}
+				tmp = append(tmp, v)
 			}
 		}
 
