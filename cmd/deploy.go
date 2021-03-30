@@ -215,20 +215,20 @@ var deployCmd = &cobra.Command{
 		// if contains dynamic, upload dynamic files to oss
 		// then trigger deployment
 		if template.ContainsDynamic {
-
-			// create temp dir
-			dir := os.TempDir()
-
-			defer os.RemoveAll(dir)
-			//fmt.Println(dir)
-			//os.MkdirAll(dir+"/source", os.ModePerm)
-
-			// copy current dir to temp dir
-			c.Copy("./", dir+"/"+deploymentCtx.Name+"-"+hashID)
+			//
+			//// create temp dir
+			//dir := os.TempDir()
+			//
+			//defer os.RemoveAll(dir)
+			////fmt.Println(dir)
+			////os.MkdirAll(dir+"/source", os.ModePerm)
+			//
+			//// copy current dir to temp dir
+			//c.Copy("./", dir+"/"+deploymentCtx.Name+"-"+hashID)
 			dirPath, _ = os.Getwd()
 
 			// remove if not clean
-			os.Remove(dir + "/" + deploymentCtx.Name + "-" + hashID + ".tar.gz")
+			//os.Remove(dir + "/" + deploymentCtx.Name + "-" + hashID + ".tar.gz")
 
 			// Read directory files
 			var names []string
@@ -288,12 +288,32 @@ you could remove the irrelevant via .letignore or gitignore.`)
 					return
 				}
 			}
-			err = archiver.Archive(names, dir+"/"+deploymentCtx.Name+"-"+hashID+".tar.gz")
+
+			// copy to temp dir
+			tempDir, _ := ioutil.TempDir("", "upload")
+			defer os.RemoveAll(tempDir)
+			for _, f := range names {
+				toName := strings.Replace(f, dirPath, tempDir+"/", 1)
+				err := c.Copy(f, toName)
+				if err != nil {
+					log.Error(err)
+				}
+			}
+
+			// copy to temp dir
+			tempZipDir, _ := ioutil.TempDir("", "zip")
+			defer os.RemoveAll(tempZipDir)
+
+			// switch dir
+			os.Chdir(tempDir) // switch to temp directory
+			err = archiver.Archive([]string{"."}, tempZipDir+"/"+deploymentCtx.Name+"-"+hashID+".tar.gz")
+			os.Chdir(dirPath) // switch back
+
 			if err != nil {
 				log.Error(err)
 				return
 			}
-			oss.UploadFileToCodeSource(dir+"/"+deploymentCtx.Name+"-"+hashID+".tar.gz", deploymentCtx.Name+"-"+hashID+".tar.gz", deploymentCtx.Name, *deploymentCtx.CN)
+			oss.UploadFileToCodeSource(tempZipDir+"/"+deploymentCtx.Name+"-"+hashID+".tar.gz", deploymentCtx.Name+"-"+hashID+".tar.gz", deploymentCtx.Name, *deploymentCtx.CN)
 		}
 
 		logrus.WithFields(logrus.Fields{
