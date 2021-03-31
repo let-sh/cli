@@ -355,11 +355,22 @@ you could remove the irrelevant via .letignore or gitignore.`)
 				log.Error(err)
 			}
 
-			log.BUpdate(" NetworkStage: " + currentStatus.NetworkStage + ", PackerStage: " + currentStatus.PackerStage + ", Status: " + currentStatus.Status)
+			// stages:
+			// * Queuing
+			// * Building
+			switch currentStatus.Status {
+			case "Queuing":
+				log.BUpdate("queuing")
+			case "Running":
+				if currentStatus.PackerStage == "Build" {
+					log.BUpdate("building")
+				}
+			}
+			//log.BUpdate(" NetworkStage: " + currentStatus.NetworkStage + ", PackerStage: " + currentStatus.PackerStage + ", Status: " + currentStatus.Status)
 
 			if currentStatus.Done {
 				if currentStatus.Status == "Failed" {
-					log.Error(errors.New(currentStatus.ErrorLogs))
+					log.Error(errors.New("build logs: " + currentStatus.ErrorLogs))
 					break
 				}
 
