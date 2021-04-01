@@ -21,6 +21,7 @@ import (
 	"github.com/let-sh/cli/requests"
 	"github.com/let-sh/cli/utils/download"
 	"github.com/mholt/archiver/v3"
+	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -39,7 +40,7 @@ e.g.:
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		projectType := strings.TrimSpace(args[0])
-
+		currentDir,_ := os.Getwd()
 		var folderName = projectType // check whether user customed folderName
 		if len(args) > 1 {
 			folderName = strings.TrimSpace(args[1])
@@ -63,12 +64,15 @@ e.g.:
 		}
 
 		log.BUpdate("downloading project template")
-		if err := archiver.Unarchive(fmt.Sprintf("%s/%s.zip", tempDir, folderName), "./"); err != nil {
+		logrus.Debug("download: ", fmt.Sprintf("%s/%s.zip", tempDir, projectType))
+		if err := archiver.Unarchive(fmt.Sprintf("%s/%s.zip", tempDir, projectType), tempDir); err != nil {
 			log.Error(err)
 			return
 		}
+		// mv to current folder
+		os.Rename(fmt.Sprintf("%s/%s", tempDir, projectType),fmt.Sprintf("%s/%s",currentDir, folderName))
 
-		log.S.StopMessage(fmt.Sprintf("init succeed\nyou could directly visit %s folder by \n    cd %s", folderName, folderName))
+		log.S.StopMessage(fmt.Sprintf(" init succeed\nyou could directly visit %s folder by \n>   cd %s", folderName, folderName))
 		log.BStop()
 	},
 }
