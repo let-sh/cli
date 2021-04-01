@@ -63,12 +63,12 @@ e.g.:
 		}
 
 		log.BUpdate("downloading project template")
-		if err := archiver.Unarchive(fmt.Sprintf("%s/%s.zip", tempDir, projectType), "./"); err != nil {
+		if err := archiver.Unarchive(fmt.Sprintf("%s/%s.zip", tempDir, folderName), "./"); err != nil {
 			log.Error(err)
 			return
 		}
 
-		log.S.StopMessage(fmt.Sprintf(" init succeed\n you could directly visit %s folder by \n    cd %s", folderName, folderName))
+		log.S.StopMessage(fmt.Sprintf("init succeed\nyou could directly visit %s folder by \n    cd %s", folderName, folderName))
 		log.BStop()
 	},
 }
