@@ -103,6 +103,25 @@ func (c *DeployContext) DetectProjectType() (projectType string) {
 		}
 	}
 
+	// handle python framework
+	if FileExists("requirements.txt") || FileExists("Pipfile") {
+		if FileExists("requirements.txt") {
+			reqFile, _ := ioutil.ReadFile("requirements.txt")
+			if strings.Contains(strings.ToLower(string(reqFile)), "flask") {
+				c.Type = "flask"
+				return "flask"
+			}
+		}
+
+		if FileExists("Pipfile") {
+			reqFile, _ := ioutil.ReadFile("Pipfile")
+			if strings.Contains(strings.ToLower(string(reqFile)), "flask") {
+				c.Type = "flask"
+				return "flask"
+			}
+		}
+	}
+
 	// handle static files
 	// check if static by index.html
 	_, err := os.Stat("index.html")

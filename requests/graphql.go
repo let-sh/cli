@@ -9,7 +9,7 @@ import (
 )
 
 // create a client (safe to share across requests)
-var Graphql = graphql.NewClient("https://api.let.sh/query")
+var Graphql = graphql.NewClient("https://api.let-sh.com/query")
 
 func CheckDeployCapability(projectName string) (hashID string, exists bool, err error) {
 	req := graphql.NewRequest(`
