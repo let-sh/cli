@@ -132,7 +132,7 @@ func (c *DeployContext) DetectProjectType() (projectType string) {
 	}
 
 	// handle static site generator
-	// hexo
+	// TODO: hexo
 
 	// hugo
 	if FileExists("config.toml") && FileExists("themes") {

@@ -19,6 +19,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/atotto/clipboard"
 	"github.com/c2h5oh/datasize"
 	"github.com/fatih/color"
 	"github.com/let-sh/cli/handler/deploy"
@@ -90,7 +91,7 @@ var deployCmd = &cobra.Command{
 			deploymentCtx.LoadCliFlag(inputProjectName, inputProjectType)
 
 			// load cn
-			// if user customed cn flag
+			// if user customized cn flag
 			deploymentCtx.LoadRegion(cmd, inputCN)
 		}
 
@@ -373,11 +374,19 @@ you could remove the irrelevant via .letignore or gitignore.`)
 					log.Error(errors.New("build logs: " + currentStatus.ErrorLogs))
 					break
 				}
+				// write review url to clipboard
+
+				writeClipBoardError := clipboard.WriteAll("https://" + currentStatus.TargetFQDN)
 
 				log.S.StopFail()
 				fmt.Println(
-					color.New(color.Bold).Sprint("Preview: ")+color.New().Sprint("https://"+currentStatus.TargetFQDN), "\n"+
-						color.New(color.Bold).Sprint("Details: ")+color.New().Sprint("https://alpha.let.sh/console/project/"+deploymentCtx.Name+"/details"),
+					color.New(color.Bold).Sprint("Preview: ")+color.New(color.Underline).Sprint("https://"+currentStatus.TargetFQDN)+func() string {
+						if writeClipBoardError == nil {
+							return color.New().Sprint("  (📋Copied!)")
+						}
+						return ""
+					}(), "\n"+
+						color.New(color.Bold).Sprint("Details: ")+color.New(color.Underline).Sprint("https://alpha.let.sh/console/project/"+deploymentCtx.Name+"/details"),
 				)
 				break
 

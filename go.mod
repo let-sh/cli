@@ -7,6 +7,7 @@ replace github.com/charmbracelet/bubbles v0.7.6 => github.com/OasisNetworks/bubb
 require (
 	github.com/StackExchange/wmi v0.0.0-20190523213315-cbe66965904d // indirect
 	github.com/aliyun/aliyun-oss-go-sdk v2.1.5+incompatible
+	github.com/atotto/clipboard v0.1.2
 	github.com/baiyubin/aliyun-sts-go-sdk v0.0.0-20180326062324-cfa1a18b161f // indirect
 	github.com/c2h5oh/datasize v0.0.0-20200825124411-48ed595a09d2
 	github.com/charmbracelet/bubbles v0.7.6
@@ -45,7 +46,6 @@ require (
 	github.com/twinj/uuid v1.0.0
 	github.com/vbauerster/mpb/v5 v5.4.0
 	github.com/weaveworks/procspy v0.0.0-20150706124340-cb970aa190c3
-	github.com/yudai/pp v2.0.1+incompatible
 	golang.org/x/net v0.0.0-20210316092652-d523dce5a7f4 // indirect
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0 // indirect

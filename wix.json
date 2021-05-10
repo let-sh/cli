@@ -2,18 +2,15 @@
   "product": "let.sh",
   "company": "Oasis Networks, Inc.",
   "license": "LICENSE",
-  "upgrade-code": "8615055C-D8E0-404C-93BE-441C503BA6F0",
+  "upgrade-code": "6f612ce2-8019-42cc-96de-d065f0bb630f",
   "files": {
-    "guid": "378896D8-6749-4821-870A-44CBBB791D0C",
+    "guid": "c14c32b7-0983-405a-abd7-599ac3051fc3",
     "items": [
-      "go-msi.exe"
+      "dist/lets_windows_windows_amd64/lets.exe"
     ]
   },
-  "directories": [
-    "templates"
-  ],
   "env": {
-    "guid": "0CB88C7F-85A7-4986-B6CE-1CAD5C17EA0E",
+    "guid": "e9afda42-f7da-45a5-acb2-6ce1f9e58b6f",
     "vars": [
       {
         "name": "PATH",
@@ -25,22 +22,11 @@
       }
     ]
   },
-  "shortcuts": {
-    "guid": "6DAFD205-3D2D-43D7-BF78-33BFE8746D2A",
-    "items": [
-      {
-        "name": "go-msi",
-        "description": "Easy msi pakage for Go",
-        "target": "[INSTALLDIR]\\go-msi.exe",
-        "wdir": "INSTALLDIR",
-        "arguments": ""
-      }
-    ]
-  },
+  "shortcuts": {},
   "choco": {
-    "description": "Easy way to generate msi package for a Go project",
-    "project-url": "https://github.com/mh-cbon/go-msi",
-    "tags": "generate go msi nuget",
-    "license-url": "https://github.com/mh-cbon/go-msi/blob/master/LICENSE"
+    "description": "Deploy you projects with a single command line",
+    "project-url": "https://github.com/let-sh/cli",
+    "tags": "letsh letapp cli let.sh",
+    "license-url": "https://github.com/let-sh/cli/blob/master/LICENSE"
   }
 }

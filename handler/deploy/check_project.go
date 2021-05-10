@@ -3,7 +3,6 @@ package deploy
 import (
 	"github.com/let-sh/cli/requests"
 	"github.com/sirupsen/logrus"
-	"github.com/yudai/pp"
 )
 
 func InitProject(projectName string) error {
@@ -14,7 +13,7 @@ func InitProject(projectName string) error {
 	//	return nil
 	//}
 	if err != nil {
-		pp.Println(err)
+		//pp.Println(err)
 		return err
 	}
 

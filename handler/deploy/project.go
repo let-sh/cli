@@ -27,7 +27,7 @@ func (c *DeployContext) ConfirmProject() bool {
 				Index(51, "New project detected:"),
 				c.Name,
 				c.Type,
-				Index(51, "\nChange new project config?"),
+				Index(51, "\nchange detected config?"),
 			),
 			RadioText: Index(51, "[y/N]").String(),
 		}) {
