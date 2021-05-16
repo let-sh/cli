@@ -382,7 +382,7 @@ you could remove the irrelevant via .letignore or gitignore.`)
 				fmt.Println(
 					color.New(color.Bold).Sprint("Preview: ")+color.New(color.Underline).Sprint("https://"+currentStatus.TargetFQDN)+func() string {
 						if writeClipBoardError == nil {
-							return color.New().Sprint("  (📋Copied!)")
+							return color.New().Sprint("  (📋 Copied!)")
 						}
 						return ""
 					}(), "\n"+
