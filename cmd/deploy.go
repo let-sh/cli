@@ -352,6 +352,8 @@ you could remove the irrelevant via .letignore or gitignore.`)
 		// awaiting deployment result
 		for {
 			currentStatus, err := requests.GetDeploymentStatus(deployment.ID)
+
+			// handle logging
 			if err != nil {
 				log.Error(err)
 			}
