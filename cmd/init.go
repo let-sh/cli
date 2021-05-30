@@ -40,7 +40,7 @@ e.g.:
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		projectType := strings.TrimSpace(args[0])
-		currentDir,_ := os.Getwd()
+		currentDir, _ := os.Getwd()
 		var folderName = projectType // check whether user customed folderName
 		if len(args) > 1 {
 			folderName = strings.TrimSpace(args[1])
@@ -70,9 +70,13 @@ e.g.:
 			return
 		}
 		// mv to current folder
-		os.Rename(fmt.Sprintf("%s/%s", tempDir, projectType),fmt.Sprintf("%s/%s",currentDir, folderName))
+		os.Rename(fmt.Sprintf("%s/%s", tempDir, projectType), fmt.Sprintf("%s/%s", currentDir, folderName))
 
-		log.S.StopMessage(fmt.Sprintf(" init succeed\nyou could directly visit %s folder by \n>   cd %s", folderName, folderName))
+		log.S.StopMessage(
+			" Init succeed\n\n" +
+				"You could directly visit " + folderName + " folder by \n" +
+				"> " + log.CyanBold("cd "+folderName),
+		)
 		log.BStop()
 	},
 }
