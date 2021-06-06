@@ -4,7 +4,5 @@ import "github.com/let-sh/cli/types"
 
 type DeployContext struct {
 	types.LetConfig
-	Channel string
+	Channel string `json:"channel,omitempty"`
 }
-
-

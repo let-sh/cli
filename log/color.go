@@ -10,4 +10,6 @@ var Yellow = color.New(color.FgHiYellow).SprintFunc()
 
 var Cyan = color.New(color.FgCyan).SprintFunc()
 
+var CyanUnderline = color.New(color.FgCyan).Add(color.Underline).SprintFunc()
+
 var CyanBold = color.New(color.FgCyan).Add(color.Bold).SprintFunc()

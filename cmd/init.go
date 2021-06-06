@@ -75,7 +75,7 @@ e.g.:
 		log.S.StopMessage(
 			" Init succeed\n\n" +
 				"You could directly visit " + folderName + " folder by \n" +
-				"> " + log.CyanBold("cd "+folderName),
+				"> " + log.CyanUnderline("cd "+folderName),
 		)
 		log.BStop()
 	},
