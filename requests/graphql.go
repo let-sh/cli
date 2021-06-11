@@ -11,6 +11,27 @@ import (
 // create a client (safe to share across requests)
 var Graphql = graphql.NewClient("https://api.let-sh.com/query")
 
+func SetPreference(name, value string) (ok bool, err error) {
+	req := graphql.NewRequest(`
+	mutation($name: String!, $value: String!) {
+	  setPreference(name:$name, value:$value)
+	}
+`)
+
+	req.Var("name", name)
+	req.Var("value", value)
+	req.Header.Set("Authorization", "Bearer "+info.Credentials.Token)
+
+	// run it and capture the response
+	var respData struct {
+		SetPreference bool `json:"setPreference,omitempty"`
+	}
+	if err := Graphql.Run(context.Background(), req, &respData); err != nil {
+		return false, err
+	}
+
+	return respData.SetPreference, nil
+}
 func GetPreference(name string) (value string, err error) {
 	req := graphql.NewRequest(`
 	query($name: String!) {
