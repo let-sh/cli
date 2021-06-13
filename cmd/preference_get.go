@@ -1,3 +1,13 @@
+package cmd
+
+import (
+	"fmt"
+	"github.com/let-sh/cli/log"
+	"github.com/let-sh/cli/requests"
+	"github.com/spf13/cobra"
+	"strings"
+)
+
 /*
 Copyright © 2021 Fred Liang <fred@oasis.ac>
 
@@ -13,37 +23,36 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package cmd
 
-import (
-	"fmt"
+// preferenceGetCmd represents the preference command
+var preferenceGetCmd = &cobra.Command{
+	Use:   "get",
+	Short: "Get you personal preferences",
+	Long: `Get your personal preferences
 
-	"github.com/spf13/cobra"
-)
-
-// configCmd represents the config command
-var configCmd = &cobra.Command{
-	Use:   "config",
-	Short: "Interact with you personal configurations",
-	Long: `Interact your personal configuration
-
-e.g. lets config get default_channel
+e.g. lets pref get default_channel
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("config called")
+		value, err := requests.GetPreference(strings.TrimSpace(args[0]))
+		if err != nil {
+			log.Errorf("cannot get preference: %s", value)
+			return
+		}
+
+		fmt.Println(value)
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(configCmd)
+	preferenceCmd.AddCommand(preferenceGetCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// configCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// preferenceCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// configCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// preferenceCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

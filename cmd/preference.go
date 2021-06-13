@@ -1,13 +1,3 @@
-package cmd
-
-import (
-	"errors"
-	"github.com/let-sh/cli/log"
-	"github.com/let-sh/cli/requests"
-	"github.com/spf13/cobra"
-	"strings"
-)
-
 /*
 Copyright © 2021 Fred Liang <fred@oasis.ac>
 
@@ -23,33 +13,29 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+package cmd
 
-// configSetCmd represents the config command
-var configSetCmd = &cobra.Command{
-	Use:   "set",
-	Short: "Set you personal configuration",
-	Long: `Set your personal configurations
+import (
+	"github.com/spf13/cobra"
+)
 
-e.g. lets config set default_channel dev
+// preferenceCmd represents the config command
+var preferenceCmd = &cobra.Command{
+	Use:     "preference",
+	Aliases: []string{"pref"},
+	Short:   "Interact with you personal preferences",
+	Long: `Interact your personal preferences
+
+e.g. lets pref get channel
+e.g. lets preference get channel
 `,
-	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) < 2 {
-			log.Warning(`error input, you could try as below:
-
-e.g. lets config set default_channel dev`)
-		}
-		value, err := requests.SetPreference(strings.TrimSpace(args[0]), strings.TrimSpace(args[1]))
-		if err != nil || !value {
-			log.Error(errors.New("cannot set configuration: " + err.Error()))
-			return
-		}
-
-		log.Success("set configuration: " + args[0] + "=" + args[1])
-	},
+	//Run: func(cmd *cobra.Command, args []string) {
+	//	fmt.Println("config called")
+	//},
 }
 
 func init() {
-	configCmd.AddCommand(configSetCmd)
+	rootCmd.AddCommand(preferenceCmd)
 
 	// Here you will define your flags and configuration settings.
 

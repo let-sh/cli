@@ -21,13 +21,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// configListCmd represents the config command
-var configListCmd = &cobra.Command{
+// preferenceListCmd represents the preference command
+var preferenceListCmd = &cobra.Command{
 	Use:   "list",
-	Short: "List you personal configurations",
-	Long: `List your personal configurations
+	Short: "List you personal preferences",
+	Long: `List your personal preferences
 
-e.g. lets config list
+e.g. lets pref list
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("config called")
@@ -35,15 +35,15 @@ e.g. lets config list
 }
 
 func init() {
-	configCmd.AddCommand(configListCmd)
+	preferenceCmd.AddCommand(preferenceListCmd)
 
-	// Here you will define your flags and configuration settings.
+	// Here you will define your flags and preferenceuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// configCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// preferenceCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// configCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// preferenceCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

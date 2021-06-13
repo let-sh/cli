@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"fmt"
+	"errors"
 	"github.com/let-sh/cli/log"
 	"github.com/let-sh/cli/requests"
 	"github.com/spf13/cobra"
@@ -24,35 +24,40 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// configGetCmd represents the config command
-var configGetCmd = &cobra.Command{
-	Use:   "get",
-	Short: "Get you personal configuration",
-	Long: `Get your personal configurations
+// preferenceSetCmd represents the preference command
+var preferenceSetCmd = &cobra.Command{
+	Use:   "set",
+	Short: "Set you personal preferences",
+	Long: `Set your personal preferences
 
-e.g. lets config get default_channel
+e.g. lets pref set default_channel dev
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		value, err := requests.GetPreference(strings.TrimSpace(args[0]))
-		if err != nil {
-			log.Errorf("cannot get configuration: %s", value)
+		if len(args) < 2 {
+			log.Warning(`error input, you could try as below:
+
+e.g. lets pref set channel dev`)
+		}
+		value, err := requests.SetPreference(strings.TrimSpace(args[0]), strings.TrimSpace(args[1]))
+		if err != nil || !value {
+			log.Error(errors.New("cannot set preference: " + err.Error()))
 			return
 		}
 
-		fmt.Println(value)
+		log.Success("set preference: " + args[0] + "=" + args[1])
 	},
 }
 
 func init() {
-	configCmd.AddCommand(configGetCmd)
+	preferenceCmd.AddCommand(preferenceSetCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// configCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// preferenceCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// configCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// preferenceCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
