@@ -323,8 +323,15 @@ you could remove the irrelevant via .letignore or gitignore.`)
 
 		configBytes, _ := json.Marshal(deploymentCtx)
 
-		channel := "dev"
-		if inputProd {
+		defaultChannel, err := requests.GetPreference("channel")
+		if err != nil {
+			log.Error(err)
+			return
+		}
+
+		// determine which channel to deploy
+		channel := defaultChannel
+		if inputProd == true { // if manually set to deploy to production, rewrite channel
 			channel = "prod"
 		}
 		deployment, err := requests.Deploy(deploymentCtx.Type, deploymentCtx.Name, string(configBytes), channel, *deploymentCtx.CN)
