@@ -32,6 +32,33 @@ func SetPreference(name, value string) (ok bool, err error) {
 
 	return respData.SetPreference, nil
 }
+
+func GetAllPreference() (data struct {
+	Channel string `json:"channel"`
+}, err error) {
+	req := graphql.NewRequest(`
+	query {
+	  	allPreference {
+			channel
+		}	
+	}
+`)
+
+	req.Header.Set("Authorization", "Bearer "+info.Credentials.Token)
+
+	// run it and capture the response
+	var respData struct {
+		AllPreference struct {
+			Channel string `json:"channel"`
+		} `json:"AllPreference,omitempty"`
+	}
+	if err := Graphql.Run(context.Background(), req, &respData); err != nil {
+		return data, err
+	}
+
+	return respData.AllPreference, nil
+}
+
 func GetPreference(name string) (value string, err error) {
 	req := graphql.NewRequest(`
 	query($name: String!) {

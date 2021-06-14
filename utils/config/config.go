@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/let-sh/cli/info"
 	"github.com/let-sh/cli/log"
+	"github.com/let-sh/cli/requests"
 	"github.com/let-sh/cli/types"
 	"github.com/mitchellh/go-homedir"
 	"io/ioutil"
@@ -57,6 +58,20 @@ func init() {
 			log.Error(err)
 		}
 		info.Credentials.Token = "GITHUB:" + repo + ":" + info.GitHub.GetToken()
+	}
+
+	_, err = os.Stat(home + "/.let/preference.json")
+	if os.IsNotExist(err) || time.Since(GetLastUpdateNotifyTime()) >= time.Hour*24 {
+		data, err := requests.GetAllPreference()
+		if err != nil {
+			log.Warning("load your preference error: " + err.Error())
+		} else {
+			f, _ := os.Create(home + "/.let/preference.json")
+			f.WriteString(func() string {
+				str, _ := json.Marshal(data)
+				return string(str)
+			}())
+		}
 	}
 }
 
