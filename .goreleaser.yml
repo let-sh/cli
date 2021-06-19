@@ -107,6 +107,7 @@ blobs:
     extra_files:
       - glob: ./version
       - glob: ./scripts/install.sh
+      - glob: ./scripts/install.ps1
       - glob: ./dist/lets_macos_arm_darwin_amd64/*.zip
       - glob: ./dist/lets_macos_arm_darwin_amd64/*.dmg
 brews:
