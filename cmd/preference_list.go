@@ -30,7 +30,7 @@ var preferenceListCmd = &cobra.Command{
 e.g. lets pref list
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("config called")
+		fmt.Println("pref called")
 	},
 }
 
