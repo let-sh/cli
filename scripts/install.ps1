@@ -4,7 +4,7 @@
 $ErrorActionPreference = 'Stop'
 
 if ($v) {
-  $Version = "v${v}"
+  $Version = "${v}"
 }
 if ($args.Length -eq 1) {
   $Version = $args.Get(0)
@@ -17,35 +17,25 @@ $BinDir = if ($LetInstall) {
   "$Home\.let\bin"
 }
 
-$LetZip = "$BinDir\let.zip"
+$LetZip = "$BinDir\let.tar.gz"
 $LetExe = "$BinDir\let.exe"
-$Target = 'x86_64-windows'
+$Target = 'windows_amd64'
 
 # GitHub requires TLS 1.2
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 $LetUri = if (!$Version) {
-  $Response = Invoke-WebRequest 'https://github.com/let-sh/cli/releases' -UseBasicParsing
-  if ($PSVersionTable.PSEdition -eq 'Core') {
-    $Response.Links |
-      Where-Object { $_.href -like "/let-sh/cli/releases/download/*/lets-${Target}.zip" } |
-      ForEach-Object { 'https://github.com' + $_.href } |
-      Select-Object -First 1
-  } else {
-    $HTMLFile = New-Object -Com HTMLFile
-    if ($HTMLFile.IHTMLDocument2_write) {
-      $HTMLFile.IHTMLDocument2_write($Response.Content)
-    } else {
-      $ResponseBytes = [Text.Encoding]::Unicode.GetBytes($Response.Content)
-      $HTMLFile.write($ResponseBytes)
-    }
-    $HTMLFile.getElementsByTagName('a') |
-      Where-Object { $_.href -like "about:/let-sh/cli/releases/download/*/lets-${Target}.zip" } |
-      ForEach-Object { $_.href -replace 'about:', 'https://github.com' } |
-      Select-Object -First 1
-  }
+  $Response = Invoke-WebRequest 'https://install.let.sh/version' -UseBasicParsing
+
+  $Version = $Response.Content.Split([Environment]::NewLine) |
+  Where-Object { $_ -match "latest:(.*)" } |
+  Select-String 'latest:(.*)' |
+  ForEach-Object {$_.matches[0].Groups[1].value} |
+  Select-Object -First 1
+
+  "https://install.let.sh.cn/cli_${Version}_${Target}.tar.gz"
 } else {
-  "https://github.com/let-sh/cli/releases/download/${Version}/lets-${Target}.zip"
+  "https://install.let.sh.cn/cli_${Version}_${Target}.tar.gz"
 }
 
 if (!(Test-Path $BinDir)) {
@@ -54,8 +44,8 @@ if (!(Test-Path $BinDir)) {
 
 Invoke-WebRequest $LetUri -OutFile $LetZip -UseBasicParsing
 
-if (Get-Command Expand-Archive -ErrorAction SilentlyContinue) {
-  Expand-Archive $LetZip -Destination $BinDir -Force
+if (Get-Command tar) {
+  tar -xvzf $LetZip -C $BinDir
 } else {
   if (Test-Path $LetExe) {
     Remove-Item $LetExe
