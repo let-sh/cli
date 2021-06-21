@@ -2,6 +2,7 @@ package update
 
 import (
 	"archive/tar"
+	"archive/zip"
 	"compress/gzip"
 	"fmt"
 	"github.com/let-sh/cli/info"
@@ -17,6 +18,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -60,9 +62,14 @@ func UpgradeCli(force bool) {
 		}
 		logrus.Debugf("compressed file: %s", f.Name())
 
-		untarDir := filepath.Join(tempDir, "let.sh")
-		os.Mkdir(untarDir, 0755)
-		err = Untar(untarDir, f)
+		unzipedDir := filepath.Join(tempDir, "let.sh")
+		os.Mkdir(unzipedDir, 0755)
+		if runtime.GOOS == "windows" {
+			err = Unzip(filepath.Join(tempDir, GetBinaryCompressedFileName(version)), unzipedDir)
+		} else {
+			err = Untar(unzipedDir, f)
+		}
+
 		if err != nil {
 			log.Warning("upgrade failed: " + err.Error())
 			logrus.WithError(err).Debugln("get compressed file")
@@ -70,12 +77,12 @@ func UpgradeCli(force bool) {
 		}
 
 		// add permission
-		err = os.Chmod(filepath.Join(untarDir, binaryName), 0755)
+		err = os.Chmod(filepath.Join(unzipedDir, binaryName), 0755)
 		if err != nil {
 			logrus.WithError(err).Debugln("get compressed file")
 			return
 		}
-		logrus.Debugf("add permission: %s", filepath.Join(untarDir, binaryName))
+		logrus.Debugf("add permission: %s", filepath.Join(unzipedDir, binaryName))
 
 		// replace binary
 		path, err := exec.LookPath(binaryName)
@@ -85,7 +92,7 @@ func UpgradeCli(force bool) {
 			return
 		}
 
-		err = os.Rename(filepath.Join(untarDir, binaryName), path)
+		err = os.Rename(filepath.Join(unzipedDir, binaryName), path)
 		if err != nil {
 			log.Warning("upgrade failed: " + err.Error())
 			logrus.WithError(err).Debugln("get compressed file")
@@ -94,7 +101,7 @@ func UpgradeCli(force bool) {
 		logrus.Debugf("mv binary: %s -> %s", filepath.Join(tempDir, binaryName), path)
 
 		// clean up temporary files
-		os.RemoveAll(untarDir)
+		os.RemoveAll(unzipedDir)
 		os.RemoveAll(filepath.Join(tempDir, GetBinaryCompressedFileName(version)))
 
 		log.Success(fmt.Sprintf("Successfully installed let.sh %s!", version))
@@ -172,6 +179,70 @@ func GetBinaryCompressedFileName(version string) string {
 		return "cli_" + version + "_" + runtime.GOOS + "_" + runtime.GOARCH + ".zip"
 	}
 	return "cli_" + version + "_" + runtime.GOOS + "_" + runtime.GOARCH + ".tar.gz"
+}
+
+func Unzip(src, dest string) error {
+	r, err := zip.OpenReader(src)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err := r.Close(); err != nil {
+			panic(err)
+		}
+	}()
+
+	os.MkdirAll(dest, 0755)
+
+	// Closure to address file descriptors issue with all the deferred .Close() methods
+	extractAndWriteFile := func(f *zip.File) error {
+		rc, err := f.Open()
+		if err != nil {
+			return err
+		}
+		defer func() {
+			if err := rc.Close(); err != nil {
+				panic(err)
+			}
+		}()
+
+		path := filepath.Join(dest, f.Name)
+
+		// Check for ZipSlip (Directory traversal)
+		if !strings.HasPrefix(path, filepath.Clean(dest)+string(os.PathSeparator)) {
+			return fmt.Errorf("illegal file path: %s", path)
+		}
+
+		if f.FileInfo().IsDir() {
+			os.MkdirAll(path, f.Mode())
+		} else {
+			os.MkdirAll(filepath.Dir(path), f.Mode())
+			f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
+			if err != nil {
+				return err
+			}
+			defer func() {
+				if err := f.Close(); err != nil {
+					panic(err)
+				}
+			}()
+
+			_, err = io.Copy(f, rc)
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+
+	for _, f := range r.File {
+		err := extractAndWriteFile(f)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func Untar(dst string, r io.Reader) error {

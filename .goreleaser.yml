@@ -90,6 +90,8 @@ scoop:
   homepage: "https://alpha.let.sh.ch/"
   description: "let.sh command line interface."
 release:
+  ids:
+    - lets_override
   github:
     owner: let-sh
     name: cli
@@ -192,7 +194,7 @@ brews:
       bin.install "program"
 
 archives:
-  - id: lets-override
+  - id: lets_override
     format: tar.gz
     format_overrides:
       - goos: windows
