@@ -28,7 +28,6 @@ builds:
       - CGO_ENABLED=0
     binary: lets
     id: lets_windows
-    format: zip
     goos:
       - windows
     flags:
@@ -191,3 +190,7 @@ brews:
     # Default is 'bin.install "program"'.
     install: |
       bin.install "program"
+
+archives:
+  - id: lets_windows
+    format: zip
