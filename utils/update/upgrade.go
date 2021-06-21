@@ -92,7 +92,14 @@ func UpgradeCli(force bool) {
 			return
 		}
 
-		err = os.Rename(filepath.Join(unzipedDir, binaryName), path)
+		if runtime.GOOS == "windows" {
+			err = os.Rename(path, path+".old")
+			err = os.Rename(filepath.Join(unzipedDir, binaryName), path)
+			os.RemoveAll(path + ".old")
+		} else {
+			err = os.Rename(filepath.Join(unzipedDir, binaryName), path)
+		}
+
 		if err != nil {
 			log.Warning("upgrade failed: " + err.Error())
 			logrus.WithError(err).Debugln("get compressed file")
