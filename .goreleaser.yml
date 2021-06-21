@@ -91,7 +91,7 @@ scoop:
   description: "let.sh command line interface."
 release:
   ids:
-    - lets_override
+    - lets
   github:
     owner: let-sh
     name: cli
