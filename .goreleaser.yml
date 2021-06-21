@@ -53,9 +53,9 @@ builds:
       - -X github.com/let-sh/cli/info.Version={{.Version}}
       - -s
       - -w
-    hooks:
-      post:
-        - gon gon_amd.hcl
+#    hooks:
+#      post:
+#        - gon gon_amd.hcl
   - env:
       - CGO_ENABLED=0
     binary: lets
@@ -70,9 +70,9 @@ builds:
       - -X github.com/let-sh/cli/info.Version={{.Version}}
       - -s
       - -w
-    hooks:
-      post:
-        - gon gon_arm.hcl
+#    hooks:
+#      post:
+#        - gon gon_arm.hcl
 checksum:
   name_template: 'checksums.txt'
 snapshot:
