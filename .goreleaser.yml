@@ -192,7 +192,7 @@ brews:
       bin.install "program"
 
 archives:
-  - id: lets
+  - id: lets-override
     format: tar.gz
     format_overrides:
       - goos: windows
