@@ -168,6 +168,9 @@ func DownloadBinaryCompressedFile(filename, tempDir string) error {
 }
 
 func GetBinaryCompressedFileName(version string) string {
+	if runtime.GOOS == "windows" {
+		return "cli_" + version + "_" + runtime.GOOS + "_" + runtime.GOARCH + ".zip"
+	}
 	return "cli_" + version + "_" + runtime.GOOS + "_" + runtime.GOARCH + ".tar.gz"
 }
 
