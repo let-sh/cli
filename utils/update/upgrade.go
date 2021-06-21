@@ -93,6 +93,8 @@ func UpgradeCli(force bool) {
 		}
 
 		if runtime.GOOS == "windows" {
+			// handle process error
+			// go further: https://stackoverflow.com/questions/9162969/how-can-a-c-binary-replace-itself
 			err = os.Rename(path, path+".old")
 			err = os.Rename(filepath.Join(unzipedDir, binaryName), path)
 			os.RemoveAll(path + ".old")
