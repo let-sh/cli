@@ -26,12 +26,14 @@ var upgradeCmd = &cobra.Command{
 	Short: "Upgrade let.sh cli ",
 	Long:  `Upgrade let.sh cli to latest version.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		update.UpgradeCli(force)
+		update.UpgradeCli(force, releaseChannel)
 	},
 }
 
 // force upgrade
 var force bool
+
+var releaseChannel string
 
 func init() {
 	rootCmd.AddCommand(upgradeCmd)
@@ -46,4 +48,5 @@ func init() {
 	// is called directly, e.g.:
 	// upgradeCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	upgradeCmd.Flags().BoolVarP(&force, "force", "f", false, "force upgrade")
+	upgradeCmd.Flags().StringVarP(&releaseChannel, "channel", "c", "", "choose cli release channel. optional: ")
 }

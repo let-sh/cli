@@ -55,7 +55,7 @@ func NotifyUpgrade(channel string) {
 	}
 
 	if utils.ItemExists([]string{"Y", "y", "yes", "Yes"}, result) {
-		UpgradeCli(false)
+		UpgradeCli(false, "")
 	}
 }
 

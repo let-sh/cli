@@ -22,7 +22,7 @@ import (
 	"time"
 )
 
-func UpgradeCli(force bool) {
+func UpgradeCli(force bool, channel string) {
 	binaryName := "lets"
 	if runtime.GOOS == "windows" {
 		binaryName = "lets.exe"
@@ -30,8 +30,14 @@ func UpgradeCli(force bool) {
 
 	tempDir := os.TempDir()
 	logrus.Debugf("tempDir: %s", tempDir)
-	if GetCurrentReleaseChannel() != "dev" || force {
-		version, err := requests.GetLatestVersion(GetCurrentReleaseChannel())
+
+	// if not specified channel, using current channel
+	if channel == "" {
+		channel = GetCurrentReleaseChannel()
+	}
+
+	if channel != "dev" || force {
+		version, err := requests.GetLatestVersion(channel)
 		if err != nil {
 			log.Warning("upgrade failed: " + err.Error())
 			logrus.WithError(err).Debugln("get latest version")
