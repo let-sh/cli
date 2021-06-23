@@ -65,6 +65,25 @@ var deployCmd = &cobra.Command{
 		}
 
 		log.BStart("deploying")
+
+		// check deployment directory is valid
+		{
+			// check not home dir
+			dir, _ := os.Getwd()
+			usr, _ := user.Current()
+			if dir == usr.HomeDir {
+				log.Error(errors.New("currently under home dir, please switch to your project dir"))
+				return
+			}
+
+			// limit files to 10000
+			files, _ := ioutil.ReadDir("./")
+			if len(files) > 10000 {
+				log.Error(errors.New("too many files in current dir, please check whether in the correct directory"))
+				return
+			}
+		}
+
 		// merge config
 		// cli flag > config file > auto saved config > detected config & types
 		{
@@ -144,23 +163,6 @@ var deployCmd = &cobra.Command{
 		}
 
 		// get project type config from api
-		{
-			// check not home dir
-			dir, _ := os.Getwd()
-			usr, _ := user.Current()
-			if dir == usr.HomeDir {
-				log.Error(errors.New("currently under home dir, please switch to your project dir"))
-				return
-			}
-
-			// limit files to 10000
-			files, _ := ioutil.ReadDir("./")
-			if len(files) > 10000 {
-				log.Error(errors.New("too many files in current dir, please check whether in the correct directory"))
-				return
-			}
-		}
-
 		log.S.StopFail()
 
 		fmt.Println("")
