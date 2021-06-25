@@ -119,6 +119,9 @@ func UploadDirToStaticSource(dirPath, projectName, bundleID string, cn bool) err
 	// Read directory files
 	var names []string
 	err = filepath.Walk(dirPath, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
 		if !info.IsDir() {
 			names = append(names, path)
 		}
