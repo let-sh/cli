@@ -11,6 +11,7 @@ import (
 func Errorf(template string, formatString ...string) {
 
 	err := errors.New(fmt.Sprintf(template, formatString))
+
 	S.StopFail()
 	sentry.CaptureException(err)
 	red := color.New(color.FgRed).SprintFunc()

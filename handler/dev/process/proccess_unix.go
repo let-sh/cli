@@ -4,7 +4,7 @@ package process
 
 import (
 	"github.com/let-sh/cli/log"
-	"github.com/shirou/gopsutil/process"
+	"github.com/shirou/gopsutil/v3/process"
 	"os/exec"
 	"strconv"
 	"strings"

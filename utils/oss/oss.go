@@ -8,8 +8,8 @@ import (
 	"github.com/let-sh/cli/requests"
 	ignore "github.com/sabhiram/go-gitignore"
 	"github.com/sirupsen/logrus"
-	"github.com/vbauerster/mpb/v5"
-	"github.com/vbauerster/mpb/v5/decor"
+	"github.com/vbauerster/mpb/v7"
+	"github.com/vbauerster/mpb/v7/decor"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -40,7 +40,8 @@ func UploadFileToCodeSource(filedir, filename, projectName string, cn bool) {
 		mpb.WithRefreshRate(200*time.Millisecond),
 	)
 
-	bar = p.AddBar(fi.Size(), mpb.BarStyle("[=>-|"),
+	bar = p.AddBar(fi.Size(),
+		//mpb.BarStyle("[=>-|"),
 		mpb.PrependDecorators(
 			decor.CountersKiloByte("% .2f / % .2f"),
 		),
@@ -138,7 +139,6 @@ func UploadDirToStaticSource(dirPath, projectName, bundleID string, cn bool) err
 
 		tmp := []string{}
 		for _, v := range names {
-
 			if !i.MatchesPath(v) {
 				tmp = append(tmp, v)
 			}
@@ -170,6 +170,52 @@ func UploadDirToStaticSource(dirPath, projectName, bundleID string, cn bool) err
 		}
 
 		names = tmp
+	}
+
+	// fill in files info
+	var totalFilesSize int64
+	for _, v := range names {
+		fi, _ := os.Stat(v)
+		mutex.Lock()
+		// register upload status
+		uploadStatus[v] = struct {
+			FilePath     string
+			ConsumedSize int64
+			TotalSize    int64
+		}{FilePath: fi.Name(), ConsumedSize: 0, TotalSize: fi.Size()}
+
+		totalFilesSize += fi.Size()
+		mutex.Unlock()
+	}
+	status := uploadStatus
+	logrus.Debug(status)
+
+	p := mpb.New(
+		mpb.WithWidth(64),
+		mpb.WithRefreshRate(200*time.Millisecond),
+	)
+
+	// init progress bar
+	{
+		bar = p.AddBar(totalFilesSize,
+			mpb.PrependDecorators(
+				decor.Name("uploading files: "),
+				decor.Counters(decor.UnitKiB, "% .1f / % .1f"),
+			),
+			mpb.AppendDecorators(decor.Percentage()),
+
+			////mpb.NewBarFiller(mpb.BarStyle("[=>-|")),
+			//mpb.PrependDecorators(
+			//	decor.CountersKiloByte("% .2f / % .2f"),
+			//),
+			//mpb.AppendDecorators(
+			//	decor.EwmaETA(decor.ET_STYLE_GO, 90),
+			//	decor.Name(" ] "),
+			//	//decor.EwmaSpeed(decor.UnitKB, "% .2f", 1024),
+			//),
+			mpb.BarRemoveOnComplete(),
+		)
+		bar.SetTotal(totalFilesSize, false)
 	}
 
 	// Copy names to a channel for workers to consume. Close the
@@ -236,7 +282,7 @@ func UploadDirToStaticSource(dirPath, projectName, bundleID string, cn bool) err
 						return filepath.ToSlash(objKey)
 					}
 					return objKey
-				}(), filePath, oss.Progress(&OssProgressListener{filepath: filePath}))
+				}(), filePath, oss.Progress(&OssProgressListener{filepath: filePath, totalFilesSize: totalFilesSize}))
 				if err != nil {
 					select {
 					case errChan <- err:
@@ -261,13 +307,17 @@ func UploadDirToStaticSource(dirPath, projectName, bundleID string, cn bool) err
 			return err
 		}
 	}
-	log.S.Suffix(" deploying ")
+
+	bar.Completed()
+	bar.Abort(true)
 	log.BUnpause()
+	log.S.Suffix(" deploying ")
 	return nil
 }
 
 type OssProgressListener struct {
-	filepath string
+	filepath       string
+	totalFilesSize int64
 }
 
 func (listener *OssProgressListener) ProgressChanged(event *oss.ProgressEvent) {
@@ -279,11 +329,12 @@ func (listener *OssProgressListener) ProgressChanged(event *oss.ProgressEvent) {
 		//	event.ConsumedBytes, event.TotalBytes)
 
 	case oss.TransferDataEvent:
-		UpdateUploadBar()
+		UpdateUploadBar(listener.totalFilesSize)
 
 		mutex.Lock()
 		//todo: add uploading bar
-		//bar.IncrBy(int(event.ConsumedBytes - uploadStatus[listener.filepath].ConsumedSize))
+
+		bar.IncrBy(int(event.ConsumedBytes - uploadStatus[listener.filepath].ConsumedSize))
 		uploadStatus[listener.filepath] = struct {
 			FilePath     string
 			ConsumedSize int64
@@ -304,38 +355,13 @@ func (listener *OssProgressListener) ProgressChanged(event *oss.ProgressEvent) {
 	}
 }
 
-func UpdateUploadBar() (totalConsumedSize, totalSize int64) {
-
+func UpdateUploadBar(totalFilesSize int64) (totalConsumedSize int64) {
 	mutex.Lock()
 	for _, v := range uploadStatus {
 		totalConsumedSize += v.ConsumedSize
-		totalSize += v.TotalSize
 	}
 	mutex.Unlock()
-	//todo: add uploading bar
-	//if bar == nil {
-	//	p := mpb.New(
-	//		mpb.WithWidth(64),
-	//		mpb.WithRefreshRate(200*time.Millisecond),
-	//	)
-	//
-	//	bar = p.AddBar(totalSize, mpb.BarStyle("[=>-|"),
-	//		mpb.PrependDecorators(
-	//			decor.CountersKiloByte("% .2f / % .2f"),
-	//		),
-	//		mpb.AppendDecorators(
-	//			decor.EwmaETA(decor.ET_STYLE_GO, 90),
-	//			decor.Name(" ] "),
-	//			decor.EwmaSpeed(decor.UnitKB, "% .2f", 1024),
-	//		),
-	//		mpb.BarRemoveOnComplete(),
-	//	)
-	//}
 
-	//if totalConsumedSize == totalSize {
-	//	bar.SetTotal(totalSize, true)
-	//} else {
-	//	bar.SetTotal(totalSize, false)
-	//}
-	return totalConsumedSize, totalSize
+	bar.SetCurrent(totalConsumedSize)
+	return totalConsumedSize
 }

@@ -3,7 +3,7 @@ package sentry
 import (
 	"github.com/getsentry/sentry-go"
 	"github.com/let-sh/cli/info"
-	"github.com/shirou/gopsutil/host"
+	"github.com/shirou/gopsutil/v3/host"
 )
 
 func init() {
