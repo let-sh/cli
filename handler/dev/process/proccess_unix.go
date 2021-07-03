@@ -21,8 +21,8 @@ func GetPortByProcessID(pid int) []int {
 		}
 		spaces := strings.Fields(line)
 
-		splited := strings.Split(spaces[8], ":")
-		port, err := strconv.Atoi(splited[1])
+		split := strings.Split(spaces[8], ":")
+		port, err := strconv.Atoi(split[1])
 		if err != nil {
 			log.Error(err)
 			return ports

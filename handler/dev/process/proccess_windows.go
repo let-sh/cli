@@ -12,11 +12,31 @@ import (
 )
 
 func GetPortByProcessID(pid int) []int {
-	cmd := exec.Command("sh", "-c", "lsof -nP -iTCP -sTCP:LISTEN | grep "+strconv.Itoa(pid))
-	out, err := cmd.Output()
-	if err != nil {
-		log.Error(err)
-	}
+	first := exec.Command("netstat", "-a", "-n", "-o")
+	second := exec.Command("find", "\""+strconv.Itoa(pid)+"\"")
+
+	// http://golang.org/pkg/io/#Pipe
+
+	reader, writer := io.Pipe()
+
+	// push first command output to writer
+	first.Stdout = writer
+
+	// read from first command output
+	second.Stdin = reader
+
+	// prepare a buffer to capture the output
+	// after second command finished executing
+	var buff bytes.Buffer
+	second.Stdout = &buff
+
+	first.Start()
+	second.Start()
+	first.Wait()
+	writer.Close()
+	second.Wait()
+
+	out := buff.String()
 	fmt.Printf("%s", out)
 
 	var ports []int
@@ -26,8 +46,8 @@ func GetPortByProcessID(pid int) []int {
 		}
 		spaces := strings.Fields(line)
 
-		splited := strings.Split(spaces[8], ":")
-		port, err := strconv.Atoi(splited[1])
+		split := strings.Split(spaces[2], ":")
+		port, err := strconv.Atoi(split[1])
 		if err != nil {
 			log.Error(err)
 			return ports
