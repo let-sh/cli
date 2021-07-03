@@ -17,15 +17,15 @@ $BinDir = if ($LetInstall) {
   "$Home\.let\bin"
 }
 
-$LetZip = "$BinDir\let.tar.gz"
-$LetExe = "$BinDir\let.exe"
+$LetZip = "$BinDir\lets.zip"
+$LetExe = "$BinDir\lets.exe"
 $Target = 'windows_amd64'
 
 # GitHub requires TLS 1.2
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 $LetUri = if (!$Version) {
-  $Response = Invoke-WebRequest 'https://install.let.sh/version' -UseBasicParsing
+  $Response = Invoke-WebRequest 'https://install.let.sh.cn/version' -UseBasicParsing
 
   $Version = $Response.Content.Split([Environment]::NewLine) |
   Where-Object { $_ -match "latest:(.*)" } |
@@ -33,9 +33,9 @@ $LetUri = if (!$Version) {
   ForEach-Object {$_.matches[0].Groups[1].value} |
   Select-Object -First 1
 
-  "https://install.let.sh.cn/cli_${Version}_${Target}.tar.gz"
+  "https://install.let.sh.cn/cli_${Version}_${Target}.zip"
 } else {
-  "https://install.let.sh.cn/cli_${Version}_${Target}.tar.gz"
+  "https://install.let.sh.cn/cli_${Version}_${Target}.zip"
 }
 
 if (!(Test-Path $BinDir)) {
@@ -44,8 +44,8 @@ if (!(Test-Path $BinDir)) {
 
 Invoke-WebRequest $LetUri -OutFile $LetZip -UseBasicParsing
 
-if (Get-Command tar) {
-  tar -xvzf $LetZip -C $BinDir
+if (Get-Command Expand-Archive -ErrorAction SilentlyContinue) {
+  Expand-Archive $LetZip -Destination $BinDir -Force
 } else {
   if (Test-Path $LetExe) {
     Remove-Item $LetExe
