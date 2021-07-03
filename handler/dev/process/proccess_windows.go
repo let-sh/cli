@@ -3,9 +3,11 @@
 package process
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/let-sh/cli/log"
 	"github.com/shirou/gopsutil/v3/process"
+	"io"
 	"os/exec"
 	"strconv"
 	"strings"
