@@ -6,10 +6,39 @@ import (
 	"github.com/let-sh/cli/info"
 	"github.com/machinebox/graphql"
 	"github.com/sirupsen/logrus"
+	"net/http"
 )
 
+var httpClient *http.Client
+
+func init() {
+	//resolver, _ := dns.NewDoHResolver(
+	//	"https://dns.alidns.com/dns-query",
+	//	dns.DoHCache())
+	//
+	//dialer := &net.Dialer{
+	//	Resolver: resolver,
+	//	// &net.Resolver{
+	//	//	PreferGo: true,
+	//	//	Dial:&resolver,
+	//	//	func(ctx context.Context, network, address string) (net.Conn, error) {
+	//	//		d := net.Dialer{
+	//	//			Timeout: time.Duration(dnsResolverTimeoutMs) * time.Millisecond,
+	//	//		}
+	//	//		return d.DialContext(ctx, dnsResolverProto, dnsResolverIP)
+	//	//	}
+	//	//},
+	//}
+	//dialContext := func(ctx context.Context, network, addr string) (net.Conn, error) {
+	//	return dialer.DialContext(ctx, network, addr)
+	//}
+	//
+	//http.DefaultTransport.(*http.Transport).DialContext = dialContext
+	httpClient = &http.Client{}
+}
+
 // create a client (safe to share across requests)
-var Graphql = graphql.NewClient("https://graphql.let.sh")
+var Graphql = graphql.NewClient("https://graphql.let.sh", graphql.WithHTTPClient(httpClient))
 
 func SetPreference(name, value string) (ok bool, err error) {
 	req := graphql.NewRequest(`
@@ -207,7 +236,6 @@ mutation($type: String!, $name: String!, $config: String, $channel: String!, $cn
 		return deployment, err
 	}
 	logrus.Debugln(respData)
-	logrus.Debug(Graphql.Log)
 	return respData.Deploy, nil
 }
 
@@ -289,7 +317,6 @@ query($type: String!) {
 		} `json:"buildTemplate,omitempty"`
 	}
 	if err := Graphql.Run(context.Background(), req, &respData); err != nil {
-
 		return buildTemplate, err
 	}
 

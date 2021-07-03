@@ -200,19 +200,19 @@ func UploadDirToStaticSource(dirPath, projectName, bundleID string, cn bool) err
 		bar = p.AddBar(totalFilesSize,
 			mpb.PrependDecorators(
 				decor.Name("uploading files: "),
-				decor.Counters(decor.UnitKiB, "% .1f / % .1f"),
+				//decor.Counters(decor.UnitKiB, "% .1f / % .1f"),
 			),
-			mpb.AppendDecorators(decor.Percentage()),
 
-			////mpb.NewBarFiller(mpb.BarStyle("[=>-|")),
-			//mpb.PrependDecorators(
-			//	decor.CountersKiloByte("% .2f / % .2f"),
-			//),
-			//mpb.AppendDecorators(
-			//	decor.EwmaETA(decor.ET_STYLE_GO, 90),
-			//	decor.Name(" ] "),
-			//	//decor.EwmaSpeed(decor.UnitKB, "% .2f", 1024),
-			//),
+			//mpb.NewBarFiller(mpb.BarStyle("[=>-|")),
+			mpb.PrependDecorators(
+				decor.CountersKiloByte("% .2f / % .2f"),
+			),
+			mpb.AppendDecorators(
+				decor.Percentage(),
+				decor.Name(" ] "),
+				//decor.EwmaETA(decor.ET_STYLE_GO, 90),
+				//decor.EwmaSpeed(decor.UnitKB, "% .2f", 1024),
+			),
 			mpb.BarRemoveOnComplete(),
 		)
 		bar.SetTotal(totalFilesSize, false)
@@ -282,7 +282,7 @@ func UploadDirToStaticSource(dirPath, projectName, bundleID string, cn bool) err
 						return filepath.ToSlash(objKey)
 					}
 					return objKey
-				}(), filePath, oss.Progress(&OssProgressListener{filepath: filePath, totalFilesSize: totalFilesSize}))
+				}(), filePath, oss.Progress(&OssProgressListener{filepath: filePath, totalFilesSize: totalFilesSize, currentTime: time.Now()}))
 				if err != nil {
 					select {
 					case errChan <- err:
@@ -318,6 +318,7 @@ func UploadDirToStaticSource(dirPath, projectName, bundleID string, cn bool) err
 type OssProgressListener struct {
 	filepath       string
 	totalFilesSize int64
+	currentTime    time.Time
 }
 
 func (listener *OssProgressListener) ProgressChanged(event *oss.ProgressEvent) {
@@ -335,6 +336,12 @@ func (listener *OssProgressListener) ProgressChanged(event *oss.ProgressEvent) {
 		//todo: add uploading bar
 
 		bar.IncrBy(int(event.ConsumedBytes - uploadStatus[listener.filepath].ConsumedSize))
+
+		// add debounce
+
+		bar.DecoratorEwmaUpdate(time.Since(listener.currentTime))
+		listener.currentTime = time.Now()
+
 		uploadStatus[listener.filepath] = struct {
 			FilePath     string
 			ConsumedSize int64

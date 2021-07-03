@@ -126,6 +126,9 @@ var deployCmd = &cobra.Command{
 		if _, ok := cache.ProjectsInfo[deploymentCtx.Name]; ok {
 			pwd, _ := os.Getwd()
 
+			logrus.Debug("cached project dir: ", cache.ProjectsInfo[deploymentCtx.Name].Dir)
+			logrus.Debug("current project dir: ", pwd)
+
 			if pwd != cache.ProjectsInfo[deploymentCtx.Name].Dir {
 				log.S.StopFail()
 				// if current dir is not previous dir
