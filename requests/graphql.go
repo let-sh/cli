@@ -38,7 +38,7 @@ func init() {
 }
 
 // create a client (safe to share across requests)
-var Graphql = graphql.NewClient("https://graphql.let.sh", graphql.WithHTTPClient(httpClient))
+var Graphql = graphql.NewClient("https://api.let.sh/query", graphql.WithHTTPClient(httpClient))
 
 func SetPreference(name, value string) (ok bool, err error) {
 	req := graphql.NewRequest(`

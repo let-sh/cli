@@ -11,7 +11,7 @@ func TestGetLatestVersion(t *testing.T) {
 }
 
 func TestHttpClient(t *testing.T) {
-	resp, err := httpClient.Get("https://graphql.let.sh")
+	resp, err := httpClient.Get("https://api.let.sh/query")
 	if err != nil {
 		panic(err)
 
