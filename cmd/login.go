@@ -42,18 +42,18 @@ var loginCmd = &cobra.Command{
 		log.BStart("redirecting to browser")
 
 		// get ticket id
-		tickeIDInterface, err := requests.GetJsonWithPath("https://api.let.sh/oauth/ticket_id", "data")
+		tickeIDInterface, err := requests.GetJsonWithPath("https://api.let-sh.com/oauth/ticket_id", "data")
 		if err != nil {
 			log.Error(err)
 			return
 		}
 
 		// open browser to login
-		openBrowser("https://api.let.sh/oauth/login?method=github&client=cli&ticket_id=" + tickeIDInterface.String() + "&device=" + goInfo.GetInfo().OS + goInfo.GetInfo().Core)
+		openBrowser("https://api.let-sh.com/oauth/login?method=github&client=cli&ticket_id=" + tickeIDInterface.String() + "&device=" + goInfo.GetInfo().OS + goInfo.GetInfo().Core)
 
 		// valid response
 		start := time.Now()
-		log.BUpdate("waiting for login result, you could also manually visit: "+"https://api.let.sh/oauth/login?method=github&client=cli&ticket_id=" + tickeIDInterface.String() + "&device=" + goInfo.GetInfo().OS + goInfo.GetInfo().Core)
+		log.BUpdate("waiting for login result, you could also manually visit: " + "https://api.let-sh.com/oauth/login?method=github&client=cli&ticket_id=" + tickeIDInterface.String() + "&device=" + goInfo.GetInfo().OS + goInfo.GetInfo().Core)
 
 		for {
 			// Code to measure
@@ -61,7 +61,7 @@ var loginCmd = &cobra.Command{
 			if duration >= time.Minute*1 {
 				break
 			}
-			tokenInterface, err := requests.GetJsonWithPath("https://api.let.sh/oauth/ticket/"+tickeIDInterface.String(), "data.token")
+			tokenInterface, err := requests.GetJsonWithPath("https://api.let-sh.com/oauth/ticket/"+tickeIDInterface.String(), "data.token")
 			if err == nil && tokenInterface.String() != "" {
 				// verify response
 				config.SetToken(tokenInterface.String())
