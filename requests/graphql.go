@@ -34,9 +34,10 @@ import (
 //	httpClient = &http.Client{}
 //}
 
-// create a client (safe to share across requests)
+// deprecated: create a client (safe to share across requests)
 var Graphql = graphql.NewClient("https://api.let-sh.com/query", graphql.WithHTTPClient(client))
 
+// deprecated: SetPreference
 func SetPreference(name, value string) (ok bool, err error) {
 	req := graphql.NewRequest(`
 	mutation($name: String!, $value: String!) {
@@ -59,6 +60,7 @@ func SetPreference(name, value string) (ok bool, err error) {
 	return respData.SetPreference, nil
 }
 
+// deprecated: GetAllPreference
 func GetAllPreference() (data struct {
 	Channel string `json:"channel"`
 }, err error) {
@@ -85,6 +87,7 @@ func GetAllPreference() (data struct {
 	return respData.AllPreference, nil
 }
 
+// deprecated
 func GetPreference(name string) (value string, err error) {
 	req := graphql.NewRequest(`
 	query($name: String!) {
@@ -106,6 +109,7 @@ func GetPreference(name string) (value string, err error) {
 	return respData.Preference, nil
 }
 
+// deprecated
 func CheckDeployCapability(projectName string) (hashID string, exists bool, err error) {
 	req := graphql.NewRequest(`
     query($name: String!) {
@@ -137,6 +141,7 @@ func CheckDeployCapability(projectName string) (hashID string, exists bool, err 
 	return respData.CheckDeployCapability.HashID, respData.CheckDeployCapability.Exists, nil
 }
 
+// deprecated
 func GetStsToken(uploadType, projectName string, cn bool) (data struct {
 	Host            string `json:"host"`
 	AccessKeyID     string `json:"accessKeyID"`
@@ -179,6 +184,7 @@ query($type: String!, $name: String!, $cn: Boolean!) {
 	return respData.StsToken, nil
 }
 
+// deprecated
 func Deploy(projectType, projectName, config, channel string, cn bool) (deployment struct {
 	ID           string `json:"id"`
 	TargetFQDN   string `json:"targetFQDN"`
@@ -236,6 +242,7 @@ mutation($type: String!, $name: String!, $config: String, $channel: String!, $cn
 	return respData.Deploy, nil
 }
 
+// deprecated
 func GetDeploymentStatus(id string) (deployment struct {
 	TargetFQDN   string `json:"targetFQDN"`
 	NetworkStage string `json:"networkStage"`
@@ -278,6 +285,7 @@ query($id: UUID!) {
 	return respData.Deployment, nil
 }
 
+// deprecated
 func GetTemplate(typeArg string) (
 	buildTemplate struct {
 		ContainsStatic   bool     `json:"containsStatic"`
@@ -320,6 +328,7 @@ query($type: String!) {
 	return respData.BuildTemplate, nil
 }
 
+// deprecated
 func CancelDeployment(deploymentID string) (
 	cancelDeploymentResult bool, err error) {
 	req := graphql.NewRequest(`
@@ -342,6 +351,7 @@ mutation($deploymentID: UUID!) {
 	return respData.CancelDeployment, nil
 }
 
+// deprecated
 func QueryDeployments(projectName string, count int) (
 	deployments struct {
 		Edges []struct {
@@ -383,6 +393,7 @@ query {
 	return respData.Deployments, nil
 }
 
+// deprecated
 func StartDevelopment(projectID string) (
 	startDevelopmentResult struct {
 		RemotePort    int    `json:"remotePort,omitempty"`
@@ -416,6 +427,7 @@ mutation($projectID: UUID!) {
 	return respData.StartDevelopment, nil
 }
 
+// deprecated
 func QueryProject(projectName string) (
 	projectInfo struct {
 		ID   string `json:"id,omitempty"`
@@ -444,6 +456,7 @@ query($projectName: String!) {
 	return respData, nil
 }
 
+// deprecated
 func StopDevelopment(projectID string) (
 	stopDevelopmentResult bool, err error) {
 	req := graphql.NewRequest(`
@@ -466,6 +479,7 @@ mutation($projectID: UUID!) {
 	return respData.StopDevelopment, nil
 }
 
+// deprecated
 func Link(projectID string, hostname string) (
 	linkResult bool, err error) {
 	req := graphql.NewRequest(`
@@ -489,6 +503,7 @@ mutation($projectID: UUID!,$hostname: String!) {
 	return respData.Link, nil
 }
 
+// deprecated
 func Unlink(projectID string, hostname string) (
 	unlinkResult bool, err error) {
 	req := graphql.NewRequest(`

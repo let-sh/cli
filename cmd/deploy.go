@@ -278,7 +278,6 @@ var deployCmd = &cobra.Command{
 
 				tmp := []string{}
 				for _, v := range names {
-
 					if !i.MatchesPath(v) {
 						tmp = append(tmp, v)
 					}
@@ -452,10 +451,10 @@ func init() {
 }
 
 func SetupCloseHandler() {
-	c := make(chan os.Signal)
-	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	channel := make(chan os.Signal)
+	signal.Notify(channel, os.Interrupt, syscall.SIGTERM)
 	go func() {
-		<-c
+		<-channel
 		if len(DeploymentID) > 0 {
 			succeed, err := requests.CancelDeployment(DeploymentID)
 			if err != nil {
