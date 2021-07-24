@@ -4,6 +4,8 @@ go 1.16
 
 replace github.com/charmbracelet/bubbles v0.7.6 => github.com/OasisNetworks/bubbles v0.7.7-0.20210226193817-28eb5c775530
 
+replace github.com/shurcooL/graphql v0.0.0-20200928012149-18c5c3165e3a => github.com/let-sh/graphql v0.0.0-20210723145227-14195939c641
+
 require (
 	github.com/aliyun/aliyun-oss-go-sdk v2.1.5+incompatible
 	github.com/atotto/clipboard v0.1.2
@@ -39,6 +41,7 @@ require (
 	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/segmentio/textio v1.2.0
 	github.com/shirou/gopsutil/v3 v3.21.5
+	github.com/shurcooL/graphql v0.0.0-20200928012149-18c5c3165e3a
 	github.com/sirupsen/logrus v1.7.0
 	github.com/spf13/cobra v1.2.1
 	github.com/theckman/yacspin v0.8.0

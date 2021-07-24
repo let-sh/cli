@@ -11,7 +11,7 @@ func StartClient(endpoint, local, exposeFqdn string) {
 		UpstreamMap: map[string]string{
 			exposeFqdn: local,
 		},
-		Token:            info.Credentials.Token,
+		Token:            info.Credentials.LoadToken(),
 		StrictForwarding: false,
 	}
 

@@ -43,7 +43,7 @@ func init() {
 	}
 
 	// bootstrap configs
-	if len(info.Credentials.Token) == 0 {
+	if len(info.Credentials.LoadToken()) == 0 {
 		credentialsFile, _ := ioutil.ReadFile(home + "/.let/credentials.json")
 		err = json.Unmarshal(credentialsFile, &info.Credentials)
 		if err != nil {
@@ -57,7 +57,7 @@ func init() {
 		if err != nil {
 			log.Error(err)
 		}
-		info.Credentials.Token = "GITHUB:" + repo + ":" + info.GitHub.GetToken()
+		info.Credentials.SetToken("GITHUB:" + repo + ":" + info.GitHub.GetToken())
 	}
 
 	_, err = os.Stat(home + "/.let/preference.json")
@@ -78,7 +78,7 @@ func init() {
 func Load() {}
 
 func SetToken(token string) {
-	info.Credentials.Token = token
+	info.Credentials.SetToken(token)
 	home, _ := homedir.Dir()
 
 	file, _ := json.MarshalIndent(&info.Credentials, "", "  ")

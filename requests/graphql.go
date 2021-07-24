@@ -6,39 +6,36 @@ import (
 	"github.com/let-sh/cli/info"
 	"github.com/machinebox/graphql"
 	"github.com/sirupsen/logrus"
-	"net/http"
 )
 
-var httpClient *http.Client
-
-func init() {
-	//resolver, _ := dns.NewDoHResolver(
-	//	"https://dns.alidns.com/dns-query",
-	//	dns.DoHCache())
-	//
-	//dialer := &net.Dialer{
-	//	Resolver: resolver,
-	//	// &net.Resolver{
-	//	//	PreferGo: true,
-	//	//	Dial:&resolver,
-	//	//	func(ctx context.Context, network, address string) (net.Conn, error) {
-	//	//		d := net.Dialer{
-	//	//			Timeout: time.Duration(dnsResolverTimeoutMs) * time.Millisecond,
-	//	//		}
-	//	//		return d.DialContext(ctx, dnsResolverProto, dnsResolverIP)
-	//	//	}
-	//	//},
-	//}
-	//dialContext := func(ctx context.Context, network, addr string) (net.Conn, error) {
-	//	return dialer.DialContext(ctx, network, addr)
-	//}
-	//
-	//http.DefaultTransport.(*http.Transport).DialContext = dialContext
-	httpClient = &http.Client{}
-}
+//func init() {
+//	//resolver, _ := dns.NewDoHResolver(
+//	//	"https://dns.alidns.com/dns-query",
+//	//	dns.DoHCache())
+//	//
+//	//dialer := &net.Dialer{
+//	//	Resolver: resolver,
+//	//	// &net.Resolver{
+//	//	//	PreferGo: true,
+//	//	//	Dial:&resolver,
+//	//	//	func(ctx context.Context, network, address string) (net.Conn, error) {
+//	//	//		d := net.Dialer{
+//	//	//			Timeout: time.Duration(dnsResolverTimeoutMs) * time.Millisecond,
+//	//	//		}
+//	//	//		return d.DialContext(ctx, dnsResolverProto, dnsResolverIP)
+//	//	//	}
+//	//	//},
+//	//}
+//	//dialContext := func(ctx context.Context, network, addr string) (net.Conn, error) {
+//	//	return dialer.DialContext(ctx, network, addr)
+//	//}
+//	//
+//	//http.DefaultTransport.(*http.Transport).DialContext = dialContext
+//	httpClient = &http.Client{}
+//}
 
 // create a client (safe to share across requests)
-var Graphql = graphql.NewClient("https://api.let-sh.com/query", graphql.WithHTTPClient(httpClient))
+var Graphql = graphql.NewClient("https://api.let-sh.com/query", graphql.WithHTTPClient(client))
 
 func SetPreference(name, value string) (ok bool, err error) {
 	req := graphql.NewRequest(`
@@ -49,7 +46,7 @@ func SetPreference(name, value string) (ok bool, err error) {
 
 	req.Var("name", name)
 	req.Var("value", value)
-	req.Header.Set("Authorization", "Bearer "+info.Credentials.Token)
+	req.Header.Set("Authorization", "Bearer "+info.Credentials.LoadToken())
 
 	// run it and capture the response
 	var respData struct {
@@ -73,7 +70,7 @@ func GetAllPreference() (data struct {
 	}
 `)
 
-	req.Header.Set("Authorization", "Bearer "+info.Credentials.Token)
+	req.Header.Set("Authorization", "Bearer "+info.Credentials.LoadToken())
 
 	// run it and capture the response
 	var respData struct {
@@ -96,7 +93,7 @@ func GetPreference(name string) (value string, err error) {
 `)
 
 	req.Var("name", name)
-	req.Header.Set("Authorization", "Bearer "+info.Credentials.Token)
+	req.Header.Set("Authorization", "Bearer "+info.Credentials.LoadToken())
 
 	// run it and capture the response
 	var respData struct {
@@ -120,7 +117,7 @@ func CheckDeployCapability(projectName string) (hashID string, exists bool, err 
 `)
 
 	req.Var("name", projectName)
-	req.Header.Set("Authorization", "Bearer "+info.Credentials.Token)
+	req.Header.Set("Authorization", "Bearer "+info.Credentials.LoadToken())
 
 	// run it and capture the response
 	var respData struct {
@@ -160,7 +157,7 @@ query($type: String!, $name: String!, $cn: Boolean!) {
 	req.Var("type", uploadType)
 	req.Var("name", projectName)
 	req.Var("cn", cn)
-	req.Header.Set("Authorization", "Bearer "+info.Credentials.Token)
+	req.Header.Set("Authorization", "Bearer "+info.Credentials.LoadToken())
 
 	// run it and capture the response
 	var respData struct {
@@ -212,7 +209,7 @@ mutation($type: String!, $name: String!, $config: String, $channel: String!, $cn
 	req.Var("config", config)
 	req.Var("channel", channel)
 	req.Var("cn", cn)
-	req.Header.Set("Authorization", "Bearer "+info.Credentials.Token)
+	req.Header.Set("Authorization", "Bearer "+info.Credentials.LoadToken())
 	logrus.Debugln(projectType, projectName, config, cn)
 	// run it and capture the response
 	var respData struct {
@@ -260,7 +257,7 @@ query($id: UUID!) {
 }
 `)
 	req.Var("id", id)
-	req.Header.Set("Authorization", "Bearer "+info.Credentials.Token)
+	req.Header.Set("Authorization", "Bearer "+info.Credentials.LoadToken())
 
 	// run it and capture the response
 	var respData struct {
@@ -303,7 +300,7 @@ query($type: String!) {
 }
 `)
 	req.Var("type", typeArg)
-	req.Header.Set("Authorization", "Bearer "+info.Credentials.Token)
+	req.Header.Set("Authorization", "Bearer "+info.Credentials.LoadToken())
 
 	// run it and capture the response
 	var respData struct {
@@ -331,7 +328,7 @@ mutation($deploymentID: UUID!) {
 }
 `)
 	req.Var("deploymentID", deploymentID)
-	req.Header.Set("Authorization", "Bearer "+info.Credentials.Token)
+	req.Header.Set("Authorization", "Bearer "+info.Credentials.LoadToken())
 
 	// run it and capture the response
 	var respData struct {
@@ -367,7 +364,7 @@ query {
   }
 }
 `, count, projectName))
-	req.Header.Set("Authorization", "Bearer "+info.Credentials.Token)
+	req.Header.Set("Authorization", "Bearer "+info.Credentials.LoadToken())
 
 	// run it and capture the response
 	var respData struct {
@@ -402,7 +399,7 @@ mutation($projectID: UUID!) {
 }
 `)
 	req.Var("projectID", projectID)
-	req.Header.Set("Authorization", "Bearer "+info.Credentials.Token)
+	req.Header.Set("Authorization", "Bearer "+info.Credentials.LoadToken())
 
 	// run it and capture the response
 	var respData struct {
@@ -433,7 +430,7 @@ query($projectName: String!) {
 }
 `)
 	req.Var("projectName", projectName)
-	req.Header.Set("Authorization", "Bearer "+info.Credentials.Token)
+	req.Header.Set("Authorization", "Bearer "+info.Credentials.LoadToken())
 
 	// run it and capture the response
 	var respData struct {
@@ -455,7 +452,7 @@ mutation($projectID: UUID!) {
 }
 `)
 	req.Var("projectID", projectID)
-	req.Header.Set("Authorization", "Bearer "+info.Credentials.Token)
+	req.Header.Set("Authorization", "Bearer "+info.Credentials.LoadToken())
 
 	// run it and capture the response
 	var respData struct {
@@ -478,7 +475,7 @@ mutation($projectID: UUID!,$hostname: String!) {
 `)
 	req.Var("projectID", projectID)
 	req.Var("hostname", hostname)
-	req.Header.Set("Authorization", "Bearer "+info.Credentials.Token)
+	req.Header.Set("Authorization", "Bearer "+info.Credentials.LoadToken())
 
 	// run it and capture the response
 	var respData struct {
@@ -501,7 +498,7 @@ mutation($projectID: UUID!,$hostname: String!) {
 `)
 	req.Var("projectID", projectID)
 	req.Var("hostname", hostname)
-	req.Header.Set("Authorization", "Bearer "+info.Credentials.Token)
+	req.Header.Set("Authorization", "Bearer "+info.Credentials.LoadToken())
 
 	// run it and capture the response
 	var respData struct {

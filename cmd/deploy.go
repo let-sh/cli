@@ -16,6 +16,7 @@ limitations under the License.
 package cmd
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -26,6 +27,7 @@ import (
 	"github.com/let-sh/cli/info"
 	"github.com/let-sh/cli/log"
 	"github.com/let-sh/cli/requests"
+	"github.com/let-sh/cli/requests/graphql"
 	"github.com/let-sh/cli/types"
 	"github.com/let-sh/cli/utils"
 	"github.com/let-sh/cli/utils/cache"
@@ -34,6 +36,7 @@ import (
 	"github.com/mholt/archiver/v3"
 	c "github.com/otiai10/copy"
 	ignore "github.com/sabhiram/go-gitignore"
+	gql "github.com/shurcooL/graphql"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"io/ioutil"
@@ -59,7 +62,7 @@ var deployCmd = &cobra.Command{
 		SetupCloseHandler()
 
 		// check whether user is logged in
-		if info.Credentials.Token == "" {
+		if info.Credentials.LoadToken() == "" {
 			log.Warning("please login via `lets login` first")
 			return
 		}
@@ -158,11 +161,34 @@ var deployCmd = &cobra.Command{
 			}
 		}
 
-		// check Check Deploy Capability
-		hashID, _, err := requests.CheckDeployCapability(deploymentCtx.Name)
-		if err != nil {
-			log.Error(err)
-			return
+		// make pre deploy request
+		{
+			query := struct {
+				graphql.QueryCheckDeployCapability
+				graphql.QueryBuildTemplate
+				graphql.QueryStsToken
+				graphql.QueryPreference
+			}{}
+			err := graphql.Client.Query(context.Background(), &query, map[string]interface{}{
+				"projectName": gql.String(deploymentCtx.Name),
+				"tokenType":   gql.String("buildBundle"),
+				"type":        gql.String(deploymentCtx.Type),
+				"cn":          gql.Boolean(*deploymentCtx.CN),
+				"name":        gql.String("channel"),
+			})
+
+			var requestError *gql.RequestError
+			if errors.As(err, &requestError) {
+				log.Error(requestError)
+				return
+			}
+
+			var graphqlError *gql.GraphQLError
+			if errors.As(err, &graphqlError) {
+				log.Error(errors.New(graphqlError.GraphqlErrors[0].Message))
+				return
+			}
+			deploymentCtx.PreDeployRequest = query
 		}
 
 		// get project type config from api
@@ -174,13 +200,9 @@ var deployCmd = &cobra.Command{
 		fmt.Printf("type: %s\n", deploymentCtx.Type)
 		fmt.Println("")
 
-		template, err := requests.GetTemplate(deploymentCtx.Type)
-		if err != nil {
-			log.Error(err)
-		}
 		{
 			if deploymentCtx.Static == "" {
-				deploymentCtx.Static = template.DistDir
+				deploymentCtx.Static = deploymentCtx.PreDeployRequest.BuildTemplate.DistDir
 			}
 		}
 
@@ -189,16 +211,16 @@ var deployCmd = &cobra.Command{
 		if len(dirPath) == 0 {
 			dirPath = "./"
 		}
-		if template.ContainsStatic {
+		if deploymentCtx.PreDeployRequest.BuildTemplate.ContainsStatic {
 			if utils.ItemExists([]string{"static"}, deploymentCtx.Type) {
 				// todo: merge static dir value source
-				if err := oss.UploadDirToStaticSource(dirPath, deploymentCtx.Name, deploymentCtx.Name+"-"+hashID, *deploymentCtx.CN); err != nil {
+				if err := oss.UploadDirToStaticSource(dirPath, deploymentCtx.Name, deploymentCtx.Name+"-"+deploymentCtx.PreDeployRequest.CheckDeployCapability.HashID, *deploymentCtx.CN); err != nil {
 					log.Error(err)
 					return
 				}
 			} else {
-				if template.LocalCompiling {
-					for _, command := range template.CompileCommands {
+				if deploymentCtx.PreDeployRequest.BuildTemplate.LocalCompiling {
+					for _, command := range deploymentCtx.PreDeployRequest.BuildTemplate.CompileCommands {
 						command := strings.Split(command, " ")
 						c := exec.Command(command[0], command[1:]...)
 						c.Stdout = os.Stdout
@@ -211,7 +233,7 @@ var deployCmd = &cobra.Command{
 					}
 				}
 
-				if err := oss.UploadDirToStaticSource(deploymentCtx.Static, deploymentCtx.Name, deploymentCtx.Name+"-"+hashID, *deploymentCtx.CN); err != nil {
+				if err := oss.UploadDirToStaticSource(deploymentCtx.Static, deploymentCtx.Name, deploymentCtx.Name+"-"+deploymentCtx.PreDeployRequest.CheckDeployCapability.HashID, *deploymentCtx.CN); err != nil {
 					log.Error(err)
 					return
 				}
@@ -220,7 +242,7 @@ var deployCmd = &cobra.Command{
 
 		// if contains dynamic, upload dynamic files to oss
 		// then trigger deployment
-		if template.ContainsDynamic {
+		if deploymentCtx.PreDeployRequest.BuildTemplate.ContainsDynamic {
 			//
 			//// create temp dir
 			//dir := os.TempDir()
@@ -238,7 +260,7 @@ var deployCmd = &cobra.Command{
 
 			// Read directory files
 			var names []string
-			err = filepath.Walk(dirPath, func(path string, info os.FileInfo, err error) error {
+			err := filepath.Walk(dirPath, func(path string, info os.FileInfo, err error) error {
 				if !info.IsDir() {
 					names = append(names, path)
 				}
@@ -312,14 +334,14 @@ you could remove the irrelevant via .letignore or gitignore.`)
 
 			// switch dir
 			os.Chdir(tempDir) // switch to temp directory
-			err = archiver.Archive([]string{"."}, tempZipDir+"/"+deploymentCtx.Name+"-"+hashID+".tar.gz")
+			err = archiver.Archive([]string{"."}, tempZipDir+"/"+deploymentCtx.Name+"-"+deploymentCtx.PreDeployRequest.CheckDeployCapability.HashID+".tar.gz")
 			os.Chdir(dirPath) // switch back
 
 			if err != nil {
 				log.Error(err)
 				return
 			}
-			oss.UploadFileToCodeSource(tempZipDir+"/"+deploymentCtx.Name+"-"+hashID+".tar.gz", deploymentCtx.Name+"-"+hashID+".tar.gz", deploymentCtx.Name, *deploymentCtx.CN)
+			oss.UploadFileToCodeSource(tempZipDir+"/"+deploymentCtx.Name+"-"+deploymentCtx.PreDeployRequest.CheckDeployCapability.HashID+".tar.gz", deploymentCtx.Name+"-"+deploymentCtx.PreDeployRequest.CheckDeployCapability.HashID+".tar.gz", deploymentCtx.Name, *deploymentCtx.CN)
 		}
 
 		logrus.WithFields(logrus.Fields{
@@ -328,14 +350,8 @@ you could remove the irrelevant via .letignore or gitignore.`)
 
 		configBytes, _ := json.Marshal(deploymentCtx)
 
-		defaultChannel, err := requests.GetPreference("channel")
-		if err != nil {
-			log.Error(err)
-			return
-		}
-
 		// determine which channel to deploy
-		channel := defaultChannel
+		channel := deploymentCtx.PreDeployRequest.Preference
 		if inputProd == true { // if manually set to deploy to production, rewrite channel
 			channel = "prod"
 		}

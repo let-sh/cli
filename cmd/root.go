@@ -63,7 +63,7 @@ func init() {
 	rootCmd.PersistentFlags().String("token", "", "let.sh access token")
 	if token, err := rootCmd.PersistentFlags().GetString("token"); err != nil {
 		if len(token) > 0 {
-			info.Credentials.Token = token
+			info.Credentials.SetToken(token)
 		}
 	}
 

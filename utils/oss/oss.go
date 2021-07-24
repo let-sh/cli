@@ -41,17 +41,24 @@ func UploadFileToCodeSource(filedir, filename, projectName string, cn bool) {
 	)
 
 	bar = p.AddBar(fi.Size(),
-		//mpb.BarStyle("[=>-|"),
+		mpb.PrependDecorators(
+			decor.Name("uploading file: "),
+			//decor.Counters(decor.UnitKiB, "% .1f / % .1f"),
+		),
+
+		//mpb.NewBarFiller(mpb.BarStyle("[=>-|")),
 		mpb.PrependDecorators(
 			decor.CountersKiloByte("% .2f / % .2f"),
 		),
 		mpb.AppendDecorators(
-			decor.EwmaETA(decor.ET_STYLE_GO, 90),
+			decor.Percentage(),
 			decor.Name(" ] "),
+			//decor.EwmaETA(decor.ET_STYLE_GO, 90),
 			decor.EwmaSpeed(decor.UnitKB, "% .2f", 1024),
 		),
 		mpb.BarRemoveOnComplete(),
 	)
+	bar.SetTotal(fi.Size(), false)
 
 	stsToken, err := requests.GetStsToken("buildBundle", projectName, cn)
 	if err != nil {
