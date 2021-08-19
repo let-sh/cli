@@ -18,6 +18,15 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"os"
+	"os/exec"
+	"os/signal"
+	"path/filepath"
+	"strconv"
+	"strings"
+	"syscall"
+	"time"
+
 	"github.com/let-sh/cli/handler/dev"
 	c "github.com/let-sh/cli/handler/dev/command"
 	"github.com/let-sh/cli/handler/dev/process"
@@ -29,14 +38,6 @@ import (
 	"github.com/manifoldco/promptui"
 	"github.com/mitchellh/go-ps"
 	"github.com/spf13/cobra"
-	"os"
-	"os/exec"
-	"os/signal"
-	"path/filepath"
-	"strconv"
-	"strings"
-	"syscall"
-	"time"
 )
 
 var inputRemoteEndpoint string

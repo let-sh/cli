@@ -2,10 +2,11 @@ package cmd
 
 import (
 	"errors"
+	"strings"
+
 	"github.com/let-sh/cli/log"
 	"github.com/let-sh/cli/requests"
 	"github.com/spf13/cobra"
-	"strings"
 )
 
 /*

@@ -2,7 +2,6 @@ package requests
 
 import (
 	"fmt"
-	"io/ioutil"
 	"testing"
 )
 
@@ -11,12 +10,12 @@ func TestGetLatestVersion(t *testing.T) {
 }
 
 func TestHttpClient(t *testing.T) {
-	resp, err := httpClient.Get("https://api.let-sh.com/query")
-	if err != nil {
-		panic(err)
+	// resp, err := httpClient.Get("https://api.let-sh.com/query")
+	// if err != nil {
+	// 	panic(err)
 
-	}
-	defer resp.Body.Close()
-	s, err := ioutil.ReadAll(resp.Body)
-	fmt.Printf(string(s))
+	// }
+	// defer resp.Body.Close()
+	// s, err := ioutil.ReadAll(resp.Body)
+	// fmt.Printf(string(s))
 }

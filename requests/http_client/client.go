@@ -1,21 +1,19 @@
-package graphql
+package http_client
 
 import (
-	"github.com/let-sh/cli/requests/http_client"
-	"github.com/shurcooL/graphql"
+	"github.com/hashicorp/go-retryablehttp"
+	"github.com/let-sh/cli/info"
 	"net/http"
 )
 
-var Client = NewClient()
+func NewClient() *http.Client {
+	retryClient := retryablehttp.NewClient()
+	retryClient.RetryMax = 3
+	httpClient := retryClient.StandardClient()
 
-func NewClient() *graphql.Client {
-	//retryClient := retryablehttp.NewClient()
-	//retryClient.RetryMax = 3
-	//httpClient := retryClient.StandardClient()
-	//
-	//rt := WithHeader(httpClient.Transport)
-	//rt.Set("Authorization", "Bearer "+info.Credentials.LoadToken())
-	//httpClient.Transport = rt
+	rt := WithHeader(httpClient.Transport)
+	rt.Set("Authorization", "Bearer "+info.Credentials.LoadToken())
+	httpClient.Transport = rt
 	//src := oauth2.StaticTokenSource(
 	//	&oauth2.Token{AccessToken: info.Credentials.LoadToken()},
 	//)
@@ -24,7 +22,7 @@ func NewClient() *graphql.Client {
 	//// set request timeout
 	//httpClient.Timeout = 10 * time.Second
 
-	return graphql.NewClient("https://api.let-sh.com/query", http_client.NewClient())
+	return httpClient
 }
 
 type withHeader struct {

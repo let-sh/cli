@@ -17,14 +17,15 @@ package cmd
 
 import (
 	"fmt"
+	"os/exec"
+	"runtime"
+	"time"
+
 	"github.com/let-sh/cli/log"
 	"github.com/let-sh/cli/requests"
 	"github.com/let-sh/cli/utils/config"
 	"github.com/matishsiao/goInfo"
 	"github.com/spf13/cobra"
-	"os/exec"
-	"runtime"
-	"time"
 )
 
 // loginCmd represents the login command
@@ -53,7 +54,8 @@ var loginCmd = &cobra.Command{
 
 		// valid response
 		start := time.Now()
-		log.BUpdate("waiting for login result, you could also manually visit: " + "https://api.let-sh.com/oauth/login?method=github&client=cli&ticket_id=" + tickeIDInterface.String() + "&device=" + goInfo.GetInfo().OS + goInfo.GetInfo().Core)
+		log.BUpdate("waiting for login result")
+		//log.BUpdate("waiting for login result, you could also manually visit: " + "https://api.let-sh.com/oauth/login?method=github&client=cli&ticket_id=" + tickeIDInterface.String() + "&device=" + goInfo.GetInfo().OS + goInfo.GetInfo().Core)
 
 		for {
 			// Code to measure

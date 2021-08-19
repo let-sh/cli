@@ -20,6 +20,16 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"os"
+	"os/exec"
+	"os/signal"
+	"os/user"
+	"path/filepath"
+	"strings"
+	"syscall"
+	"time"
+
 	"github.com/atotto/clipboard"
 	"github.com/c2h5oh/datasize"
 	"github.com/fatih/color"
@@ -39,15 +49,6 @@ import (
 	gql "github.com/shurcooL/graphql"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"io/ioutil"
-	"os"
-	"os/exec"
-	"os/signal"
-	"os/user"
-	"path/filepath"
-	"strings"
-	"syscall"
-	"time"
 )
 
 var DeploymentID string

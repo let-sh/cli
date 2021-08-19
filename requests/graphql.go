@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/let-sh/cli/info"
+	"github.com/let-sh/cli/requests/http_client"
 	"github.com/machinebox/graphql"
 	"github.com/sirupsen/logrus"
 )
@@ -35,7 +36,7 @@ import (
 //}
 
 // deprecated: create a client (safe to share across requests)
-var Graphql = graphql.NewClient("https://api.let-sh.com/query", graphql.WithHTTPClient(client))
+var Graphql = graphql.NewClient("https://api.let-sh.com/query", graphql.WithHTTPClient(http_client.NewClient()))
 
 // deprecated: SetPreference
 func SetPreference(name, value string) (ok bool, err error) {

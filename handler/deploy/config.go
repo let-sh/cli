@@ -2,11 +2,12 @@ package deploy
 
 import (
 	"encoding/json"
+	"io/ioutil"
+	"os"
+
 	"github.com/let-sh/cli/log"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"io/ioutil"
-	"os"
 )
 
 func (c *DeployContext) LoadLetJson() {

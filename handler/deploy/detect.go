@@ -71,7 +71,7 @@ func (c *DeployContext) DetectProjectType() (projectType string) {
 		var packageConfig types.PackageDotJson
 		json.Unmarshal(jsonBytes, &packageConfig)
 
-		for k, _ := range packageConfig.Dependencies {
+		for k := range packageConfig.Dependencies {
 			if strings.Contains(k, "@docusaurus") {
 				c.Type = "docusaurus"
 				return "docusaurus"

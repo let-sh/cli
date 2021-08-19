@@ -1,8 +1,9 @@
 package deploy
 
 import (
-	"github.com/let-sh/cli/utils/config"
 	"testing"
+
+	"github.com/let-sh/cli/utils/config"
 )
 
 func TestInitProject(t *testing.T) {

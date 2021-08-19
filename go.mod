@@ -20,6 +20,7 @@ require (
 	github.com/go-ole/go-ole v1.2.5 // indirect
 	github.com/google/go-github/v33 v33.0.0
 	github.com/gorilla/websocket v1.4.2
+	github.com/hashicorp/go-retryablehttp v0.7.0 // indirect
 	github.com/joho/godotenv v1.3.0
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/machinebox/graphql v0.2.2

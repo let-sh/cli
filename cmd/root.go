@@ -17,6 +17,8 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/let-sh/cli/info"
 	"github.com/let-sh/cli/ui"
 	"github.com/let-sh/cli/utils/config"
@@ -24,7 +26,6 @@ import (
 	"github.com/logrusorgru/aurora"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"os"
 )
 
 var cfgFile string

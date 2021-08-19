@@ -2,12 +2,13 @@ package dev
 
 import (
 	"fmt"
-	"github.com/weaveworks/procspy"
 	"testing"
+
+	"github.com/weaveworks/procspy"
 )
 
 func TestStartClient(t *testing.T) {
-	StartClient("", "")
+	// StartClient("", "")
 }
 
 func TestNet(t *testing.T) {

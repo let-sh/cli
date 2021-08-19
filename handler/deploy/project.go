@@ -2,11 +2,12 @@ package deploy
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/let-sh/cli/log"
 	"github.com/let-sh/cli/requests"
 	"github.com/let-sh/cli/ui"
 	. "github.com/logrusorgru/aurora"
-	"strings"
 )
 
 func (c *DeployContext) ConfirmProject() bool {

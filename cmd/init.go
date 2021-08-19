@@ -17,14 +17,15 @@ package cmd
 
 import (
 	"fmt"
+	"io/ioutil"
+	"os"
+	"strings"
+
 	"github.com/let-sh/cli/log"
 	"github.com/let-sh/cli/requests"
 	"github.com/let-sh/cli/utils/download"
 	"github.com/mholt/archiver/v3"
 	"github.com/sirupsen/logrus"
-	"io/ioutil"
-	"os"
-	"strings"
 
 	"github.com/spf13/cobra"
 )

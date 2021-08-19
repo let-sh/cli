@@ -17,12 +17,13 @@ package cmd
 
 import (
 	"errors"
+	"os"
+	"strings"
+
 	"github.com/let-sh/cli/log"
 	"github.com/let-sh/cli/requests"
 	"github.com/let-sh/cli/utils/cache"
 	"github.com/spf13/cobra"
-	"os"
-	"strings"
 )
 
 // linkCmd represents the link command
