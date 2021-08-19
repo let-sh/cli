@@ -9,8 +9,8 @@ import (
 	"github.com/let-sh/cli/log"
 	"github.com/let-sh/cli/requests"
 	"github.com/sirupsen/logrus"
-	"github.com/vbauerster/mpb/v5"
-	"github.com/vbauerster/mpb/v5/decor"
+	"github.com/vbauerster/mpb/v7"
+	"github.com/vbauerster/mpb/v7/decor"
 	"io"
 	"net/http"
 	"os"
@@ -161,7 +161,8 @@ func DownloadBinaryCompressedFile(filename, tempDir string) error {
 		mpb.WithRefreshRate(200*time.Millisecond),
 	)
 
-	bar := p.AddBar(bodySize, mpb.BarStyle("[=>-|"),
+	bar := p.AddBar(bodySize,
+		//mpb.BarStyle("[=>-|"),
 		mpb.PrependDecorators(
 			decor.CountersKiloByte("% .2f / % .2f"),
 		),
