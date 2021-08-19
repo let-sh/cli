@@ -3,11 +3,14 @@ package http_client
 import (
 	"github.com/hashicorp/go-retryablehttp"
 	"github.com/let-sh/cli/info"
+	"io/ioutil"
+	"log"
 	"net/http"
 )
 
 func NewClient() *http.Client {
 	retryClient := retryablehttp.NewClient()
+	retryClient.Logger = log.New(ioutil.Discard, "", log.LstdFlags)
 	retryClient.RetryMax = 3
 	httpClient := retryClient.StandardClient()
 

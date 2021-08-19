@@ -20,7 +20,7 @@ require (
 	github.com/go-ole/go-ole v1.2.5 // indirect
 	github.com/google/go-github/v33 v33.0.0
 	github.com/gorilla/websocket v1.4.2
-	github.com/hashicorp/go-retryablehttp v0.7.0 // indirect
+	github.com/hashicorp/go-retryablehttp v0.7.0
 	github.com/joho/godotenv v1.3.0
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/machinebox/graphql v0.2.2
@@ -48,7 +48,6 @@ require (
 	github.com/theckman/yacspin v0.8.0
 	github.com/tidwall/gjson v1.6.7
 	github.com/twinj/uuid v1.0.0
-	github.com/vbauerster/mpb/v5 v5.4.0
 	github.com/vbauerster/mpb/v7 v7.0.3
 	github.com/weaveworks/procspy v0.0.0-20150706124340-cb970aa190c3
 	golang.org/x/crypto v0.0.0-20210616213533-5ff15b29337e // indirect
