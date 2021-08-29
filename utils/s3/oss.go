@@ -1,4 +1,4 @@
-package oss
+package s3
 
 import (
 	"bufio"

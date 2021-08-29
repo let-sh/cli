@@ -41,7 +41,7 @@ import (
 	"github.com/let-sh/cli/types"
 	"github.com/let-sh/cli/utils"
 	"github.com/let-sh/cli/utils/cache"
-	"github.com/let-sh/cli/utils/oss"
+	"github.com/let-sh/cli/utils/s3"
 	"github.com/manifoldco/promptui"
 	"github.com/mholt/archiver/v3"
 	c "github.com/otiai10/copy"
@@ -207,7 +207,7 @@ var deployCmd = &cobra.Command{
 			}
 		}
 
-		// if contains static, upload static files to oss
+		// if contains static, upload static files to s3
 		dirPath := deploymentCtx.Static
 		if len(dirPath) == 0 {
 			dirPath = "./"
@@ -215,7 +215,7 @@ var deployCmd = &cobra.Command{
 		if deploymentCtx.PreDeployRequest.BuildTemplate.ContainsStatic {
 			if utils.ItemExists([]string{"static"}, deploymentCtx.Type) {
 				// todo: merge static dir value source
-				if err := oss.UploadDirToStaticSource(dirPath, deploymentCtx.Name, deploymentCtx.Name+"-"+deploymentCtx.PreDeployRequest.CheckDeployCapability.HashID, *deploymentCtx.CN); err != nil {
+				if err := s3.UploadDirToStaticSource(dirPath, deploymentCtx.Name, deploymentCtx.Name+"-"+deploymentCtx.PreDeployRequest.CheckDeployCapability.HashID, *deploymentCtx.CN); err != nil {
 					log.Error(err)
 					return
 				}
@@ -234,14 +234,14 @@ var deployCmd = &cobra.Command{
 					}
 				}
 
-				if err := oss.UploadDirToStaticSource(deploymentCtx.Static, deploymentCtx.Name, deploymentCtx.Name+"-"+deploymentCtx.PreDeployRequest.CheckDeployCapability.HashID, *deploymentCtx.CN); err != nil {
+				if err := s3.UploadDirToStaticSource(deploymentCtx.Static, deploymentCtx.Name, deploymentCtx.Name+"-"+deploymentCtx.PreDeployRequest.CheckDeployCapability.HashID, *deploymentCtx.CN); err != nil {
 					log.Error(err)
 					return
 				}
 			}
 		}
 
-		// if contains dynamic, upload dynamic files to oss
+		// if contains dynamic, upload dynamic files to s3
 		// then trigger deployment
 		if deploymentCtx.PreDeployRequest.BuildTemplate.ContainsDynamic {
 			//
@@ -341,7 +341,7 @@ you could remove the irrelevant via .letignore or gitignore.`)
 				log.Error(err)
 				return
 			}
-			oss.UploadFileToCodeSource(tempZipDir+"/"+deploymentCtx.Name+"-"+deploymentCtx.PreDeployRequest.CheckDeployCapability.HashID+".tar.gz", deploymentCtx.Name+"-"+deploymentCtx.PreDeployRequest.CheckDeployCapability.HashID+".tar.gz", deploymentCtx.Name, *deploymentCtx.CN)
+			s3.UploadFileToCodeSource(tempZipDir+"/"+deploymentCtx.Name+"-"+deploymentCtx.PreDeployRequest.CheckDeployCapability.HashID+".tar.gz", deploymentCtx.Name+"-"+deploymentCtx.PreDeployRequest.CheckDeployCapability.HashID+".tar.gz", deploymentCtx.Name, *deploymentCtx.CN)
 		}
 
 		logrus.WithFields(logrus.Fields{

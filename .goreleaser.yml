@@ -102,7 +102,7 @@ release:
 blobs:
   -
     provider: s3
-    endpoint: let-cli.oss-accelerate.aliyuncs.com
+    endpoint: let-cli.s3-accelerate.aliyuncs.com
     region: cn-hongkong
     bucket: "."
     folder: "."
