@@ -12,7 +12,7 @@ type QueryCheckDeployCapability struct {
 	CheckDeployCapability struct {
 		HashID string `graphql:"hashID"`
 		Exists bool   `graphql:"exists"`
-	} `graphql:"checkDeployCapability(projectName:$projectName)"`
+	} `graphql:"checkDeployCapability(projectName:$projectName,cn:$cn)"`
 }
 type QueryStsToken struct {
 	StsToken struct {
