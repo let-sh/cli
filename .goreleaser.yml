@@ -129,7 +129,7 @@ brews:
       # Optionally a token can be provided, if it differs from the token provided to GoReleaser
       token: "{{ .Env.GITHUB_TOKEN }}"
 
-    url_template: "http://install.let.sh.cn/{{ .ArtifactName }}"
+    url_template: "http://install.let-sh.com/{{ .ArtifactName }}"
 
     # Allows you to set a custom download strategy. Note that you'll need
     # to implement the strategy and add it to your tap repository.

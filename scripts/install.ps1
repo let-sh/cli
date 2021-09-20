@@ -25,7 +25,7 @@ $Target = 'windows_amd64'
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 $LetUri = if (!$Version) {
-  $Response = Invoke-WebRequest 'https://install.let.sh.cn/version' -UseBasicParsing
+  $Response = Invoke-WebRequest 'https://install.let-sh.com/version' -UseBasicParsing
 
   $Version = $Response.Content.Split([Environment]::NewLine) |
   Where-Object { $_ -match "latest:(.*)" } |
@@ -33,9 +33,9 @@ $LetUri = if (!$Version) {
   ForEach-Object {$_.matches[0].Groups[1].value} |
   Select-Object -First 1
 
-  "https://install.let.sh.cn/cli_${Version}_${Target}.zip"
+  "https://install.let-sh.com/cli_${Version}_${Target}.zip"
 } else {
-  "https://install.let.sh.cn/cli_${Version}_${Target}.zip"
+  "https://install.let-sh.com/cli_${Version}_${Target}.zip"
 }
 
 if (!(Test-Path $BinDir)) {

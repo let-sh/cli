@@ -137,7 +137,7 @@ func DownloadBinaryCompressedFile(filename, tempDir string) error {
 	defer out.Close()
 
 	// Get the data
-	resp, err := http.Get("https://install.let.sh.cn/" + filename)
+	resp, err := http.Get("https://install.let-sh.com/" + filename)
 	if err != nil {
 		return err
 	}
@@ -147,7 +147,7 @@ func DownloadBinaryCompressedFile(filename, tempDir string) error {
 	if resp.StatusCode != http.StatusOK {
 		logrus.WithFields(logrus.Fields{
 			"status_code": resp.Status,
-			"url":         "https://install.let.sh.cn/" + filename,
+			"url":         "https://install.let-sh.com/" + filename,
 		}).WithError(err).Debugln("download binary compressed file error")
 		return fmt.Errorf("bad status: %s", resp.Status)
 	}

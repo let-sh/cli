@@ -39,14 +39,14 @@ letsh_get_binary() {
     # Validate that the version matches MAJOR.MINOR.PATCH to avoid garbage-in/garbage-out behavior
     version=${v#$2}
     if echo "$version" | grep -qE "^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$"; then
-      url="https://install.let.sh.cn/cli_${version}_${os}_amd64.tar.gz"
+      url="https://install.let-sh.com/cli_${version}_${os}_amd64.tar.gz"
     else
       printf "$red> Version number invalid.$reset\n"
       exit 1
     fi
   else
-    version=$(curl -sS https://install.let.sh.cn/version | grep "latest:" | cut -f 2 -d ":")
-    url="https://install.let.sh.cn/cli_${version}_${os}_amd64.tar.gz"
+    version=$(curl -sS https://install.let-sh.com/version | grep "latest:" | cut -f 2 -d ":")
+    url="https://install.let-sh.com/cli_${version}_${os}_amd64.tar.gz"
   fi
 
 #  if [ $os = 'win' ]; then
@@ -160,7 +160,7 @@ letsh_install() {
       if [ "$1" = '--version' ]; then
         specified_version=$2
       else
-        specified_version=$(curl -sS https://install.let.sh.cn/version | grep "latest:" | cut -f 2 -d ":")
+        specified_version=$(curl -sS https://install.let-sh.com/version | grep "latest:" | cut -f 2 -d ":")
       fi
       letsh_version=$(lets version)
 

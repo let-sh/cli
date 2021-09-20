@@ -4,7 +4,7 @@
 
 ```shell
 # install cli
-curl -o- -sL https://install.let.sh.cn/install.sh | bash
+curl -o- -sL https://install.let-sh.com/install.sh | bash
 ```
 
 ## Login

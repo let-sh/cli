@@ -29,7 +29,7 @@ func GetJsonWithPath(url string, path string) (data gjson.Result, err error) {
 }
 
 func GetLatestVersion(channel string) (version string, err error) {
-	resp, err := http.Get("https://install.let.sh.cn/version")
+	resp, err := http.Get("https://install.let-sh.com/version")
 	if err != nil {
 		return "", err
 	}

@@ -135,29 +135,33 @@ var deployCmd = &cobra.Command{
 
 			if pwd != cache.ProjectsInfo[deploymentCtx.Name].Dir {
 				log.S.StopFail()
-				// if current dir is not previous dir
-				prompt := promptui.Prompt{
-					Label:   "Detected your project dir changed, continue deployment?[Y/n]",
-					Default: "Y",
-					Validate: func(input string) error {
-						if utils.ItemExists([]string{"", "n", "N", "No", "Y", "y", "yes", "Yes"}, input) {
-							return nil
-						}
-						return errors.New("no matching input")
-					},
+
+				if !inputAssumeYes {
+					// if current dir is not previous dir
+					prompt := promptui.Prompt{
+						Label:   "Detected your project dir changed, continue deployment?[Y/n]",
+						Default: "Y",
+						Validate: func(input string) error {
+							if utils.ItemExists([]string{"", "n", "N", "No", "Y", "y", "yes", "Yes"}, input) {
+								return nil
+							}
+							return errors.New("no matching input")
+						},
+					}
+
+					result, err := prompt.Run()
+					if err != nil {
+						log.Error(err)
+						return
+					}
+
+					if utils.ItemExists([]string{"n", "N", "No"}, result) {
+						log.S.StopFail()
+						log.Warning("Deployment canceled")
+						return
+					}
 				}
 
-				result, err := prompt.Run()
-				if err != nil {
-					log.Error(err)
-					return
-				}
-
-				if utils.ItemExists([]string{"n", "N", "No"}, result) {
-					log.S.StopFail()
-					log.Warning("Deployment canceled")
-					return
-				}
 				log.BStart("deploying")
 			}
 		}
@@ -179,16 +183,17 @@ var deployCmd = &cobra.Command{
 			})
 
 			var requestError *gql.RequestError
-			if errors.As(err, &requestError) {
-				log.Error(requestError)
-				return
-			}
-
 			var graphqlError *gql.GraphQLError
 			if errors.As(err, &graphqlError) {
 				log.Error(errors.New(graphqlError.GraphqlErrors[0].Message))
 				return
 			}
+
+			if errors.As(err, &requestError) {
+				log.Error(requestError)
+				return
+			}
+
 			deploymentCtx.PreDeployRequest = query
 		}
 
@@ -362,6 +367,12 @@ you could remove the irrelevant via .letignore or gitignore.`)
 			return
 		}
 
+		if inputDetach {
+			log.S.StopFail()
+			log.Success("triggered deployment succeed")
+			return
+		}
+
 		DeploymentID = deployment.ID
 
 		pwd, _ := os.Getwd()
@@ -434,6 +445,8 @@ var inputProjectType string
 var inputCN bool
 var inputStaticDir string
 var inputProd bool
+var inputDetach bool    // return immediately after submitted deployment
+var inputAssumeYes bool // assume the answer to all prompts is yes
 
 func init() {
 	rootCmd.AddCommand(deployCmd)
@@ -445,6 +458,9 @@ func init() {
 	deployCmd.Flags().StringVarP(&inputStaticDir, "static", "", "", "static dir name (if deploy type is static)")
 
 	deployCmd.Flags().BoolVarP(&inputProd, "prod", "", false, "deploy in production mode, will assign linked domain")
+	deployCmd.Flags().BoolVarP(&inputDetach, "detach", "", false, "return immediately after submitted deployment")
+	deployCmd.Flags().BoolVarP(&inputAssumeYes, "assume-yes", "y", false,
+		"assume the answer to all prompts is yes")
 
 	// todo: handle input dev
 	deployCmd.Flags().BoolVarP(&inputCN, "cn", "", true, "deploy in mainland of china")
