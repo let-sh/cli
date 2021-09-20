@@ -186,6 +186,66 @@ query($type: String!, $name: String!, $cn: Boolean!) {
 }
 
 // deprecated
+func DeployWithCheckRunID(projectType, projectName, config, channel string, cn bool,
+	checkRunID int64) (deployment struct {
+	ID           string `json:"id"`
+	TargetFQDN   string `json:"targetFQDN"`
+	NetworkStage string `json:"networkStage"`
+	PackerStage  string `json:"packerStage"`
+	Status       string `json:"status"`
+	Project      struct {
+		ID string `json:"id"`
+	} `json:"project"`
+}, err error) {
+	req := graphql.NewRequest(`
+mutation($type: String!, $name: String!, $config: String, $channel: String!, $cn: Boolean, $checkRunID: Int64) {
+	  deploy(input:{type:$type, projectName:$name, config:$config, channel:$channel, cn:$cn, checkRunID:$checkRunID}) {
+		id
+		targetFQDN
+		networkStage
+		packerStage
+		status
+		project {
+			id
+		}
+	  }
+}
+`)
+
+	req.Var("type", projectType)
+	req.Var("name", projectName)
+	req.Var("config", config)
+	req.Var("channel", channel)
+	req.Var("cn", cn)
+	req.Var("checkRunID", checkRunID)
+	req.Header.Set("Authorization", "Bearer "+info.Credentials.LoadToken())
+	logrus.Debugln(projectType, projectName, config, cn)
+	// run it and capture the response
+	var respData struct {
+		Deploy struct {
+			ID           string `json:"id"`
+			TargetFQDN   string `json:"targetFQDN"`
+			NetworkStage string `json:"networkStage"`
+			PackerStage  string `json:"packerStage"`
+			Status       string `json:"status"`
+			Project      struct {
+				ID string `json:"id"`
+			} `json:"project"`
+		} `json:"deploy,omitempty"`
+	}
+
+	if err := Graphql.Run(context.Background(), req, &respData); err != nil {
+		//if len(respData.Error.Errors) > 0 {
+		//	return "", false, errors.New(respData.Error.Errors[0].Message)
+		//}
+
+		return deployment, err
+	}
+	logrus.Debugln(respData)
+	return respData.Deploy, nil
+}
+
+// deprecated
 func Deploy(projectType, projectName, config, channel string, cn bool) (deployment struct {
 	ID           string `json:"id"`
 	TargetFQDN   string `json:"targetFQDN"`
