@@ -360,7 +360,23 @@ you could remove the irrelevant via .letignore or gitignore.`)
 		if inputProd == true { // if manually set to deploy to production, rewrite channel
 			channel = "prod"
 		}
-		deployment, err := requests.Deploy(deploymentCtx.Type, deploymentCtx.Name, string(configBytes), channel, *deploymentCtx.CN)
+		var deployment struct {
+			ID           string `json:"id"`
+			TargetFQDN   string `json:"targetFQDN"`
+			NetworkStage string `json:"networkStage"`
+			PackerStage  string `json:"packerStage"`
+			Status       string `json:"status"`
+			Project      struct {
+				ID string `json:"id"`
+			} `json:"project"`
+		}
+		var err error
+		if inputCheckRunID == 0 {
+			deployment, err = requests.Deploy(deploymentCtx.Type, deploymentCtx.Name, string(configBytes), channel, *deploymentCtx.CN)
+		} else {
+			deployment, err = requests.DeployWithCheckRunID(deploymentCtx.Type, deploymentCtx.Name, string(configBytes), channel,
+				*deploymentCtx.CN, inputCheckRunID)
+		}
 
 		if err != nil {
 			log.Error(err)
@@ -445,8 +461,9 @@ var inputProjectType string
 var inputCN bool
 var inputStaticDir string
 var inputProd bool
-var inputDetach bool    // return immediately after submitted deployment
-var inputAssumeYes bool // assume the answer to all prompts is yes
+var inputDetach bool      // return immediately after submitted deployment
+var inputAssumeYes bool   // assume the answer to all prompts is yes
+var inputCheckRunID int64 // github check run id
 
 func init() {
 	rootCmd.AddCommand(deployCmd)
@@ -464,6 +481,10 @@ func init() {
 
 	// todo: handle input dev
 	deployCmd.Flags().BoolVarP(&inputCN, "cn", "", true, "deploy in mainland of china")
+	deployCmd.Flags().MarkHidden("cn")
+
+	// todo: handle input dev
+	deployCmd.Flags().Int64VarP(&inputCheckRunID, "check-run-id", "", 0, "github check run id")
 	deployCmd.Flags().MarkHidden("cn")
 }
 
