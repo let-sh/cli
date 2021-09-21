@@ -49,7 +49,7 @@ func init() {
 			credentialsFile, _ := ioutil.ReadFile(home + "/.let/credentials.json")
 			err = json.Unmarshal(credentialsFile, &info.Credentials)
 			if err != nil {
-				log.Error(err)
+				log.Errorf("load credentials error: %s", err.Error())
 			}
 		}
 	}

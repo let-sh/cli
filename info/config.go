@@ -20,7 +20,8 @@ func (c *credentials) LoadToken() string {
 		credentialsFile, _ := ioutil.ReadFile(home + "/.let/credentials.json")
 		err := json.Unmarshal(credentialsFile, &Credentials)
 		if err != nil {
-			log.Fatal(err)
+
+			log.Fatalf("load token error: %s", err.Error())
 		}
 	}
 	return Credentials.Token
