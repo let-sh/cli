@@ -14,18 +14,18 @@ var ProjectsInfo types.ProjectsInfo
 
 func init() {
 	home, _ := homedir.Dir()
-	_, err := os.Stat(home + "/.let/projects.json")
-	if err == nil {
-		if _, err = os.Stat(home + "/.let/"); err != nil {
-			os.MkdirAll(home+"/.let/", os.ModePerm)
-		}
 
+	if _, err := os.Stat(home + "/.let/"); err != nil {
+		os.MkdirAll(home+"/.let/", os.ModePerm)
+	}
+
+	_, err := os.Stat(home + "/.let/projects.json")
+	if err != nil {
 		if _, err = os.Stat(home + "/.let/projects.json"); err != nil {
 			f, _ := os.Create(home + "/.let/projects.json")
 			f.WriteString("{}")
 		}
 	} else {
-
 		projectsInfoFile, _ := ioutil.ReadFile(home + "/.let/projects.json")
 		err := json.Unmarshal(projectsInfoFile, &ProjectsInfo)
 		if err != nil {
