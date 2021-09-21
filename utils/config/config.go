@@ -91,8 +91,13 @@ func SetToken(token string) {
 func GetLastUpdateNotifyTime() (latest time.Time) {
 	home, _ := homedir.Dir()
 	var extra types.Extra
+	if _, err := os.Stat(home + "/.let/"); err != nil {
+		os.MkdirAll(home+"/.let/", os.ModePerm)
+	}
 	extrasFile, _ := ioutil.ReadFile(home + "/.let/extra.json")
 	err := json.Unmarshal(extrasFile, &extra)
+
+	// if err occurs, write file
 	if err != nil {
 		os.Remove(home + "/.let/extra.json")
 		f, _ := os.Create(home + "/.let/extra.json")

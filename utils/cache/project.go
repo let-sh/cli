@@ -7,18 +7,32 @@ import (
 	"github.com/let-sh/cli/types"
 	"github.com/mitchellh/go-homedir"
 	"io/ioutil"
+	"os"
 )
 
 var ProjectsInfo types.ProjectsInfo
 
 func init() {
 	home, _ := homedir.Dir()
-	projectsInfoFile, _ := ioutil.ReadFile(home + "/.let/projects.json")
-	err := json.Unmarshal(projectsInfoFile, &ProjectsInfo)
-	if err != nil {
-		ioutil.WriteFile(home+"/.let/projects.json", []byte("{}"), 0644)
-		log.Error(err)
-		return
+	_, err := os.Stat(home + "/.let/projects.json")
+	if err == nil {
+		if _, err = os.Stat(home + "/.let/"); err != nil {
+			os.MkdirAll(home+"/.let/", os.ModePerm)
+		}
+
+		if _, err = os.Stat(home + "/.let/projects.json"); err != nil {
+			f, _ := os.Create(home + "/.let/projects.json")
+			f.WriteString("{}")
+		}
+	} else {
+
+		projectsInfoFile, _ := ioutil.ReadFile(home + "/.let/projects.json")
+		err := json.Unmarshal(projectsInfoFile, &ProjectsInfo)
+		if err != nil {
+			ioutil.WriteFile(home+"/.let/projects.json", []byte("{}"), 0644)
+			log.Errorf("load project error: %s", err.Error())
+			return
+		}
 	}
 }
 
