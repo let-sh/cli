@@ -174,7 +174,7 @@ var deployCmd = &cobra.Command{
 				graphql.QueryStsToken
 				graphql.QueryPreference
 			}{}
-			err := graphql.Client.Query(context.Background(), &query, map[string]interface{}{
+			err := graphql.NewClient().Query(context.Background(), &query, map[string]interface{}{
 				"projectName": gql.String(deploymentCtx.Name),
 				"tokenType":   gql.String("buildBundle"),
 				"type":        gql.String(deploymentCtx.Type),

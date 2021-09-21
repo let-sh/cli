@@ -61,12 +61,14 @@ func init() {
 	rootCmd.PersistentFlags().BoolVarP(&Debug, "debug", "", false, "debugging cli command")
 	rootCmd.PersistentFlags().MarkHidden("debug")
 	//rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cli.yaml)")
-	rootCmd.PersistentFlags().String("token", "", "let.sh access token")
-	if token, err := rootCmd.PersistentFlags().GetString("token"); err != nil {
-		if len(token) > 0 {
-			info.Credentials.SetToken(token)
-		}
-	}
+	//rootCmd.PersistentFlags().String("token", "", "let.sh access token")
+	rootCmd.PersistentFlags().StringVarP(&info.Credentials.Token, "token", "", "", "let.sh access token")
+	//
+	//if token, err := rootCmd.PersistentFlags().GetString("token"); err != nil {
+	//	if len(token) > 0 {
+	//		info.Credentials.SetToken(token)
+	//	}
+	//}
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.

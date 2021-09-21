@@ -43,11 +43,14 @@ func init() {
 	}
 
 	// bootstrap configs
-	if len(info.Credentials.LoadToken()) == 0 {
-		credentialsFile, _ := ioutil.ReadFile(home + "/.let/credentials.json")
-		err = json.Unmarshal(credentialsFile, &info.Credentials)
-		if err != nil {
-			log.Error(err)
+	_, err = os.Stat(home + "/.let/credentials.json")
+	if err != nil {
+		if len(info.Credentials.LoadToken()) == 0 {
+			credentialsFile, _ := ioutil.ReadFile(home + "/.let/credentials.json")
+			err = json.Unmarshal(credentialsFile, &info.Credentials)
+			if err != nil {
+				log.Error(err)
+			}
 		}
 	}
 

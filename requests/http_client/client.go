@@ -15,7 +15,7 @@ func NewClient() *http.Client {
 	httpClient := retryClient.StandardClient()
 
 	rt := WithHeader(httpClient.Transport)
-	rt.Set("Authorization", "Bearer "+info.Credentials.LoadToken())
+	rt.Set("Authorization", "Bearer "+info.Credentials.Token)
 	httpClient.Transport = rt
 	//src := oauth2.StaticTokenSource(
 	//	&oauth2.Token{AccessToken: info.Credentials.LoadToken()},

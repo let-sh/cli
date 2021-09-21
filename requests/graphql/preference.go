@@ -5,7 +5,7 @@ import (
 )
 
 func SetPreference(name, value string) (m MutationSetPreference, err error) {
-	err = Client.Mutate(context.Background(), &m, map[string]interface{}{
+	err = NewClient().Mutate(context.Background(), &m, map[string]interface{}{
 		"name":  name,
 		"value": value,
 	})
@@ -13,6 +13,6 @@ func SetPreference(name, value string) (m MutationSetPreference, err error) {
 }
 
 func GetAllPreference() (q QueryAllPreference, err error) {
-	err = Client.Query(context.Background(), &q, nil)
+	err = NewClient().Query(context.Background(), &q, nil)
 	return q, err
 }

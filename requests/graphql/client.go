@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-var Client = NewClient()
+//var Client = NewClient()
 
 func NewClient() *graphql.Client {
 	//retryClient := retryablehttp.NewClient()

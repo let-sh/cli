@@ -15,7 +15,6 @@ func init() {
 	hostInfo, _ := host.Info()
 	sentry.ConfigureScope(func(scope *sentry.Scope) {
 		scope.SetExtra("version", info.Version)
-		scope.SetExtra("token", info.Credentials.LoadToken())
 		scope.SetExtra("os", hostInfo.OS)
 		scope.SetExtra("platform", hostInfo.Platform)
 		scope.SetExtra("platform_family", hostInfo.PlatformFamily)

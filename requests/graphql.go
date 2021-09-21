@@ -36,7 +36,9 @@ import (
 //}
 
 // deprecated: create a client (safe to share across requests)
-var Graphql = graphql.NewClient("https://api.let-sh.com/query", graphql.WithHTTPClient(http_client.NewClient()))
+func Graphql() *graphql.Client {
+	return graphql.NewClient("https://api.let-sh.com/query", graphql.WithHTTPClient(http_client.NewClient()))
+}
 
 // deprecated: SetPreference
 func SetPreference(name, value string) (ok bool, err error) {
@@ -54,7 +56,7 @@ func SetPreference(name, value string) (ok bool, err error) {
 	var respData struct {
 		SetPreference bool `json:"setPreference,omitempty"`
 	}
-	if err := Graphql.Run(context.Background(), req, &respData); err != nil {
+	if err := Graphql().Run(context.Background(), req, &respData); err != nil {
 		return false, err
 	}
 
@@ -81,7 +83,7 @@ func GetAllPreference() (data struct {
 			Channel string `json:"channel"`
 		} `json:"AllPreference,omitempty"`
 	}
-	if err := Graphql.Run(context.Background(), req, &respData); err != nil {
+	if err := Graphql().Run(context.Background(), req, &respData); err != nil {
 		return data, err
 	}
 
@@ -103,7 +105,7 @@ func GetPreference(name string) (value string, err error) {
 	var respData struct {
 		Preference string `json:"preference,omitempty"`
 	}
-	if err := Graphql.Run(context.Background(), req, &respData); err != nil {
+	if err := Graphql().Run(context.Background(), req, &respData); err != nil {
 		return "", err
 	}
 
@@ -131,7 +133,7 @@ func CheckDeployCapability(projectName string) (hashID string, exists bool, err 
 			Exists bool   `json:"exists"`
 		} `json:"checkDeployCapability,omitempty"`
 	}
-	if err := Graphql.Run(context.Background(), req, &respData); err != nil {
+	if err := Graphql().Run(context.Background(), req, &respData); err != nil {
 		//if len(respData.Error.Errors) > 0 {
 		//	return "", false, errors.New(respData.Error.Errors[0].Message)
 		//}
@@ -174,7 +176,7 @@ query($type: String!, $name: String!, $cn: Boolean!) {
 			SecurityToken   string `json:"securityToken"`
 		} `json:"stsToken,omitempty"`
 	}
-	if err := Graphql.Run(context.Background(), req, &respData); err != nil {
+	if err := Graphql().Run(context.Background(), req, &respData); err != nil {
 		//if len(respData.Error.Errors) > 0 {
 		//	return "", false, errors.New(respData.Error.Errors[0].Message)
 		//}
@@ -234,7 +236,7 @@ mutation($type: String!, $name: String!, $config: String, $channel: String!, $cn
 		} `json:"deploy,omitempty"`
 	}
 
-	if err := Graphql.Run(context.Background(), req, &respData); err != nil {
+	if err := Graphql().Run(context.Background(), req, &respData); err != nil {
 		//if len(respData.Error.Errors) > 0 {
 		//	return "", false, errors.New(respData.Error.Errors[0].Message)
 		//}
@@ -292,7 +294,7 @@ mutation($type: String!, $name: String!, $config: String, $channel: String!, $cn
 		} `json:"deploy,omitempty"`
 	}
 
-	if err := Graphql.Run(context.Background(), req, &respData); err != nil {
+	if err := Graphql().Run(context.Background(), req, &respData); err != nil {
 		//if len(respData.Error.Errors) > 0 {
 		//	return "", false, errors.New(respData.Error.Errors[0].Message)
 		//}
@@ -338,7 +340,7 @@ query($id: UUID!) {
 			ErrorLogs    string `json:"errorLogs"`
 		} `json:"deployment,omitempty"`
 	}
-	if err := Graphql.Run(context.Background(), req, &respData); err != nil {
+	if err := Graphql().Run(context.Background(), req, &respData); err != nil {
 
 		return deployment, err
 	}
@@ -382,7 +384,7 @@ query($type: String!) {
 			DistDir          string   `json:"distDir"`
 		} `json:"buildTemplate,omitempty"`
 	}
-	if err := Graphql.Run(context.Background(), req, &respData); err != nil {
+	if err := Graphql().Run(context.Background(), req, &respData); err != nil {
 		return buildTemplate, err
 	}
 
@@ -404,7 +406,7 @@ mutation($deploymentID: UUID!) {
 	var respData struct {
 		CancelDeployment bool `json:"buildTemplate,omitempty"`
 	}
-	if err := Graphql.Run(context.Background(), req, &respData); err != nil {
+	if err := Graphql().Run(context.Background(), req, &respData); err != nil {
 
 		return cancelDeploymentResult, err
 	}
@@ -447,7 +449,7 @@ query {
 			} `json:"edges"`
 		} `json:"deployments"`
 	}
-	if err := Graphql.Run(context.Background(), req, &respData); err != nil {
+	if err := Graphql().Run(context.Background(), req, &respData); err != nil {
 		return respData.Deployments, err
 	}
 
@@ -481,7 +483,7 @@ mutation($projectID: UUID!) {
 			Fqdn          string `json:"fqdn,omitempty"`
 		} `json:"startDevelopment,omitempty"`
 	}
-	if err := Graphql.Run(context.Background(), req, &respData); err != nil {
+	if err := Graphql().Run(context.Background(), req, &respData); err != nil {
 		return startDevelopmentResult, err
 	}
 
@@ -510,7 +512,7 @@ query($projectName: String!) {
 		ID   string `json:"id,omitempty"`
 		Name string `json:"name,omitempty"`
 	}
-	if err := Graphql.Run(context.Background(), req, &respData); err != nil {
+	if err := Graphql().Run(context.Background(), req, &respData); err != nil {
 		return projectInfo, err
 	}
 
@@ -532,7 +534,7 @@ mutation($projectID: UUID!) {
 	var respData struct {
 		StopDevelopment bool `json:"stopDevelopment,omitempty"`
 	}
-	if err := Graphql.Run(context.Background(), req, &respData); err != nil {
+	if err := Graphql().Run(context.Background(), req, &respData); err != nil {
 
 		return stopDevelopmentResult, err
 	}
@@ -556,7 +558,7 @@ mutation($projectID: UUID!,$hostname: String!) {
 	var respData struct {
 		Link bool `json:"link,omitempty"`
 	}
-	if err := Graphql.Run(context.Background(), req, &respData); err != nil {
+	if err := Graphql().Run(context.Background(), req, &respData); err != nil {
 
 		return linkResult, err
 	}
@@ -580,7 +582,7 @@ mutation($projectID: UUID!,$hostname: String!) {
 	var respData struct {
 		Unlink bool `json:"unlink,omitempty"`
 	}
-	if err := Graphql.Run(context.Background(), req, &respData); err != nil {
+	if err := Graphql().Run(context.Background(), req, &respData); err != nil {
 
 		return unlinkResult, err
 	}
@@ -622,7 +624,7 @@ mutation($projectID: UUID!,$hostname: String!) {
 //			} `json:"edges"`
 //		} `json:"deployments"`
 //	}
-//	if err := Graphql.Run(context.Background(), req, &respData); err != nil {
+//	if err := Graphql().Run(context.Background(), req, &respData); err != nil {
 //		return respData.Deployments, err
 //	}
 //
