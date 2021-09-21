@@ -3,8 +3,8 @@ package info
 import (
 	"encoding/json"
 	"github.com/let-sh/cli/types"
+	"github.com/sirupsen/logrus"
 	"io/ioutil"
-	"log"
 	"os"
 )
 
@@ -20,8 +20,7 @@ func (c *credentials) LoadToken() string {
 		credentialsFile, _ := ioutil.ReadFile(home + "/.let/credentials.json")
 		err := json.Unmarshal(credentialsFile, &Credentials)
 		if err != nil {
-
-			log.Fatalf("load token error: %s", err.Error())
+			logrus.Debugln("load token error: %s", err.Error())
 		}
 	}
 	return Credentials.Token

@@ -10,7 +10,7 @@ import (
 	"os"
 )
 
-var ProjectsInfo types.ProjectsInfo
+var ProjectsInfo = make(types.ProjectsInfo)
 
 func init() {
 	home, _ := homedir.Dir()
