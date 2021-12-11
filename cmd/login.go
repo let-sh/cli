@@ -114,4 +114,5 @@ func openBrowser(url string) (err error) {
 		log.Error(err)
 		return err
 	}
+	return nil
 }
