@@ -17,6 +17,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/muesli/termenv"
 	"os/exec"
 	"runtime"
 	"time"
@@ -52,9 +53,18 @@ var loginCmd = &cobra.Command{
 		// open browser to login
 		err = openBrowser("https://api.let-sh.com/oauth/login?method=github&client=cli&ticket_id=" + tickeIDInterface.
 			String() + "&device=" + goInfo.GetInfo().OS + goInfo.GetInfo().Core)
-		if err != nil {
-			fmt.Println("please open your browser to visit: " + "https://api.let-sh.com/oauth/login?method=github&client=cli&ticket_id=" + tickeIDInterface.
-				String() + "&device=" + goInfo.GetInfo().OS + goInfo.GetInfo().Core + "\n")
+
+		shortenedUrl, err := requests.GenerateShortUrl("https://api.let-sh.com/oauth/login?method=github&client=cli&ticket_id=" + tickeIDInterface.
+			String() + "&device=" + goInfo.GetInfo().OS + goInfo.GetInfo().Core)
+
+		if err == nil && shortenedUrl != "" {
+			log.S.StopFail()
+			fmt.Println(
+				termenv.
+					String("if your browser not opened automatically, please visit: " + shortenedUrl).
+					Foreground(termenv.ColorProfile().Color("#808080")),
+			)
+			log.BStart("redirecting to browser")
 		}
 
 		// valid response

@@ -1,6 +1,8 @@
 package requests
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
@@ -60,4 +62,25 @@ func GetLatestVersion(channel string) (version string, err error) {
 		}
 	}
 	return "", errors.New("channel not found")
+}
+
+func GenerateShortUrl(url string) (shortendUrl string, err error) {
+	payload := make(map[string]interface{})
+	payload["url"] = url
+	payloadBytes, _ := json.Marshal(&payload)
+	body := bytes.NewBuffer(payloadBytes)
+	resp, err := client.Post("https://api.let-sh.com/j/", "application/json", body)
+
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+	respBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+	data := gjson.Get(string(respBody), "data")
+
+	return data.String(), err
 }
