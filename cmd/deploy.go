@@ -202,8 +202,6 @@ var deployCmd = &cobra.Command{
 
 		fmt.Println("")
 		fmt.Println(log.CyanBold("Detected Project Info"))
-		//fmt.Printf("name: %s\n", deploymentCtx.Name)
-		//fmt.Printf("type: %s\n", deploymentCtx.Type)
 		fmt.Println("name:", termenv.String(deploymentCtx.Name).Bold().String())
 		fmt.Println("type:", termenv.String(deploymentCtx.Type).Bold().String())
 		fmt.Println("")
