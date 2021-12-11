@@ -10,7 +10,7 @@ before:
     - chmod +x ./scripts/gen_version.py
     - python3 ./scripts/gen_version.py
     # if npx not install, install it
-    -  command -v upx >/dev/null 2>&1 || { brew install upx >&2; }
+#    -  command -v upx >/dev/null 2>&1 || { brew install upx >&2; }
 builds:
   - env:
       - CGO_ENABLED=0
