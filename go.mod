@@ -47,7 +47,7 @@ require (
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.2.1
 	github.com/theckman/yacspin v0.8.0
-	github.com/tidwall/gjson v1.6.7
+	github.com/tidwall/gjson v1.12.1
 	github.com/twinj/uuid v1.0.0
 	github.com/vbauerster/mpb/v7 v7.0.3
 	github.com/weaveworks/procspy v0.0.0-20150706124340-cb970aa190c3
@@ -94,8 +94,8 @@ require (
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/tencentyun/cos-go-sdk-v5 v0.7.31 // indirect
-	github.com/tidwall/match v1.0.3 // indirect
-	github.com/tidwall/pretty v1.0.2 // indirect
+	github.com/tidwall/match v1.1.1 // indirect
+	github.com/tidwall/pretty v1.2.0 // indirect
 	github.com/tklauser/go-sysconf v0.3.9 // indirect
 	github.com/tklauser/numcpus v0.3.0 // indirect
 	github.com/ulikunitz/xz v0.5.10 // indirect
