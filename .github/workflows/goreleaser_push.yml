@@ -10,7 +10,7 @@ on:
 
 jobs:
   goreleaser_push:
-    runs-on: [self-hosted, macos-latest]
+    runs-on: [self-hosted]
     steps:
       -
         name: Checkout
