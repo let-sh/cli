@@ -50,7 +50,12 @@ var loginCmd = &cobra.Command{
 		}
 
 		// open browser to login
-		openBrowser("https://api.let-sh.com/oauth/login?method=github&client=cli&ticket_id=" + tickeIDInterface.String() + "&device=" + goInfo.GetInfo().OS + goInfo.GetInfo().Core)
+		err = openBrowser("https://api.let-sh.com/oauth/login?method=github&client=cli&ticket_id=" + tickeIDInterface.
+			String() + "&device=" + goInfo.GetInfo().OS + goInfo.GetInfo().Core)
+		if err != nil {
+			fmt.Println("please open your browser to visit: " + "https://api.let-sh.com/oauth/login?method=github&client=cli&ticket_id=" + tickeIDInterface.
+				String() + "&device=" + goInfo.GetInfo().OS + goInfo.GetInfo().Core + "\n")
+		}
 
 		// valid response
 		start := time.Now()
@@ -93,8 +98,7 @@ func init() {
 	// loginCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
-func openBrowser(url string) {
-	var err error
+func openBrowser(url string) (err error) {
 
 	switch runtime.GOOS {
 	case "linux":
@@ -108,5 +112,6 @@ func openBrowser(url string) {
 	}
 	if err != nil {
 		log.Error(err)
+		return err
 	}
 }

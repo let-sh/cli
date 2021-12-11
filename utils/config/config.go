@@ -64,7 +64,7 @@ func init() {
 	}
 
 	_, err = os.Stat(home + "/.let/preference.json")
-	if os.IsNotExist(err) || time.Since(GetLastUpdateNotifyTime()) >= time.Hour*24 {
+	if (os.IsNotExist(err) || time.Since(GetLastUpdateNotifyTime()) >= time.Hour*24) && info.Credentials.LoadToken() != "" {
 		data, err := requests.GetAllPreference()
 		if err != nil {
 			log.Warning("load your preference error: " + err.Error())
