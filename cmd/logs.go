@@ -23,9 +23,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// logCmd represents the log command
-var logCmd = &cobra.Command{
-	Use:   "log",
+// logsCmd represents the log command
+var logsCmd = &cobra.Command{
+	Use:   "logs",
 	Short: "Show latest logs",
 	Long: `Show latest logs under current project.
 
@@ -59,7 +59,7 @@ var inputLines int
 var logInputProjectName string
 
 func init() {
-	rootCmd.AddCommand(logCmd)
+	rootCmd.AddCommand(logsCmd)
 
 	// Here you will define your flags and configuration settings.
 
@@ -71,6 +71,6 @@ func init() {
 	// is called directly, e.g.:
 	dir, _ := os.Getwd()
 
-	logCmd.Flags().IntVarP(&inputLines, "lines", "l", 10, "latest lines of logs")
-	logCmd.Flags().StringVarP(&logInputProjectName, "project", "p", filepath.Base(dir), "project name, e.g. react")
+	logsCmd.Flags().IntVarP(&inputLines, "lines", "l", 10, "latest lines of logs")
+	logsCmd.Flags().StringVarP(&logInputProjectName, "project", "p", filepath.Base(dir), "project name, e.g. react")
 }

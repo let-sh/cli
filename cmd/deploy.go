@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/muesli/termenv"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -32,7 +33,6 @@ import (
 
 	"github.com/atotto/clipboard"
 	"github.com/c2h5oh/datasize"
-	"github.com/fatih/color"
 	"github.com/let-sh/cli/handler/deploy"
 	"github.com/let-sh/cli/info"
 	"github.com/let-sh/cli/log"
@@ -202,8 +202,10 @@ var deployCmd = &cobra.Command{
 
 		fmt.Println("")
 		fmt.Println(log.CyanBold("Detected Project Info"))
-		fmt.Printf("name: %s\n", deploymentCtx.Name)
-		fmt.Printf("type: %s\n", deploymentCtx.Type)
+		//fmt.Printf("name: %s\n", deploymentCtx.Name)
+		//fmt.Printf("type: %s\n", deploymentCtx.Type)
+		fmt.Println("name:", termenv.String(deploymentCtx.Name).Bold().String())
+		fmt.Println("type:", termenv.String(deploymentCtx.Type).Bold().String())
 		fmt.Println("")
 
 		{
@@ -436,15 +438,36 @@ you could remove the irrelevant via .letignore or gitignore.`)
 				writeClipBoardError := clipboard.WriteAll("https://" + currentStatus.TargetFQDN)
 
 				log.S.StopFail()
+				//fmt.Println(
+				//	color.New(color.Bold).Sprint("Preview: ")+color.New(color.Underline).Sprint("https://"+currentStatus.TargetFQDN)+func() string {
+				//		if writeClipBoardError == nil {
+				//			return color.New().Sprint("  (📋 Copied!)")
+				//		}
+				//		return ""
+				//	}(), "\n"+
+				//		color.New(color.Bold).Sprint("Details: ")+color.New(color.Underline).Sprint("https://alpha.let.sh/console/project/"+deploymentCtx.Name+"/details"),
+				//)
+
 				fmt.Println(
-					color.New(color.Bold).Sprint("Preview: ")+color.New(color.Underline).Sprint("https://"+currentStatus.TargetFQDN)+func() string {
+					termenv.String("Preview:").String(), termenv.String("https://"+currentStatus.
+						TargetFQDN).Underline().Bold().String()+func() string {
 						if writeClipBoardError == nil {
-							return color.New().Sprint("  (📋 Copied!)")
+							p := termenv.ColorProfile()
+							return termenv.String("  (📋 Copied!)").Foreground(p.Color("#808080")).String()
 						}
 						return ""
-					}(), "\n"+
-						color.New(color.Bold).Sprint("Details: ")+color.New(color.Underline).Sprint("https://alpha.let.sh/console/project/"+deploymentCtx.Name+"/details"),
+					}(),
+					"\n"+termenv.String("Details: ").String()+termenv.String("https://alpha.let.sh/console/project/"+deploymentCtx.Name+"/details").Bold().Underline().String(),
+					//color.New(color.Bold).Sprint("Preview: ")+color.New(color.Underline).Sprint("https://"+currentStatus.TargetFQDN)+func() string {
+					//	if writeClipBoardError == nil {
+					//		return color.New().Sprint("  (📋 Copied!)")
+					//	}
+					//	return ""
+					//}(),
+					//"\n"+
+					//	color.New(color.Bold).Sprint("Details: ")+color.New(color.Underline).Sprint("https://alpha.let.sh/console/project/"+deploymentCtx.Name+"/details"),
 				)
+
 				break
 
 			}
