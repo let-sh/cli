@@ -106,7 +106,14 @@ var devCmd = &cobra.Command{
 				log.Error(err)
 				return
 			}
-			remoteEndpoint = result.RemoteAddress + ":" + strconv.Itoa(result.RemotePort)
+
+			// using wss://
+			if result.RemotePort == 443 {
+				remoteEndpoint = "wss://" + result.RemoteAddress + ":" + strconv.Itoa(result.RemotePort)
+			} else {
+				remoteEndpoint = "ws://" + result.RemoteAddress + ":" + strconv.Itoa(result.RemotePort)
+			}
+
 		}
 
 		{

@@ -61,8 +61,12 @@ var loginCmd = &cobra.Command{
 			log.S.StopFail()
 			fmt.Println(
 				termenv.
-					String("if your browser not opened automatically, please visit: " + shortenedUrl).
+					String("if your browser not opened automatically, please visit: ").
 					Foreground(termenv.ColorProfile().Color("#808080")),
+
+				termenv.
+					String(shortenedUrl).
+					Foreground(termenv.ColorProfile().Color("#808080")).Underline(),
 			)
 			log.BStart("redirecting to browser")
 		}
@@ -86,7 +90,6 @@ var loginCmd = &cobra.Command{
 				log.BStop()
 				return
 			}
-
 			time.Sleep(time.Second * 1)
 		}
 		log.S.StopFailMessage(" login timeout")
