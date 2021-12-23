@@ -83,7 +83,8 @@ var deployCmd = &cobra.Command{
 			// limit files to 10000
 			files, _ := ioutil.ReadDir("./")
 			if len(files) > 10000 {
-				log.Error(errors.New("too many files in current dir, please check whether in the correct directory"))
+				log.Error(errors.New("too many files in current dir, please check whether in the " +
+					"correct directory"))
 				return
 			}
 		}

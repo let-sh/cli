@@ -28,15 +28,15 @@ func (c *DeployContext) ConfirmProject() bool {
 				Index(51, "New project detected:"),
 				c.Name,
 				c.Type,
-				Index(51, "\nchange detected config?"),
+				Index(51, "\ncontinue to deploy?"),
 			),
-			RadioText: Index(51, "[y/N]").String(),
+			RadioText: Index(51, "[Y/n]").String(),
 		}) {
 			// changing project config
-			return false
-		} else {
 			log.BStart("deploying")
 			return true
+		} else {
+			return false
 		}
 	}
 	log.BStart("deploying")
