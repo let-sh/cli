@@ -128,7 +128,7 @@ func (c *DeployContext) DetectProjectType() (projectType string) {
 	if !os.IsNotExist(err) {
 		c.Type = "static"
 		c.Static = "./"
-		return
+		return "static"
 	}
 
 	// handle static site generator

@@ -57,7 +57,7 @@ var loginCmd = &cobra.Command{
 		shortenedUrl, err := requests.GenerateShortUrl("https://api.let-sh.com/oauth/login?method=github&client=cli&ticket_id=" + tickeIDInterface.
 			String() + "&device=" + goInfo.GetInfo().OS + goInfo.GetInfo().Core)
 
-		if err == nil && shortenedUrl != "" {
+		if shortenedUrl != "" {
 			log.S.StopFail()
 			fmt.Println(
 				termenv.
@@ -124,7 +124,7 @@ func openBrowser(url string) (err error) {
 		err = fmt.Errorf("unsupported platform")
 	}
 	if err != nil {
-		log.Error(err)
+		//log.Error(err)
 		return err
 	}
 	return nil
