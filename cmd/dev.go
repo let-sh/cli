@@ -18,6 +18,11 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"github.com/let-sh/cli/handler/deploy"
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/cast"
+	"net"
+	"net/http"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -57,7 +62,12 @@ var devCmd = &cobra.Command{
 		var localEndpoint string
 		var ports []int
 
-		//detectedType :=deploy.DetectProjectType()
+		var deploymentCtx deploy.DeployContext
+		detectedType := deploymentCtx.DetectProjectType()
+		logrus.Debug("detected project type: ", detectedType)
+
+		deploymentCtx.LoadLetJson()
+
 		dir, _ := os.Getwd()
 		p, err := cache.GetProjectInfo(dir)
 
@@ -70,21 +80,48 @@ var devCmd = &cobra.Command{
 		}
 
 		// if user not specified command
-		if len(inputCommand) == 0 {
-			if len(command) == 0 {
-				// if current dir is not previous dir
-				prompt := promptui.Prompt{
-					Label: "Please enter your command to start service",
-				}
-				result, err := prompt.Run()
-				if err != nil {
-					log.Error(err)
-					return
-				}
-				command = result
+		// TODO: add default command placeholders for different project types
+		// TODO: support static type project reverse proxy
+		if detectedType == "static" {
+			// TODO: trigger to reverse port
+			freePort, err := GetFreePort()
+			if err != nil {
+				log.Error(err)
+				return
 			}
+			inputLocalEndpoint = "localhost:" + cast.ToString(freePort)
+			go ServeStaticFiles(deploymentCtx.Static, freePort)
 		} else {
-			command = inputCommand
+			if len(inputCommand) == 0 {
+				if len(command) == 0 {
+					//detectedType
+
+					// if current dir is not previous dir
+					prompt := promptui.Prompt{
+						Default: func() string {
+							switch detectedType {
+							case "gin":
+								return "go run main.go"
+							case "react":
+								return "yarn dev"
+							case "vue":
+								return "yarn dev"
+							default:
+								return ""
+							}
+						}(),
+						Label: "Please enter your command to start service",
+					}
+					result, err := prompt.Run()
+					if err != nil {
+						log.Error(err)
+						return
+					}
+					command = result
+				}
+			} else {
+				command = inputCommand
+			}
 		}
 
 		p.ServeCommand = command
@@ -116,7 +153,7 @@ var devCmd = &cobra.Command{
 
 		}
 
-		{
+		if detectedType != "static" {
 			// run server command
 			cmdSlice := strings.Split(command, " ")
 			currentCmd := exec.Command(cmdSlice[0], cmdSlice[1:]...)
@@ -260,4 +297,27 @@ func FindAllChildrenProcess(pid int) (exists bool, childrenPid int) {
 		}
 	}
 	return false, 0
+}
+
+func ServeStaticFiles(dir string, port int) {
+	fs := http.FileServer(http.Dir(dir))
+	http.Handle("/", fs)
+
+	err := http.ListenAndServe(":"+cast.ToString(port), nil)
+	if err != nil {
+		log.Error(err)
+		return
+	}
+}
+
+func GetFreePort() (port int, err error) {
+	var a *net.TCPAddr
+	if a, err = net.ResolveTCPAddr("tcp", "localhost:0"); err == nil {
+		var l *net.TCPListener
+		if l, err = net.ListenTCP("tcp", a); err == nil {
+			defer l.Close()
+			return l.Addr().(*net.TCPAddr).Port, nil
+		}
+	}
+	return
 }
