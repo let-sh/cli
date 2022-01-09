@@ -17,6 +17,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/let-sh/cli/ui"
 	"os"
 	"path/filepath"
 
@@ -52,6 +53,24 @@ e.g.
 		//})
 		//
 		//fmt.Println("log called")
+		detectedType := "gin"
+		defaultCommand := func() string {
+			switch detectedType {
+			case "gin":
+				return "go run main.go"
+			case "react":
+				return "yarn dev"
+			case "vue":
+				return "yarn dev"
+			default:
+				return ""
+			}
+		}()
+		ui.InputArea(ui.InputAreaConfig{
+			Layout:             "Please enter your command to start service:",
+			DefaultPlaceholder: defaultCommand,
+			PlaceHolders:       []string{defaultCommand},
+		})
 	},
 }
 

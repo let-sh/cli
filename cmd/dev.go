@@ -19,6 +19,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/let-sh/cli/handler/deploy"
+	"github.com/let-sh/cli/ui"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cast"
 	"net"
@@ -96,23 +97,23 @@ var devCmd = &cobra.Command{
 				if len(command) == 0 {
 					//detectedType
 
-					// if current dir is not previous dir
-					prompt := promptui.Prompt{
-						Default: func() string {
-							switch detectedType {
-							case "gin":
-								return "go run main.go"
-							case "react":
-								return "yarn dev"
-							case "vue":
-								return "yarn dev"
-							default:
-								return ""
-							}
-						}(),
-						Label: "Please enter your command to start service",
-					}
-					result, err := prompt.Run()
+					defaultCommand := func() string {
+						switch detectedType {
+						case "gin":
+							return "go run main.go"
+						case "react":
+							return "yarn dev"
+						case "vue":
+							return "yarn dev"
+						default:
+							return ""
+						}
+					}()
+					result, err := ui.InputArea(ui.InputAreaConfig{
+						Layout:             "Please enter your command to start service: ",
+						DefaultPlaceholder: defaultCommand,
+						PlaceHolders:       []string{defaultCommand},
+					})
 					if err != nil {
 						log.Error(err)
 						return
