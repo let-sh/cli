@@ -26,6 +26,7 @@ func init() {
 	sentry.Init()
 }
 
+// deprecated
 func BStart(message string) {
 	cfg := yacspin.Config{
 		Frequency: 50 * time.Millisecond,
@@ -42,18 +43,22 @@ func BStart(message string) {
 	S.Start()
 }
 
+// deprecated
 func BUpdate(message string) {
 	S.Message(" " + message)
 }
 
+// deprecated
 func BStop() {
 	S.Stop()
 }
 
+// deprecated
 func BPause() {
 	S.Pause()
 }
 
+// deprecated
 func BUnpause() {
 	S.Unpause()
 }

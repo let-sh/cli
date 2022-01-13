@@ -155,6 +155,8 @@ var devCmd = &cobra.Command{
         }
 
         if detectedType != "static" {
+            ui.Spinner.Start("starting development service")
+
             // run server command
             cmdSlice := strings.Split(command, " ")
             currentCmd := exec.Command(cmdSlice[0], cmdSlice[1:]...)
@@ -167,6 +169,7 @@ var devCmd = &cobra.Command{
                     break
                 }
             }
+            ui.Spinner.Stop()
 
             // awaiting port binding
             for i := 0; i < 15; i++ {
@@ -272,11 +275,10 @@ func SetupCloseDevelopmentHandler(projectID string) {
     signal.Notify(c, os.Interrupt, syscall.SIGTERM)
     go func() {
         <-c
-        log.BStart("exiting development mode")
+        ui.Spinner.Start("exiting development mode")
         KillServiceProcess(projectID)
 
-        log.S.StopFail()
-
+        ui.Spinner.Stop()
         log.Warning("exited development")
         os.Exit(0)
     }()
