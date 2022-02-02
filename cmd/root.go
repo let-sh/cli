@@ -62,7 +62,7 @@ func init() {
 	rootCmd.PersistentFlags().MarkHidden("debug")
 	//rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cli.yaml)")
 	//rootCmd.PersistentFlags().String("token", "", "let.sh access token")
-	rootCmd.PersistentFlags().StringVarP(&info.Credentials.Token, "token", "", "", "let.sh access token")
+	rootCmd.PersistentFlags().StringVarP(&info.Credentials.Token, "token", "", "", "specify the let.sh access token, ")
 	//
 	//if token, err := rootCmd.PersistentFlags().GetString("token"); err != nil {
 	//	if len(token) > 0 {

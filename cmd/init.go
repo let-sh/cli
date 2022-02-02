@@ -74,7 +74,7 @@ e.g.:
 		os.Rename(fmt.Sprintf("%s/%s", tempDir, projectType), fmt.Sprintf("%s/%s", currentDir, folderName))
 
 		log.S.StopMessage(
-			" Init succeed\n\n" +
+			" Init succeeded\n\n" +
 				"You could directly visit " + folderName + " folder by \n" +
 				"> " + log.CyanUnderline("cd "+folderName),
 		)

@@ -358,9 +358,14 @@ you could remove the irrelevant via .letignore or gitignore.`)
 
 		// determine which channel to deploy
 		channel := deploymentCtx.PreDeployRequest.Preference
+
 		if inputProd == true { // if manually set to deploy to production, rewrite channel
 			channel = "prod"
 		}
+		if inputDev == true { // if manually set to deploy to production, rewrite channel
+			channel = "dev"
+		}
+
 		var deployment struct {
 			ID           string `json:"id"`
 			TargetFQDN   string `json:"targetFQDN"`
@@ -386,7 +391,7 @@ you could remove the irrelevant via .letignore or gitignore.`)
 
 		if inputDetach {
 			log.S.StopFail()
-			log.Success("triggered deployment succeed")
+			log.Success("triggered deployment succeeded")
 			return
 		}
 
@@ -483,6 +488,7 @@ var inputProjectType string
 var inputCN bool
 var inputStaticDir string
 var inputProd bool
+var inputDev bool
 var inputDetach bool      // return immediately after submitted deployment
 var inputAssumeYes bool   // assume the answer to all prompts is yes
 var inputCheckRunID int64 // github check run id
@@ -496,12 +502,14 @@ func init() {
 	deployCmd.Flags().StringVarP(&inputProjectType, "type", "t", "", "current project type, e.g. react")
 	deployCmd.Flags().StringVarP(&inputStaticDir, "static", "", "", "static dir name (if deploy type is static)")
 
-	deployCmd.Flags().BoolVarP(&inputProd, "prod", "", false, "deploy in production mode, will assign linked domain")
 	deployCmd.Flags().BoolVarP(&inputDetach, "detach", "", false, "return immediately after submitted deployment")
 	deployCmd.Flags().BoolVarP(&inputAssumeYes, "assume-yes", "y", false,
 		"assume the answer to all prompts is yes")
 
 	// todo: handle input dev
+	deployCmd.Flags().BoolVarP(&inputProd, "prod", "", false, "deploy in production channel, will assign linked domain")
+	deployCmd.Flags().BoolVarP(&inputDev, "dev", "", false, "deploy in development channel")
+
 	deployCmd.Flags().BoolVarP(&inputCN, "cn", "", true, "deploy in mainland of china")
 	deployCmd.Flags().MarkHidden("cn")
 
@@ -516,13 +524,13 @@ func SetupCloseHandler() {
 	go func() {
 		<-channel
 		if len(DeploymentID) > 0 {
-			succeed, err := requests.CancelDeployment(DeploymentID)
+			succeeded, err := requests.CancelDeployment(DeploymentID)
 			if err != nil {
 				log.S.StopFail()
 				log.Error(err)
 				os.Exit(0)
 			}
-			if succeed {
+			if succeeded {
 				log.S.StopFail()
 				log.Warning("Deployment canceled")
 				os.Exit(0)

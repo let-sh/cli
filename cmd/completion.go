@@ -79,6 +79,7 @@ PowerShell:
 			cmd.Root().GenPowerShellCompletionWithDesc(os.Stdout)
 		}
 	},
+	Hidden: true,
 }
 
 func init() {
