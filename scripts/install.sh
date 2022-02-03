@@ -143,7 +143,9 @@ letsh_link() {
       exit 1
     )
 
-    printf "$green> Successfully installed let.sh $version! Please open another terminal where the \`lets\` command will now be available.$reset\n"
+    printf "$green> Successfully installed let.sh $version! Reloading shell...$reset\n"
+    
+    source "$DETECTED_PROFILE"
   fi
 }
 
