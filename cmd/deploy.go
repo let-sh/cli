@@ -506,14 +506,12 @@ func init() {
 	deployCmd.Flags().BoolVarP(&inputAssumeYes, "assume-yes", "y", false,
 		"assume the answer to all prompts is yes")
 
-	// todo: handle input dev
 	deployCmd.Flags().BoolVarP(&inputProd, "prod", "", false, "deploy in production channel, will assign linked domain")
 	deployCmd.Flags().BoolVarP(&inputDev, "dev", "", false, "deploy in development channel")
 
 	deployCmd.Flags().BoolVarP(&inputCN, "cn", "", true, "deploy in mainland of china")
 	deployCmd.Flags().MarkHidden("cn")
 
-	// todo: handle input dev
 	deployCmd.Flags().Int64VarP(&inputCheckRunID, "check-run-id", "", 0, "github check run id")
 	deployCmd.Flags().MarkHidden("cn")
 }
