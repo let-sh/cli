@@ -16,6 +16,7 @@ limitations under the License.
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -41,6 +42,11 @@ e.g.:
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		projectType := strings.TrimSpace(args[0])
+		if projectType == "" {
+			log.Warning("Please specify the project type")
+			return
+		}
+
 		currentDir, _ := os.Getwd()
 		var folderName = projectType // check whether user customed folderName
 		if len(args) > 1 {
@@ -71,7 +77,11 @@ e.g.:
 			return
 		}
 		// mv to current folder
-		os.Rename(fmt.Sprintf("%s/%s", tempDir, projectType), fmt.Sprintf("%s/%s", currentDir, folderName))
+		err := os.Rename(fmt.Sprintf("%s/%s", tempDir, projectType), fmt.Sprintf("%s/%s", currentDir, folderName))
+		if err != nil {
+			log.Error(errors.New("cannot init project to current folder: " + err.Error()))
+			//logrus.Debug("current project dir: ", pwd)
+		}
 
 		log.S.StopMessage(
 			" Init succeeded\n\n" +
