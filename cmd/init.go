@@ -48,7 +48,9 @@ e.g.:
 		}
 
 		currentDir, _ := os.Getwd()
-		var folderName = projectType // check whether user customed folderName
+
+		// check whether user custom folderName
+		var folderName = projectType
 		if len(args) > 1 {
 			folderName = strings.TrimSpace(args[1])
 		}
@@ -81,6 +83,7 @@ e.g.:
 		if err != nil {
 			log.Error(errors.New("cannot init project to current folder: " + err.Error()))
 			//logrus.Debug("current project dir: ", pwd)
+			return
 		}
 
 		log.S.StopMessage(

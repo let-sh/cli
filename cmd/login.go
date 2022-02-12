@@ -17,7 +17,10 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/manifoldco/promptui"
+	"github.com/mdp/qrterminal/v3"
 	"github.com/muesli/termenv"
+	"os"
 	"os/exec"
 	"runtime"
 	"time"
@@ -40,8 +43,19 @@ var loginCmd = &cobra.Command{
 	//This application is a tool to generate the needed files
 	//to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// loading
-		log.BStart("redirecting to browser")
+		// select login methods
+		prompt := promptui.Select{
+			Label: "Login Method",
+			Items: []string{"GitHub", "WeChat"},
+		}
+
+		_, loginMethod, err := prompt.Run()
+
+		if err != nil {
+			loginMethod = "GitHub"
+		}
+
+		log.BStart("loading...")
 
 		// get ticket id
 		tickeIDInterface, err := requests.GetJsonWithPath("https://api.let-sh.com/oauth/ticket_id", "data")
@@ -49,26 +63,47 @@ var loginCmd = &cobra.Command{
 			log.Error(err)
 			return
 		}
+		log.S.StopFail()
 
-		// open browser to login
-		err = openBrowser("https://api.let-sh.com/oauth/login?method=github&client=cli&ticket_id=" + tickeIDInterface.
-			String() + "&device=" + goInfo.GetInfo().OS + goInfo.GetInfo().Core)
+		switch loginMethod {
+		case "GitHub":
+			// open browser to login
+			err = openBrowser("https://api.let-sh.com/oauth/login?method=github&client=cli&ticket_id=" + tickeIDInterface.
+				String() + "&device=" + goInfo.GetInfo().OS + goInfo.GetInfo().Core)
 
-		shortenedUrl, err := requests.GenerateShortUrl("https://api.let-sh.com/oauth/login?method=github&client=cli&ticket_id=" + tickeIDInterface.
-			String() + "&device=" + goInfo.GetInfo().OS + goInfo.GetInfo().Core)
+			shortenedUrl, _ := requests.GenerateShortUrl("https://api.let-sh." +
+				"com/oauth/login?method=github&client=cli&ticket_id=" + tickeIDInterface.
+				String() + "&device=" + goInfo.GetInfo().OS + goInfo.GetInfo().Core)
 
-		if shortenedUrl != "" {
-			log.S.StopFail()
-			fmt.Println(
-				termenv.
-					String("if your browser not opened automatically, please visit: ").
-					Foreground(termenv.ColorProfile().Color("#808080")),
+			if shortenedUrl != "" {
+				log.S.StopFail()
+				fmt.Println(
+					termenv.
+						String("if your browser not opened automatically, please visit: ").
+						Foreground(termenv.ColorProfile().Color("#808080")),
 
-				termenv.
-					String(shortenedUrl).
-					Foreground(termenv.ColorProfile().Color("#808080")).Underline(),
-			)
-			log.BStart("redirecting to browser")
+					termenv.
+						String(shortenedUrl).
+						Foreground(termenv.ColorProfile().Color("#808080")).Underline(),
+				)
+				log.BStart("redirecting to browser")
+			}
+		case "WeChat":
+
+			shortenedUrl, _ := requests.GenerateShortUrl("https://api.let-sh.com" +
+				"/oauth/login?method=wechat&client=cli&ticket_id=" + tickeIDInterface.
+				String() + "&device=" + goInfo.GetInfo().OS + goInfo.GetInfo().Core)
+
+			config := qrterminal.Config{
+				Level:     qrterminal.L,
+				Writer:    os.Stdout,
+				BlackChar: qrterminal.BLACK,
+				WhiteChar: qrterminal.WHITE,
+				QuietZone: 0,
+			}
+			qrterminal.GenerateWithConfig(shortenedUrl, config)
+
+			fmt.Println("\nplease use WeChat to scan the QR code above.\n")
 		}
 
 		// valid response
