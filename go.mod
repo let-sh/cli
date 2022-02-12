@@ -32,7 +32,7 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/go-ps v1.0.0
 	github.com/muesli/reflow v0.3.0 // indirect
-	github.com/muesli/termenv v0.9.0 // indirect
+	github.com/muesli/termenv v0.9.0
 	github.com/myesui/uuid v1.0.0 // indirect
 	github.com/otiai10/copy v1.4.2
 	github.com/pelletier/go-toml v1.9.3
@@ -52,12 +52,15 @@ require (
 	github.com/vbauerster/mpb/v7 v7.0.3
 	github.com/weaveworks/procspy v0.0.0-20150706124340-cb970aa190c3
 	golang.org/x/crypto v0.0.0-20210616213533-5ff15b29337e // indirect
-	golang.org/x/oauth2 v0.0.0-20210402161424-2e8d93401602
+	golang.org/x/oauth2 v0.0.0-20210514164344-f6687ab2804c
 	golang.org/x/term v0.0.0-20210615171337-6886f2dfbf5b // indirect
 	gopkg.in/stretchr/testify.v1 v1.2.2 // indirect
 )
 
+require github.com/spf13/cast v1.4.1
+
 require (
+	github.com/Baozisoftware/qrcode-terminal-go v0.0.0-20170407111555-c0650d8dff0f // indirect
 	github.com/StackExchange/wmi v1.2.1 // indirect
 	github.com/VividCortex/ewma v1.2.0 // indirect
 	github.com/Xuanwo/templateutils v0.1.0 // indirect
@@ -84,6 +87,7 @@ require (
 	github.com/mattn/go-isatty v0.0.13 // indirect
 	github.com/mattn/go-runewidth v0.0.13 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
+	github.com/mdp/qrterminal/v3 v3.0.0 // indirect
 	github.com/mozillazg/go-httpheader v0.2.1 // indirect
 	github.com/nwaples/rardecode v1.1.0 // indirect
 	github.com/pierrec/lz4/v4 v4.0.3 // indirect
@@ -92,7 +96,7 @@ require (
 	github.com/prometheus/client_model v0.2.0 // indirect
 	github.com/prometheus/common v0.9.1 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
-	github.com/spf13/cast v1.4.1 // indirect
+	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/tencentyun/cos-go-sdk-v5 v0.7.31 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
@@ -109,4 +113,5 @@ require (
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.26.0 // indirect
+	rsc.io/qr v0.2.0 // indirect
 )
