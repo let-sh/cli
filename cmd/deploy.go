@@ -449,7 +449,7 @@ you could remove the irrelevant via .letignore or gitignore.`)
 				//		}
 				//		return ""
 				//	}(), "\n"+
-				//		color.New(color.Bold).Sprint("Details: ")+color.New(color.Underline).Sprint("https://alpha.let.sh/console/project/"+deploymentCtx.Name+"/details"),
+				//		color.New(color.Bold).Sprint("Details: ")+color.New(color.Underline).Sprint("https://let.sh/console/project/"+deploymentCtx.Name+"/details"),
 				//)
 
 				fmt.Println(
@@ -461,7 +461,7 @@ you could remove the irrelevant via .letignore or gitignore.`)
 						}
 						return ""
 					}(),
-					"\n"+termenv.String("Details: ").String()+termenv.String("https://alpha.let.sh/console/project/"+deploymentCtx.Name+"/details").Bold().Underline().String(),
+					"\n"+termenv.String("Details: ").String()+termenv.String("https://let.sh/console/project/"+deploymentCtx.Name+"/details").Bold().Underline().String(),
 					//color.New(color.Bold).Sprint("Preview: ")+color.New(color.Underline).Sprint("https://"+currentStatus.TargetFQDN)+func() string {
 					//	if writeClipBoardError == nil {
 					//		return color.New().Sprint("  (📋 Copied!)")
@@ -469,7 +469,7 @@ you could remove the irrelevant via .letignore or gitignore.`)
 					//	return ""
 					//}(),
 					//"\n"+
-					//	color.New(color.Bold).Sprint("Details: ")+color.New(color.Underline).Sprint("https://alpha.let.sh/console/project/"+deploymentCtx.Name+"/details"),
+					//	color.New(color.Bold).Sprint("Details: ")+color.New(color.Underline).Sprint("https://let.sh/console/project/"+deploymentCtx.Name+"/details"),
 				)
 
 				break

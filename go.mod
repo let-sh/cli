@@ -57,10 +57,12 @@ require (
 	gopkg.in/stretchr/testify.v1 v1.2.2 // indirect
 )
 
-require github.com/spf13/cast v1.4.1
+require (
+	github.com/mdp/qrterminal/v3 v3.0.0
+	github.com/spf13/cast v1.4.1
+)
 
 require (
-	github.com/Baozisoftware/qrcode-terminal-go v0.0.0-20170407111555-c0650d8dff0f // indirect
 	github.com/StackExchange/wmi v1.2.1 // indirect
 	github.com/VividCortex/ewma v1.2.0 // indirect
 	github.com/Xuanwo/templateutils v0.1.0 // indirect
@@ -87,7 +89,6 @@ require (
 	github.com/mattn/go-isatty v0.0.13 // indirect
 	github.com/mattn/go-runewidth v0.0.13 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
-	github.com/mdp/qrterminal/v3 v3.0.0 // indirect
 	github.com/mozillazg/go-httpheader v0.2.1 // indirect
 	github.com/nwaples/rardecode v1.1.0 // indirect
 	github.com/pierrec/lz4/v4 v4.0.3 // indirect
@@ -96,7 +97,6 @@ require (
 	github.com/prometheus/client_model v0.2.0 // indirect
 	github.com/prometheus/common v0.9.1 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
-	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/tencentyun/cos-go-sdk-v5 v0.7.31 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
