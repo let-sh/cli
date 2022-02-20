@@ -453,7 +453,17 @@ you could remove the irrelevant via .letignore or gitignore.`)
 				//		color.New(color.Bold).Sprint("Details: ")+color.New(color.Underline).Sprint("https://let.sh/console/project/"+deploymentCtx.Name+"/details"),
 				//)
 
+				// if web3
+				if currentStatus.Web3 != nil {
+					log.CyanBold("Web3 Info:")
+					fmt.Println("IPFS:    ", termenv.String("https://ipfs.io/ipfs/"+currentStatus.Web3.IpfsCID).Bold().
+						String())
+					fmt.Println("ARWEAVE: ", termenv.String("https://arweave.net/"+currentStatus.Web3.ArTID).Bold().
+						String())
+				}
+
 				fmt.Println(
+
 					termenv.String("Preview:").String(), termenv.String("https://"+currentStatus.
 						TargetFQDN).Underline().Bold().String()+func() string {
 						if writeClipBoardError == nil {
