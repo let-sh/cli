@@ -113,6 +113,7 @@ var deployCmd = &cobra.Command{
 
 			// Step4: merge cli flag config
 			deploymentCtx.LoadCliFlag(inputProjectName, inputProjectType)
+			deploymentCtx.Web3 = &inputWeb3
 
 			// load cn
 			// if user customized cn flag
@@ -492,6 +493,7 @@ var inputDev bool
 var inputDetach bool      // return immediately after submitted deployment
 var inputAssumeYes bool   // assume the answer to all prompts is yes
 var inputCheckRunID int64 // github check run id
+var inputWeb3 bool        // deploy to web3
 
 func init() {
 	rootCmd.AddCommand(deployCmd)
@@ -509,11 +511,15 @@ func init() {
 	deployCmd.Flags().BoolVarP(&inputProd, "prod", "", false, "deploy in production channel, will assign linked domain")
 	deployCmd.Flags().BoolVarP(&inputDev, "dev", "", false, "deploy in development channel")
 
+	deployCmd.Flags().BoolVarP(&inputWeb3, "web3", "", false, "deploy in web3 infra, store files on arweave, "+
+		"visit via ipfs")
+
 	deployCmd.Flags().BoolVarP(&inputCN, "cn", "", true, "deploy in mainland of china")
 	deployCmd.Flags().MarkHidden("cn")
 
 	deployCmd.Flags().Int64VarP(&inputCheckRunID, "check-run-id", "", 0, "github check run id")
-	deployCmd.Flags().MarkHidden("cn")
+	deployCmd.Flags().MarkHidden("check-run-id")
+
 }
 
 func SetupCloseHandler() {

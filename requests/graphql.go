@@ -305,6 +305,11 @@ mutation($type: String!, $name: String!, $config: String, $channel: String!, $cn
 	return respData.Deploy, nil
 }
 
+type Web3 struct {
+	IpfsCID string `json:"ipfsCID"`
+	ArTID   string `json:"arTID"`
+}
+
 // deprecated
 func GetDeploymentStatus(id string) (deployment struct {
 	TargetFQDN   string `json:"targetFQDN"`
@@ -313,6 +318,7 @@ func GetDeploymentStatus(id string) (deployment struct {
 	Status       string `json:"status"`
 	Done         bool   `json:"done"`
 	ErrorLogs    string `json:"errorLogs"`
+	Web3         *Web3  `json:"web3,omitempty"`
 }, err error) {
 	req := graphql.NewRequest(`
 query($id: UUID!) {
@@ -323,6 +329,10 @@ query($id: UUID!) {
 		status
 		done
 		errorLogs
+		web3 {
+          ipfsCID
+          arTID
+		}
 	  }
 }
 `)
@@ -338,6 +348,7 @@ query($id: UUID!) {
 			Status       string `json:"status"`
 			Done         bool   `json:"done"`
 			ErrorLogs    string `json:"errorLogs"`
+			Web3         *Web3  `json:"web3,omitempty"`
 		} `json:"deployment,omitempty"`
 	}
 	if err := Graphql().Run(context.Background(), req, &respData); err != nil {
