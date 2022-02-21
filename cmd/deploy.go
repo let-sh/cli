@@ -477,7 +477,7 @@ you could remove the irrelevant via .letignore or gitignore.`)
 
 				fmt.Println(
 
-					termenv.String("Preview:").String(), termenv.String("https://"+currentStatus.
+					termenv.String("URL:   ").String(), termenv.String("https://"+currentStatus.
 						TargetFQDN).Underline().Bold().String()+func() string {
 						if writeClipBoardError == nil {
 							p := termenv.ColorProfile()
@@ -485,7 +485,8 @@ you could remove the irrelevant via .letignore or gitignore.`)
 						}
 						return ""
 					}(),
-					"\n"+termenv.String("Details: ").String()+termenv.String("https://let.sh/console/project/"+deploymentCtx.Name+"/details").Bold().Underline().String(),
+					"\n"+termenv.String("Details: ").String()+termenv.String("https://let."+
+						"sh/console/projects/"+deploymentCtx.Name+"/details").Bold().Underline().String(),
 					//color.New(color.Bold).Sprint("Preview: ")+color.New(color.Underline).Sprint("https://"+currentStatus.TargetFQDN)+func() string {
 					//	if writeClipBoardError == nil {
 					//		return color.New().Sprint("  (📋 Copied!)")

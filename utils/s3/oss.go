@@ -293,6 +293,9 @@ func UploadDirToStaticSource(dirPath, projectName, bundleID string, cn bool) err
 				if err != nil {
 					select {
 					case errChan <- err:
+						log.Error(err)
+						resChan <- &err
+						return
 						// will break parent goroutine out of loop
 					default:
 						// don't care, first error wins
