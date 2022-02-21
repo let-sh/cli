@@ -197,6 +197,15 @@ var deployCmd = &cobra.Command{
 			}
 
 			deploymentCtx.PreDeployRequest = query
+
+			// check whether is dynamic project
+			if deploymentCtx.LetConfig.Web3 != nil {
+				if deploymentCtx.PreDeployRequest.BuildTemplate.ContainsDynamic && *deploymentCtx.LetConfig.Web3 {
+					log.Warning("you cannot deploy dynamic project to web3 infra yet")
+					return
+				}
+			}
+
 		}
 
 		// get project type config from api
@@ -459,7 +468,9 @@ you could remove the irrelevant via .letignore or gitignore.`)
 					fmt.Println("IPFS:   ", termenv.String("https://ipfs.io/ipfs/"+currentStatus.Web3.IpfsCID).
 						Underline().Bold().
 						String())
-					fmt.Println("ARWEAVE:", termenv.String("https://arweave.net/"+currentStatus.Web3.ArTID).Underline().Bold().
+					fmt.Println("Arweave:", termenv.String("https://arweave.net/"+currentStatus.Web3.ArTID).
+						Underline().
+						Bold().
 						String())
 					fmt.Println("\n")
 				}
