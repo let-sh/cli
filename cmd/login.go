@@ -52,6 +52,11 @@ var loginCmd = &cobra.Command{
 		_, loginMethod, err := prompt.Run()
 
 		if err != nil {
+			if err == promptui.ErrInterrupt {
+				os.Exit(-1)
+				return
+			}
+
 			loginMethod = "GitHub"
 		}
 
