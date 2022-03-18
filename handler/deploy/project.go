@@ -31,6 +31,7 @@ func (c *DeployContext) ConfirmProject() bool {
 				Index(51, "\ncontinue to deploy?"),
 			),
 			RadioText: Index(51, "[Y/n]").String(),
+			Default:   true,
 		}) {
 			// changing project config
 			log.BStart("deploying")
