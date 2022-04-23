@@ -377,28 +377,26 @@ you could remove the irrelevant via .letignore or gitignore.`)
 		}
 
 		var deployment struct {
-			ID           string `graphql:"id" json:"id"`
-			TargetFQDN   string `graphql:"targetFQDN" json:"targetFQDN"`
-			NetworkStage string `graphql:"networkStage" json:"networkStage"`
-			PackerStage  string `graphql:"packerStage" json:"packerStage"`
-			Status       string `graphql:"status" json:"status"`
+			ID           string `json:"id"`
+			TargetFQDN   string `json:"targetFQDN"`
+			NetworkStage string `json:"networkStage"`
+			PackerStage  string `json:"packerStage"`
+			Status       string `json:"status"`
 			Project      struct {
-				ID string `graphql:"id" json:"id"`
-			} `graphql:"project" json:"project"`
+				ID string `json:"id"`
+			} `json:"project"`
 		}
 		var err error
 
 		if inputCheckRunID == 0 {
-			var val graphql.MutationDeploy
-			val, err = graphql.Deploy(deploymentCtx.Type, deploymentCtx.Name, string(configBytes), channel,
+
+			deployment, err = requests.Deploy(deploymentCtx.Type, deploymentCtx.Name, string(configBytes), channel,
 				*deploymentCtx.CN)
-			deployment = val.Deploy
 		} else {
-			var val graphql.MutationDeployWithCheckRunID
-			val, err = graphql.DeployWithCheckRunID(deploymentCtx.Type, deploymentCtx.Name, string(configBytes),
+
+			deployment, err = requests.DeployWithCheckRunID(deploymentCtx.Type, deploymentCtx.Name, string(configBytes),
 				channel,
 				*deploymentCtx.CN, inputCheckRunID)
-			deployment = val.Deploy
 		}
 
 		if err != nil {

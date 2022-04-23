@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"errors"
-	"github.com/let-sh/cli/requests/graphql"
+	"github.com/let-sh/cli/requests"
 	"strings"
 
 	"github.com/let-sh/cli/log"
@@ -39,8 +39,8 @@ e.g. lets pref set default_channel dev
 
 e.g. lets pref set channel dev`)
 		}
-		value, err := graphql.SetPreference(strings.TrimSpace(args[0]), strings.TrimSpace(args[1]))
-		if err != nil || !value.SetPreference {
+		value, err := requests.SetPreference(strings.TrimSpace(args[0]), strings.TrimSpace(args[1]))
+		if err != nil || !value {
 			log.Error(errors.New("cannot set preference: " + err.Error()))
 			return
 		}

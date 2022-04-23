@@ -17,7 +17,7 @@ package cmd
 
 import (
 	"errors"
-	"github.com/let-sh/cli/requests/graphql"
+	"github.com/let-sh/cli/requests"
 	"os"
 	"strings"
 
@@ -46,13 +46,13 @@ e.g.: lets link test.let.sh.cn
 			return
 		}
 
-		result, err := graphql.Link(p.ID, strings.TrimSpace(args[0]))
+		result, err := requests.Link(p.ID, strings.TrimSpace(args[0]))
 		if err != nil {
 			log.Error(err)
 			return
 		}
 
-		if result.Link == false {
+		if result == false {
 			log.Error(errors.New("link failed"))
 			return
 		}

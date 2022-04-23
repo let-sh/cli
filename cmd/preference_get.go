@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/let-sh/cli/requests/graphql"
+	"github.com/let-sh/cli/requests"
 	"strings"
 
 	"github.com/let-sh/cli/log"
@@ -34,9 +34,9 @@ var preferenceGetCmd = &cobra.Command{
 e.g. lets pref get default_channel
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		value, err := graphql.GetPreference(strings.TrimSpace(args[0]))
+		value, err := requests.GetPreference(strings.TrimSpace(args[0]))
 		if err != nil {
-			log.Errorf("cannot get preference: %s", value.Preference)
+			log.Errorf("cannot get preference: %s", value)
 			return
 		}
 

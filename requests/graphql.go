@@ -86,6 +86,33 @@ func GetPreference(name string) (value string, err error) {
 }
 
 // deprecated
+func GetUser() (user struct {
+	Name string `json:"name,omitempty"`
+}, err error) {
+	req := graphql.NewRequest(`
+	query {
+	  user{
+		name
+}
+	}
+`)
+
+	req.Header.Set("Authorization", "Bearer "+info.Credentials.LoadToken())
+
+	// run it and capture the response
+	var respData struct {
+		User struct {
+			Name string `json:"name,omitempty"`
+		} `json:"user,omitempty"`
+	}
+	if err := Graphql().Run(context.Background(), req, &respData); err != nil {
+		return respData.User, err
+	}
+
+	return respData.User, nil
+}
+
+// deprecated
 func CheckDeployCapability(projectName string) (hashID string, exists bool, err error) {
 	req := graphql.NewRequest(`
     query($name: String!) {

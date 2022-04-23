@@ -19,7 +19,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/let-sh/cli/handler/deploy"
-	"github.com/let-sh/cli/requests/graphql"
+	"github.com/let-sh/cli/requests"
 	"github.com/let-sh/cli/ui"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cast"
@@ -139,8 +139,8 @@ var devCmd = &cobra.Command{
 			Fqdn          string `json:"fqdn,omitempty"`
 		}
 		if !forceLocal {
-			val, err := graphql.StartDevelopment(p.ID)
-			result := val.StartDevelopment
+			result, err := requests.StartDevelopment(p.ID)
+
 			if err != nil {
 				log.Error(err)
 				return
@@ -298,7 +298,7 @@ func KillServiceProcess(projectID string) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		graphql.StopDevelopment(projectID)
+		requests.StopDevelopment(projectID)
 	}()
 
 	wg.Add(1)

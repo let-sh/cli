@@ -5,6 +5,12 @@ type QueryAllPreference struct {
 		Channel string `graphql:"channel"`
 	}
 }
+
+type QueryUser struct {
+	User struct {
+		Channel string `graphql:"channel"`
+	}
+}
 type QueryPreference struct {
 	Preference string `graphql:"preference(name: $name)"`
 }
@@ -101,7 +107,7 @@ type QueryProject struct {
 }
 
 type MutationStopDevelopment struct {
-	StopDevelopment bool `graphql:"stopDevelopment(projectID:$projectID)""`
+	StopDevelopment bool `graphql:"stopDevelopment(projectID:$projectID)"`
 }
 type MutationLink struct {
 	Link bool `graphql:"link(projectID:$projectID,hostname:$hostname)"`

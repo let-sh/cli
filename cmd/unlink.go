@@ -17,7 +17,7 @@ package cmd
 
 import (
 	"errors"
-	"github.com/let-sh/cli/requests/graphql"
+	"github.com/let-sh/cli/requests"
 	"os"
 	"strings"
 
@@ -45,13 +45,13 @@ e.g.: lets unlink test.let.sh`,
 			return
 		}
 
-		result, err := graphql.Unlink(p.ID, strings.TrimSpace(args[0]))
+		result, err := requests.Unlink(p.ID, strings.TrimSpace(args[0]))
 		if err != nil {
 			log.Error(err)
 			return
 		}
 
-		if result.Unlink == false {
+		if result == false {
 			log.Error(errors.New("unlink failed"))
 			return
 		}
