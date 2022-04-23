@@ -244,9 +244,9 @@ var devCmd = &cobra.Command{
 		time.Sleep(time.Second / 3)
 
 		fmt.Println("\n"+aurora.BrightCyan("[msg]").Bold().String(),
-			"you can visit remotely at: "+aurora.Bold("https://"+result.Fqdn).String()+"\n\r")
-		fmt.Println("\n"+aurora.BrightCyan("[msg]").Bold().String(),
-			"or debug requests at: "+aurora.Bold("https://let.sh/console/projects/"+deploymentCtx.Name+"/development").String()+"\n\r")
+			"you can visit remotely at: "+aurora.Bold("https://"+result.Fqdn).String()+"\n")
+		fmt.Println(aurora.BrightCyan("[msg]").Bold().String(),
+			"or debug requests at: "+aurora.Bold("https://let.sh/console/projects/"+p.Name+"/development").String()+"\n\r")
 
 		dev.StartClient(remoteEndpoint, localEndpoint, result.Fqdn)
 	},
