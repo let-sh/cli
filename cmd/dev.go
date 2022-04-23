@@ -19,6 +19,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/let-sh/cli/handler/deploy"
+	"github.com/let-sh/cli/requests/graphql"
 	"github.com/let-sh/cli/ui"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cast"
@@ -38,7 +39,6 @@ import (
 	c "github.com/let-sh/cli/handler/dev/command"
 	"github.com/let-sh/cli/handler/dev/process"
 	"github.com/let-sh/cli/log"
-	"github.com/let-sh/cli/requests"
 	"github.com/let-sh/cli/utils"
 	"github.com/let-sh/cli/utils/cache"
 	"github.com/logrusorgru/aurora"
@@ -139,7 +139,8 @@ var devCmd = &cobra.Command{
 			Fqdn          string `json:"fqdn,omitempty"`
 		}
 		if !forceLocal {
-			result, err = requests.StartDevelopment(p.ID)
+			val, err := graphql.StartDevelopment(p.ID)
+			result := val.StartDevelopment
 			if err != nil {
 				log.Error(err)
 				return
@@ -244,7 +245,7 @@ var devCmd = &cobra.Command{
 		time.Sleep(time.Second / 3)
 
 		fmt.Println("\n"+aurora.BrightCyan("[msg]").Bold().String(),
-			"you can visit remotely at: "+aurora.Bold("https://"+result.Fqdn).String()+"\n")
+			"you can visit remotely at: "+aurora.Bold("https://"+result.Fqdn).String())
 		fmt.Println(aurora.BrightCyan("[msg]").Bold().String(),
 			"or debug requests at: "+aurora.Bold("https://let.sh/console/projects/"+p.Name+"/development").String()+"\n\r")
 
@@ -297,7 +298,7 @@ func KillServiceProcess(projectID string) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		requests.StopDevelopment(projectID)
+		graphql.StopDevelopment(projectID)
 	}()
 
 	wg.Add(1)

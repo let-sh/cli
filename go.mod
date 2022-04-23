@@ -1,6 +1,6 @@
 module github.com/let-sh/cli
 
-go 1.17
+go 1.18
 
 replace github.com/charmbracelet/bubbles v0.7.6 => github.com/OasisNetworks/bubbles v0.7.7-0.20210226193817-28eb5c775530
 

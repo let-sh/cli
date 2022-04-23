@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"github.com/let-sh/cli/info"
 	"github.com/let-sh/cli/log"
-	"github.com/let-sh/cli/requests"
+	"github.com/let-sh/cli/requests/graphql"
 	"github.com/let-sh/cli/types"
 	"github.com/mitchellh/go-homedir"
 	"io/ioutil"
@@ -65,13 +65,13 @@ func init() {
 
 	_, err = os.Stat(home + "/.let/preference.json")
 	if (os.IsNotExist(err) || time.Since(GetLastUpdateNotifyTime()) >= time.Hour*24) && info.Credentials.LoadToken() != "" {
-		data, err := requests.GetAllPreference()
+		data, err := graphql.GetAllPreference()
 		if err != nil {
 			log.Warning("load your preference error: " + err.Error())
 		} else {
 			f, _ := os.Create(home + "/.let/preference.json")
 			f.WriteString(func() string {
-				str, _ := json.Marshal(data)
+				str, _ := json.Marshal(data.AllPreference)
 				return string(str)
 			}())
 		}

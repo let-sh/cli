@@ -47,15 +47,28 @@ type MutationSetPreference struct {
 }
 type MutationDeploy struct {
 	Deploy struct {
-		ID           string
-		TargetFQDN   string
-		NetworkStage string
-		PackerStage  string
-		Status       string
+		ID           string `graphql:"id" json:"id"`
+		TargetFQDN   string `graphql:"targetFQDN" json:"targetFQDN"`
+		NetworkStage string `graphql:"networkStage" json:"networkStage"`
+		PackerStage  string `graphql:"packerStage" json:"packerStage"`
+		Status       string `graphql:"status" json:"status"`
 		Project      struct {
-			ID string
-		}
+			ID string `graphql:"id" json:"id"`
+		} `graphql:"project" json:"project"`
 	} `graphql:"deploy(input:{type:$type, projectName:$name, config:$config, channel:$channel, cn:$cn})"`
+}
+
+type MutationDeployWithCheckRunID struct {
+	Deploy struct {
+		ID           string `graphql:"id" json:"id"`
+		TargetFQDN   string `graphql:"targetFQDN" json:"targetFQDN"`
+		NetworkStage string `graphql:"networkStage" json:"networkStage"`
+		PackerStage  string `graphql:"packerStage" json:"packerStage"`
+		Status       string `graphql:"status" json:"status"`
+		Project      struct {
+			ID string `graphql:"id" json:"id"`
+		} `graphql:"project" json:"project"`
+	} `graphql:"deploy(input:{type:$type, projectName:$name, config:$config, channel:$channel, cn:$cn, checkRunID:$checkRunID})"`
 }
 
 type MutationCancelDeployment struct {
@@ -74,9 +87,9 @@ type QueryDeployments struct {
 
 type MutationStartDevelopment struct {
 	StartDevelopment struct {
-		RemotePort    int    `graphql:"remotePort"`
-		RemoteAddress string `graphql:"remoteAddress"`
-		Fqdn          string `graphql:"fqdn"`
+		RemotePort    int    `graphql:"remotePort" json:"remotePort,omitempty"`
+		RemoteAddress string `graphql:"remoteAddress" json:"remoteAddress,omitempty"`
+		Fqdn          string `graphql:"fqdn" json:"fqdn,omitempty"`
 	} `graphql:"startDevelopment(projectID:$projectID)"`
 }
 

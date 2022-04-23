@@ -16,3 +16,10 @@ func GetAllPreference() (q QueryAllPreference, err error) {
 	err = NewClient().Query(context.Background(), &q, nil)
 	return q, err
 }
+
+func GetPreference(name string) (q QueryPreference, err error) {
+	err = NewClient().Query(context.Background(), &q, map[string]interface{}{
+		"name": name,
+	})
+	return q, err
+}
