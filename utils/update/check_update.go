@@ -13,6 +13,7 @@ import (
 )
 
 func CheckUpdate() {
+	// check update every day
 	if time.Since(config.GetLastUpdateNotifyTime()) < time.Hour*24 {
 		return
 	}
@@ -55,7 +56,7 @@ func NotifyUpgrade(channel string) {
 	}
 
 	if utils.ItemExists([]string{"Y", "y", "yes", "Yes"}, result) {
-		UpgradeCli(false, "")
+		UpgradeCli(false, channel)
 	}
 }
 
