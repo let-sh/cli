@@ -242,9 +242,16 @@ var deployCmd = &cobra.Command{
 						c := exec.Command(command[0], command[1:]...)
 						c.Stdout = os.Stdout
 						c.Stderr = os.Stderr
+
+						// FIXME: handler exit code not 0
 						err := c.Run()
 						if err != nil {
 							log.Error(err)
+							return
+						}
+
+						if c.ProcessState.ExitCode() != 0 {
+							log.Error(errors.New("build error"))
 							return
 						}
 					}

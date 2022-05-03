@@ -42,7 +42,9 @@ func GetLatestVersion(channel string) (version string, err error) {
 		"status_code": resp.StatusCode,
 		"body":        string(body),
 	}).Debugln("get latest version")
+
 	for _, latest := range strings.Split(string(body), "\n") {
+		// for each line in version file
 		switch channel {
 		case "beta":
 			if strings.Contains(latest, "beta") {
