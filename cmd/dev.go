@@ -109,7 +109,7 @@ var devCmd = &cobra.Command{
 							return ""
 						}
 					}()
-					result, err := ui.InputArea(ui.InputAreaConfig{
+					resultStr, err := ui.InputArea(ui.InputAreaConfig{
 						Layout:             "Please enter your command to start service: ",
 						DefaultPlaceholder: defaultCommand,
 						PlaceHolders:       []string{defaultCommand},
@@ -118,7 +118,7 @@ var devCmd = &cobra.Command{
 						log.Error(err)
 						return
 					}
-					command = result
+					command = resultStr
 				}
 			} else {
 				command = inputCommand
@@ -139,13 +139,12 @@ var devCmd = &cobra.Command{
 			Fqdn          string `json:"fqdn,omitempty"`
 		}
 		if !forceLocal {
-			result, err := requests.StartDevelopment(p.ID)
+			result, err = requests.StartDevelopment(p.ID)
 
 			if err != nil {
 				log.Error(err)
 				return
 			}
-
 			// using wss://
 			if result.RemotePort == 443 {
 				remoteEndpoint = "wss://" + result.RemoteAddress + ":" + strconv.Itoa(result.RemotePort)
@@ -201,7 +200,6 @@ var devCmd = &cobra.Command{
 				}
 			}
 		}
-
 		// if no input local port
 		// detect service port
 		if len(inputLocalEndpoint) == 0 {
@@ -220,13 +218,13 @@ var devCmd = &cobra.Command{
 					Items: ports,
 				}
 
-				_, result, err := prompt.Run()
+				_, resultStr, err := prompt.Run()
 				if err != nil {
 					KillServiceProcess(p.ID)
 					log.Error(err)
 					return
 				}
-				localEndpoint = "localhost:" + result
+				localEndpoint = "localhost:" + resultStr
 			}
 		} else {
 			localEndpoint = inputLocalEndpoint
@@ -236,7 +234,6 @@ var devCmd = &cobra.Command{
 		if remoteEndpoint == "" || localEndpoint == "" {
 			log.Error(errors.New("currently under development"))
 		}
-
 		if len(result.Fqdn) == 0 {
 			log.Error(errors.New("missing public visit fqdn"))
 		}

@@ -60,6 +60,7 @@ require (
 require (
 	github.com/mdp/qrterminal/v3 v3.0.0
 	github.com/spf13/cast v1.4.1
+	github.com/yudai/pp v2.0.1+incompatible
 )
 
 require (
