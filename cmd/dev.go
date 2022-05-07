@@ -239,7 +239,7 @@ var devCmd = &cobra.Command{
 		}
 
 		// waiting for tunnel to be ready
-		time.Sleep(time.Second / 3)
+		time.Sleep(time.Second / 2)
 
 		fmt.Println("\n"+aurora.BrightCyan("[msg]").Bold().String(),
 			"you can visit remotely at: "+aurora.Bold("https://"+result.Fqdn).String())

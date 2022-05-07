@@ -6,6 +6,7 @@ import (
 	"github.com/let-sh/cli/types"
 	"github.com/pelletier/go-toml"
 	"github.com/rogpeppe/go-internal/modfile"
+	"golang.org/x/exp/maps"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -70,7 +71,7 @@ func (c *DeployContext) DetectProjectType() (projectType string) {
 		}
 		var packageConfig types.PackageDotJson
 		json.Unmarshal(jsonBytes, &packageConfig)
-
+		maps.Copy(packageConfig.DevDependencies, packageConfig.Dependencies)
 		for k := range packageConfig.Dependencies {
 			if strings.Contains(k, "@docusaurus") {
 				c.Type = "docusaurus"
@@ -80,6 +81,11 @@ func (c *DeployContext) DetectProjectType() (projectType string) {
 			if strings.Contains(k, "next") {
 				c.Type = "next"
 				return "next"
+			}
+
+			if strings.Contains(k, "vuepress") {
+				c.Type = "vuepress"
+				return "vuepress"
 			}
 
 			if strings.Contains(k, "react") {
@@ -149,3 +155,5 @@ func FileExists(path string) bool {
 	}
 	return true
 }
+
+type m = map[string]string
