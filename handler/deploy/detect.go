@@ -112,6 +112,11 @@ func (c *DeployContext) DetectProjectType() (projectType string) {
 				return "angular"
 			}
 
+			if strings.Contains(k, "hexo") {
+				c.Type = "hexo"
+				return "hexo"
+			}
+
 		}
 	}
 
@@ -142,9 +147,6 @@ func (c *DeployContext) DetectProjectType() (projectType string) {
 		c.Static = "./"
 		return "static"
 	}
-
-	// handle static site generator
-	// TODO: hexo
 
 	// hugo
 	if FileExists("config.toml") && FileExists("themes") {
