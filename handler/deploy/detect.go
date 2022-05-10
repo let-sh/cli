@@ -153,7 +153,9 @@ func (c *DeployContext) DetectProjectType() (projectType string) {
 		c.Type = "hugo"
 		return "hugo"
 	}
-	return "static"
+
+	c.Type = "unknown"
+	return "unknown"
 }
 
 func FileExists(path string) bool {

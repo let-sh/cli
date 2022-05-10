@@ -120,6 +120,12 @@ var deployCmd = &cobra.Command{
 			deploymentCtx.LoadRegion(cmd, inputCN)
 		}
 
+		if deploymentCtx.Type == "unknown" {
+			log.Warning("unknown project type, please check your project directory. " +
+				"or you could specify project type with `-t` flag")
+			return
+		}
+
 		// check project exists
 		// if not exists, tell to create
 		// and confirm project configuration
