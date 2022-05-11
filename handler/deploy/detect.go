@@ -128,6 +128,11 @@ func (c *DeployContext) DetectProjectType() (projectType string) {
 				c.Type = "flask"
 				return "flask"
 			}
+
+			if strings.Contains(strings.ToLower(string(reqFile)), "fastapi") {
+				c.Type = "fastapi"
+				return "fastapi"
+			}
 		}
 
 		if FileExists("Pipfile") {
@@ -135,6 +140,11 @@ func (c *DeployContext) DetectProjectType() (projectType string) {
 			if strings.Contains(strings.ToLower(string(reqFile)), "flask") {
 				c.Type = "flask"
 				return "flask"
+			}
+
+			if strings.Contains(strings.ToLower(string(reqFile)), "fastapi") {
+				c.Type = "fastapi"
+				return "fastapi"
 			}
 		}
 	}
