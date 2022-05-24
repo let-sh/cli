@@ -17,7 +17,6 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/manifoldco/promptui"
 	"github.com/mdp/qrterminal/v3"
 	"github.com/muesli/termenv"
 	"os"
@@ -44,22 +43,23 @@ var loginCmd = &cobra.Command{
 	//to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		// select login methods
-		prompt := promptui.Select{
-			Label: "Login Method",
-			Items: []string{"GitHub", "WeChat"},
-		}
-
-		_, loginMethod, err := prompt.Run()
-
-		if err != nil {
-			if err == promptui.ErrInterrupt {
-				os.Exit(-1)
-				return
-			}
-
-			loginMethod = "GitHub"
-		}
-
+		// TODO: support more login methods
+		//prompt := promptui.Select{
+		//	Label: "Login Method",
+		//	Items: []string{"GitHub", "WeChat"},
+		//}
+		//
+		//_, loginMethod, err := prompt.Run()
+		//
+		//if err != nil {
+		//	if err == promptui.ErrInterrupt {
+		//		os.Exit(-1)
+		//		return
+		//	}
+		//
+		//	loginMethod = "GitHub"
+		//}
+		loginMethod := "GitHub"
 		log.BStart("loading...")
 
 		// get ticket id
