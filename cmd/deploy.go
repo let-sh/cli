@@ -121,6 +121,7 @@ var deployCmd = &cobra.Command{
 		}
 
 		if deploymentCtx.Type == "unknown" {
+			log.S.StopFail()
 			log.Warning("unknown project type, please check your project directory. " +
 				"or you could specify project type with `-t` flag")
 			return
@@ -304,7 +305,9 @@ var deployCmd = &cobra.Command{
 			// respect .gitignore and .letignore
 			if _, err := os.Stat(filepath.Join(dirPath, ".gitignore")); err == nil {
 				// match a file against a particular .gitignore
-				i, _ := ignore.CompileIgnoreFile(filepath.Join(dirPath, ".gitignore"))
+				i, _ := ignore.CompileIgnoreFileAndLines(filepath.Join(dirPath, ".gitignore"),
+					"node_modules", // nodejs
+				)
 
 				tmp := []string{}
 				for _, v := range names {

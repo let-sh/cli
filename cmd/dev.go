@@ -67,6 +67,7 @@ var devCmd = &cobra.Command{
 		var deploymentCtx deploy.DeployContext
 		detectedType := deploymentCtx.DetectProjectType()
 		if detectedType == "unknown" {
+			log.S.StopFail()
 			log.Warning("unknown project type, please check your project directory. " +
 				"or you could specify project type with `-t` flag")
 			return
