@@ -79,6 +79,11 @@ func (c *DeployContext) DetectProjectType() (projectType string) {
 		}
 		maps.Copy(packageConfig.Dependencies, packageConfig.DevDependencies)
 		for k := range packageConfig.Dependencies {
+			if strings.Contains(k, "@surgio/gateway") {
+				c.Type = "surgio"
+				return "surgio"
+			}
+
 			if strings.Contains(k, "express") {
 				c.Type = "express"
 				return "express"
