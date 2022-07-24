@@ -37,7 +37,9 @@ import (
 
 // deprecated: create a client (safe to share across requests)
 func Graphql() *graphql.Client {
-	return graphql.NewClient("https://api.let-sh.com/query", graphql.WithHTTPClient(http_client.NewClient()))
+	c := http_client.NewClient()
+	c.Transport = WithHeader(c.Transport)
+	return graphql.NewClient("https://api.let-sh.com/query", graphql.WithHTTPClient(client))
 }
 
 // deprecated: SetPreference

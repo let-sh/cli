@@ -16,6 +16,7 @@ func NewClient() *http.Client {
 
 	rt := WithHeader(httpClient.Transport)
 	rt.Set("Authorization", "Bearer "+info.Credentials.Token)
+
 	httpClient.Transport = rt
 	//src := oauth2.StaticTokenSource(
 	//	&oauth2.Token{AccessToken: info.Credentials.LoadToken()},
@@ -37,8 +38,9 @@ func WithHeader(rt http.RoundTripper) withHeader {
 	if rt == nil {
 		rt = http.DefaultTransport
 	}
-
-	return withHeader{Header: make(http.Header), rt: rt}
+	wh := withHeader{Header: make(http.Header), rt: rt}
+	wh.Set("Cli-Version", info.Version)
+	return wh
 }
 
 func (h withHeader) RoundTrip(req *http.Request) (*http.Response, error) {

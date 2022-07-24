@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"github.com/let-sh/cli/info"
 	"github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 	"io/ioutil"
@@ -15,7 +16,30 @@ import (
 
 var client = &http.Client{Timeout: 10 * time.Second}
 
+func WithHeader(rt http.RoundTripper) withHeader {
+	if rt == nil {
+		rt = http.DefaultTransport
+	}
+	wh := withHeader{Header: make(http.Header), rt: rt}
+	wh.Set("Cli-Version", info.Version)
+	return wh
+}
+
+type withHeader struct {
+	http.Header
+	rt http.RoundTripper
+}
+
+func (h withHeader) RoundTrip(req *http.Request) (*http.Response, error) {
+	for k, v := range h.Header {
+		req.Header[k] = v
+	}
+
+	return h.rt.RoundTrip(req)
+}
+
 func GetJsonWithPath(url string, path string) (data gjson.Result, err error) {
+	client.Transport = WithHeader(client.Transport)
 	r, err := client.Get(url)
 	if err != nil {
 		return data, err

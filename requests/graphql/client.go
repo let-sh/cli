@@ -23,8 +23,10 @@ func NewClient() *graphql.Client {
 	//
 	//// set request timeout
 	//httpClient.Timeout = 10 * time.Second
+	c := http_client.NewClient()
+	c.Transport = WithHeader(c.Transport)
 
-	return graphql.NewClient("https://api.let-sh.com/query", http_client.NewClient())
+	return graphql.NewClient("https://api.let-sh.com/query", c)
 }
 
 type withHeader struct {
