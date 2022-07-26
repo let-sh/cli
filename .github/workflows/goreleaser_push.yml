@@ -10,7 +10,7 @@ on:
 
 jobs:
   goreleaser_push:
-    runs-on: [self-hosted]
+    runs-on: ubuntu-latest
     steps:
       -
         name: Checkout
@@ -36,15 +36,26 @@ jobs:
 #          brew tap mitchellh/gon
 #          brew install mitchellh/gon/gon
 #          brew install goreleaser
-      -
-        name: Run GoReleaser
+      - name: Set up Go
+        uses: actions/setup-go@v3
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install GitPython
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v3
+        with:
+          # either 'goreleaser' (default) or 'goreleaser-pro'
+          distribution: goreleaser
+          version: latest
+          args: --rm-dist --skip-publish --skip-validate
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           AC_USERNAME: ${{ secrets.AC_USERNAME }}
           AC_PASSWORD: ${{ secrets.AC_PASSWORD }}
-        run: |
-          goreleaser --rm-dist --skip-publish --skip-validate
-      -
-        name: Check Binary
-        run: |
-          ./dist/lets_linux_amd64/lets version
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#      -
+#        name: Check Binary
+#        run: |
+#          ./dist/lets_linux_amd64/lets version
