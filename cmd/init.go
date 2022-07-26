@@ -18,8 +18,10 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/let-sh/cli/log"
@@ -79,7 +81,7 @@ e.g.:
 			return
 		}
 		// mv to current folder
-		err := os.Rename(fmt.Sprintf("%s/%s", tempDir, projectType), fmt.Sprintf("%s/%s", currentDir, folderName))
+		err := moveDirectory(fmt.Sprintf("%s/%s", tempDir, projectType), fmt.Sprintf("%s/%s", currentDir, folderName))
 		if err != nil {
 			log.Error(errors.New("cannot init project to current folder: " + err.Error()))
 			//logrus.Debug("current project dir: ", pwd)
@@ -93,6 +95,47 @@ e.g.:
 		)
 		log.BStop()
 	},
+}
+
+func moveDirectory(src, dst string) error {
+	err := os.MkdirAll(dst, 0755)
+	if err != nil {
+		return err
+	}
+	files, err := ioutil.ReadDir(src)
+	if err != nil {
+		return err
+	}
+	for _, file := range files {
+		srcfp := filepath.Join(src, file.Name())
+		dstfp := filepath.Join(dst, file.Name())
+		if file.IsDir() {
+			moveDirectory(srcfp, dstfp)
+		} else {
+			moveFile(srcfp, dstfp)
+		}
+	}
+	return nil
+}
+
+func moveFile(src, dst string) error {
+	in, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer in.Close()
+
+	out, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	_, err = io.Copy(out, in)
+	if err != nil {
+		return err
+	}
+	return out.Close()
 }
 
 func init() {

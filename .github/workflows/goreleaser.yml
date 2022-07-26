@@ -42,7 +42,7 @@ jobs:
           AC_PASSWORD: ${{ secrets.AC_PASSWORD }}
         run: |
 
-          goreleaser --rm-dist
+          goreleaser --rm-dist --force
       -
         name: Check Binary
         run: |
