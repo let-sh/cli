@@ -3,6 +3,7 @@ package update
 import (
 	"github.com/let-sh/cli/info"
 	"github.com/let-sh/cli/requests"
+	"github.com/let-sh/cli/utils"
 	"github.com/sirupsen/logrus"
 	"os"
 	"os/exec"
@@ -57,7 +58,7 @@ func TestUpgradeCli(t *testing.T) {
 		return
 	}
 
-	err = os.Rename(filepath.Join(tempDir, "lets"), path)
+	utils.MoveFile(filepath.Join(tempDir, "lets"), path)
 	if err != nil {
 		logrus.WithError(err).Debugln("get compressed file")
 		return

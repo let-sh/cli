@@ -8,6 +8,7 @@ import (
 	"github.com/let-sh/cli/info"
 	"github.com/let-sh/cli/log"
 	"github.com/let-sh/cli/requests"
+	"github.com/let-sh/cli/utils"
 	"github.com/sirupsen/logrus"
 	"github.com/vbauerster/mpb/v7"
 	"github.com/vbauerster/mpb/v7/decor"
@@ -101,11 +102,11 @@ func UpgradeCli(force bool, channel string) {
 		if runtime.GOOS == "windows" {
 			// handle process error
 			// go further: https://stackoverflow.com/questions/9162969/how-can-a-c-binary-replace-itself
-			err = os.Rename(path, path+".old")
-			err = os.Rename(filepath.Join(unzipedDir, binaryName), path)
+			utils.Move(path, path+".old")
+			utils.Move(filepath.Join(unzipedDir, binaryName), path)
 			os.RemoveAll(path + ".old")
 		} else {
-			err = os.Rename(filepath.Join(unzipedDir, binaryName), path)
+			err = utils.Move(filepath.Join(unzipedDir, binaryName), path)
 		}
 
 		if err != nil {
