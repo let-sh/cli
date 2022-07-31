@@ -130,7 +130,7 @@ brews:
       owner: let-sh
       name: homebrew-tap
       # Optionally a token can be provided, if it differs from the token provided to GoReleaser
-      token: "{{ .Env.GITHUB_TOKEN }}"
+      token: "{{ .Env.GH_RELEASE_TOKEN }}"
 
     url_template: "http://install.let-sh.com/{{ .ArtifactName }}"
 
@@ -138,7 +138,7 @@ brews:
     # to implement the strategy and add it to your tap repository.
     # Example: https://docs.brew.sh/Formula-Cookbook#specifying-the-download-strategy-explicitly
     # Default is empty.
-    # download_strategy: CurlDownloadStrategy.
+#    download_strategy: CurlDownloadStrategy.
 
     # Allows you to add a custom require_relative at the top of the formula template
     # Default is empty
@@ -176,12 +176,11 @@ brews:
     # If set to auto, the release will not be uploaded to the homebrew tap
     # in case there is an indicator for prerelease in the tag e.g. v1.0.0-rc1
     # Default is false.
-    skip_upload: true
+#    skip_upload: true
 
     # Packages your package depends on.
     dependencies:
       - name: git
-      - name: upx
       - name: zsh
         type: optional
 
@@ -189,12 +188,12 @@ brews:
     # So you can `brew test` your formula.
     # Default is empty.
     test: |
-      system "#{bin}/program version"
+      system "#{bin}/lets version"
 
     # Custom install script for brew.
     # Default is 'bin.install "program"'.
     install: |
-      bin.install "program"
+      bin.install "lets"
 
 archives:
   - id: lets_override
