@@ -85,11 +85,6 @@ func (c *DeployContext) DetectProjectType() (projectType string) {
             return "gateway"
         }
 
-        if utils.ItemExists(packages, "@surgio/gateway") {
-            c.Type = "surgio"
-            return "surgio"
-        }
-
         if utils.ItemExists(packages, "express") {
             c.Type = "express"
             return "express"
