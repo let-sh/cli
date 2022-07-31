@@ -1,44 +1,52 @@
 package utils
 
 import (
-	"reflect"
-	"strings"
+    "reflect"
+    "strings"
 )
 
 func ItemExists(slice interface{}, item interface{}) bool {
-	s := reflect.ValueOf(slice)
+    s := reflect.ValueOf(slice)
 
-	if s.Kind() != reflect.Slice {
-		panic("Invalid data-type")
-	}
+    if s.Kind() != reflect.Slice {
+        panic("Invalid data-type")
+    }
 
-	for i := 0; i < s.Len(); i++ {
-		if s.Index(i).Interface() == item {
-			return true
-		}
-	}
+    for i := 0; i < s.Len(); i++ {
+        if s.Index(i).Interface() == item {
+            return true
+        }
+    }
 
-	return false
+    return false
 }
 
 func RemoveDuplicates(intSlice []int) []int {
-	keys := make(map[int]bool)
-	list := []int{}
-	for _, entry := range intSlice {
-		if _, value := keys[entry]; !value {
-			keys[entry] = true
-			list = append(list, entry)
-		}
-	}
-	return list
+    keys := make(map[int]bool)
+    list := []int{}
+    for _, entry := range intSlice {
+        if _, value := keys[entry]; !value {
+            keys[entry] = true
+            list = append(list, entry)
+        }
+    }
+    return list
 }
 
 func MatchPrefix(stringArray []string, prefix string) string {
-	for _,s := range stringArray {
-		if strings.HasPrefix(s,prefix) {
-			return s
-		}
-	}
+    for _, s := range stringArray {
+        if strings.HasPrefix(s, prefix) {
+            return s
+        }
+    }
 
-	return ""
+    return ""
+}
+
+func Keys[K comparable, V any](m map[K]V) []K {
+    keys := make([]K, 0, len(m))
+    for k := range m {
+        keys = append(keys, k)
+    }
+    return keys
 }

@@ -4,6 +4,7 @@ import (
     "encoding/json"
     "github.com/let-sh/cli/log"
     "github.com/let-sh/cli/types"
+    "github.com/let-sh/cli/utils"
     "github.com/pelletier/go-toml"
     "github.com/rogpeppe/go-internal/modfile"
     "golang.org/x/exp/maps"
@@ -78,61 +79,65 @@ func (c *DeployContext) DetectProjectType() (projectType string) {
             packageConfig.DevDependencies = map[string]string{}
         }
         maps.Copy(packageConfig.Dependencies, packageConfig.DevDependencies)
-        for k := range packageConfig.Dependencies {
-            if strings.Contains(k, "@surgio/gateway") {
-                c.Type = "surgio"
-                return "surgio"
-            }
-
-            if strings.Contains(k, "express") {
-                c.Type = "express"
-                return "express"
-            }
-
-            if strings.Contains(k, "@docusaurus") {
-                c.Type = "docusaurus"
-                return "docusaurus"
-            }
-
-            if strings.Contains(k, "next") {
-                c.Type = "next"
-                return "next"
-            }
-
-            if strings.Contains(k, "vitepress") {
-                c.Type = "vitepress"
-                return "vitepress"
-            }
-
-            if strings.Contains(k, "vuepress") {
-                c.Type = "vuepress"
-                return "vuepress"
-            }
-
-            if strings.Contains(k, "react") {
-                c.Type = "react"
-                return "react"
-            }
-
-            if strings.Contains(k, "@nuxt") {
-                c.Type = "nuxt"
-                return "nuxt"
-            }
-            if strings.Contains(k, "@vue") || strings.Contains(k, "vue") {
-                c.Type = "vue"
-                return "vue"
-            }
-            if strings.Contains(k, "@angular") {
-                c.Type = "angular"
-                return "angular"
-            }
-
-            if strings.Contains(k, "hexo") {
-                c.Type = "hexo"
-                return "hexo"
-            }
-
+        packages := utils.Keys(packageConfig.Dependencies)
+        if utils.ItemExists(packages, "@surgio/gateway") {
+            c.Type = "gateway"
+            return "gateway"
         }
+
+        if utils.ItemExists(packages, "@surgio/gateway") {
+            c.Type = "surgio"
+            return "surgio"
+        }
+
+        if utils.ItemExists(packages, "express") {
+            c.Type = "express"
+            return "express"
+        }
+
+        if utils.ItemExists(packages, "@docusaurus") {
+            c.Type = "docusaurus"
+            return "docusaurus"
+        }
+
+        if utils.ItemExists(packages, "next") {
+            c.Type = "next"
+            return "next"
+        }
+
+        if utils.ItemExists(packages, "vitepress") {
+            c.Type = "vitepress"
+            return "vitepress"
+        }
+
+        if utils.ItemExists(packages, "vuepress") {
+            c.Type = "vuepress"
+            return "vuepress"
+        }
+
+        if utils.ItemExists(packages, "react") {
+            c.Type = "react"
+            return "react"
+        }
+
+        if utils.ItemExists(packages, "@nuxt") {
+            c.Type = "nuxt"
+            return "nuxt"
+        }
+        if utils.ItemExists(packages, "@vue") || utils.ItemExists(packages, "vue") {
+            c.Type = "vue"
+            return "vue"
+        }
+        if utils.ItemExists(packages, "@angular") {
+            c.Type = "angular"
+            return "angular"
+        }
+
+        if utils.ItemExists(packages, "hexo") {
+            c.Type = "hexo"
+            return "hexo"
+        }
+
     }
 
     // handle python framework
